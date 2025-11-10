@@ -161,6 +161,24 @@ export async function getServices(): Promise<Service[]> {
   return data.map(mapServiceRow);
 }
 
+/**
+ * Get all services without filtering by availability
+ * Used in admin panel to show all services regardless of status
+ */
+export async function getAllServices(): Promise<Service[]> {
+  const { data, error } = await supabase
+    .from('services')
+    .select('*')
+    .order('name');
+
+  if (error) {
+    console.error('Error fetching all services:', error);
+    throw new Error(`Failed to fetch all services: ${error.message}`);
+  }
+
+  return data.map(mapServiceRow);
+}
+
 export async function getServiceById(id: string): Promise<Service | null> {
   const { data, error } = await supabase
     .from('services')

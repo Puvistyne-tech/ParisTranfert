@@ -153,10 +153,10 @@ export function Navbar() {
         )}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16 overflow-visible">
+          <div className="flex justify-between items-center h-16 md:h-20 overflow-visible">
             {/* Logo */}
-            <Link href="/" className="flex items-center space-x-4 hover:opacity-80 transition-opacity duration-300 relative z-10">
-              <div className="relative h-20 w-20 md:h-24 md:w-24" style={{ marginBottom: '-1rem' }}>
+            <Link href="/" className="flex items-center space-x-2 md:space-x-4 hover:opacity-80 transition-opacity duration-300 relative z-10">
+              <div className="relative h-12 w-12 md:h-20 md:w-20 lg:h-24 lg:w-24" style={{ marginBottom: '0' }}>
                 <Image
                   src="/logo.png"
                   alt="Prestige Shuttle Group"
@@ -167,7 +167,7 @@ export function Navbar() {
               </div>
               <span
                 className={cn(
-                  "text-lg md:text-xl font-bold font-display whitespace-nowrap",
+                  "text-base md:text-lg lg:text-xl font-bold font-display whitespace-nowrap",
                   shouldUseDarkText ? "text-gray-900 dark:text-gray-100" : "text-white",
                 )}
               >

@@ -379,7 +379,8 @@ export function Step2TripDetails({
               {t("tripDetailsTitle")}
             </h2>
             <div className="flex items-center space-x-2">
-              {/* DEBUG BUTTON - TODO: Remove in production */}
+              {/* DEBUG BUTTON - Only visible in development */}
+              {process.env.NODE_ENV === 'development' && (
               <Button
                 variant="outline"
                 size="sm"
@@ -401,11 +402,12 @@ export function Step2TripDetails({
                   onFormFieldChange('phone', '+33123456789');
                 }}
                 className="flex items-center space-x-2 bg-yellow-100 hover:bg-yellow-200 border-yellow-400 text-yellow-800 text-xs"
-                title="DEBUG: Autofill form - Remove in production"
+                  title="DEBUG: Autofill form - Only visible in development"
               >
                 <TestTube className="w-4 h-4" />
                 <span>DEBUG: Fill</span>
               </Button>
+              )}
               <Button
                 variant="outline"
                 size="sm"

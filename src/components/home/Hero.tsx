@@ -321,7 +321,7 @@ export function Hero() {
   return (
     <section
       id="home"
-      className="min-h-screen flex items-center relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-400 to-indigo-800"
+      className="min-h-screen flex items-center relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-400 to-indigo-800 pt-20 md:pt-24"
     >
       {/* Modern Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
@@ -716,7 +716,7 @@ export function Hero() {
           initial={{ opacity: 0, x: 100 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 100 }}
-          className="fixed top-20 right-4 z-[60] w-full max-w-sm"
+          className="fixed top-16 md:top-20 right-4 z-[60] w-full max-w-sm"
         >
           <div className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 rounded-xl shadow-2xl p-3 border-2 border-yellow-300 relative overflow-hidden">
             {/* Sparkle animation */}
@@ -772,7 +772,7 @@ export function Hero() {
         </motion.div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-8 md:py-12">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
           <motion.div
@@ -781,12 +781,12 @@ export function Hero() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-5xl lg:text-7xl font-bold font-display mb-6 leading-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold font-display mb-6 leading-tight">
               Premium <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">Paris</span>
               <br />
               Transfers
             </h1>
-            <p className="text-xl lg:text-2xl mb-8 text-white/90 leading-relaxed">
+            <p className="text-lg sm:text-xl lg:text-2xl mb-8 text-white/90 leading-relaxed">
               {t("subtitle")}
             </p>
 

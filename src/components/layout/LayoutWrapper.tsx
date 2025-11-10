@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { ConditionalNavbar } from "./ConditionalNavbar";
 import { Footer } from "./Footer";
-import { AdminLoginButton } from "./AdminLoginButton";
+import { MobileFAB } from "./MobileFAB";
 import { PublicDarkModeProvider } from "@/components/providers/DarkModeProvider";
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
@@ -22,7 +22,7 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
         <ConditionalNavbar />
         <main className="flex-1">{children}</main>
         <Footer />
-        <AdminLoginButton />
+        <MobileFAB />
       </div>
     </PublicDarkModeProvider>
   );

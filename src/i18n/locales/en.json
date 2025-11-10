@@ -41,25 +41,21 @@
     "airportTransfer": {
       "name": "Airport Transfer",
       "description": "Seamless transfers to and from Charles de Gaulle, Orly, and Beauvais airports with professional drivers",
-      "price": "From €45",
       "features": ["CDG Airport", "Orly Airport", "Beauvais Airport"]
     },
     "disneyland": {
       "name": "Disneyland Paris",
       "description": "Direct transfers to Disneyland Paris and its hotels with magical comfort for the whole family",
-      "price": "From €55",
       "features": ["Disneyland Park", "Walt Disney Studios", "Disney Hotels"]
     },
     "privateTour": {
       "name": "Private Tour",
       "description": "Customized 4-hour Paris city tours tailored to your preferences with expert local guides",
-      "price": "From €120",
       "features": ["Eiffel Tower", "Louvre Museum", "Notre-Dame"]
     },
     "weddingTransfer": {
       "name": "Wedding Transfer",
       "description": "Elegant transportation for your special day",
-      "price": "From €80",
       "features": [
         "Luxury Vehicles",
         "Professional Service",
@@ -69,13 +65,11 @@
     "businessTransfer": {
       "name": "Business Transfer",
       "description": "Professional transfers for business meetings and events",
-      "price": "From €60",
       "features": ["Wi-Fi Available", "Quiet Environment", "Punctual Service"]
     },
     "customTransfer": {
       "name": "Custom Transfer",
       "description": "Tailored transportation solutions for your specific needs",
-      "price": "Quote on Request",
       "features": [
         "Flexible Routes",
         "Special Requirements",
@@ -85,7 +79,6 @@
     "international": {
       "name": "International Transfer",
       "description": "Long-distance transfers to international destinations",
-      "price": "Quote on Request",
       "features": [
         "International Destinations",
         "Long Distance",
@@ -95,7 +88,6 @@
     "greeterService": {
       "name": "Greeter Service",
       "description": "Personalized greeting and assistance service",
-      "price": "Quote on Request",
       "features": [
         "Personalized Greeting",
         "Assistance Service",
@@ -105,13 +97,23 @@
     "serviceVip": {
       "name": "VIP Service",
       "description": "Enjoy an exclusive travel experience with our VIP transport service. Discreet, luxurious, and tailored to your needs. Perfect for business executives, celebrities, or any client looking for first-class service.",
-      "price": "€120-€300/hour",
       "features": [
         "Discreet Service",
         "Executive Vehicles",
         "Personal Assistant",
         "Security Protocols",
         "Customized Experience"
+      ]
+    },
+    "tourGuide": {
+      "name": "Tour Guide Service",
+      "description": "Professional guided tours of Paris with expert local guides. Discover the city's history, culture, and hidden gems with personalized itineraries tailored to your interests.",
+      "features": [
+        "Expert Local Guides",
+        "Customized Itineraries",
+        "Multiple Languages",
+        "Historical & Cultural Tours",
+        "Flexible Duration"
       ]
     }
   },
@@ -185,9 +187,9 @@
     "title": "Get In Touch",
     "subtitle": "Ready to experience premium transportation? Contact us today for a seamless booking experience!",
     "contactInfo": "Contact Information",
-    "phone": "+33 1 XX XX XX XX",
-    "phoneSubtitle": "Available 24/7",
-    "email": "info@paristransfers.com",
+    "phone": "+33 6 19 97 51 36",
+    "phoneSubtitle": "24/7 Service",
+    "email": "support@prestigeshuttlegroup.com",
     "emailSubtitle": "Quick response guaranteed",
     "address": "Paris, France",
     "addressSubtitle": "Serving all of Paris",
@@ -436,6 +438,7 @@
     "emailBody": "Please find attached the reservation confirmation for {customerName}.",
     "shareTitle": "Reservation #{reservationId}",
     "shareText": "Reservation confirmation for {customerName}",
+    "submissionFailed": "Submission Failed",
     "pdf": {
       "companyName": "PARIS TRANSFER",
       "companySubtitle": "Premium Transportation Services",

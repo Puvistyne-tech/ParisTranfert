@@ -119,28 +119,22 @@ export default function ContactPage() {
               </h3>
               <div className="flex space-x-4">
                 <a
-                  href="https://facebook.com"
+                  href="https://www.facebook.com/share/1CjiuP6kZK/?mibextid=wwXIfr"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center hover:scale-110 transition-all duration-300"
+                  aria-label="Facebook"
                 >
                   <span className="text-white text-sm font-bold">f</span>
                 </a>
                 <a
-                  href="https://instagram.com"
+                  href="https://www.instagram.com/prestige_shuttle_group?igsh=MXRucjBudGZyZ2UyNA=="
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-10 h-10 bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg flex items-center justify-center hover:scale-110 transition-all duration-300"
+                  aria-label="Instagram"
                 >
                   <span className="text-white text-sm font-bold">i</span>
-                </a>
-                <a
-                  href="https://twitter.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-500 rounded-lg flex items-center justify-center hover:scale-110 transition-all duration-300"
-                >
-                  <span className="text-white text-sm font-bold">t</span>
                 </a>
               </div>
             </div>

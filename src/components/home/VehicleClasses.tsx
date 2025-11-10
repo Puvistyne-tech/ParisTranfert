@@ -9,17 +9,25 @@ import { useVehicleTypes } from "@/hooks/useVehicleTypes";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import type { VehicleType } from "@/components/models/vehicleTypes";
+import { useReservationStore } from "@/store/reservationStore";
 
 export function VehicleClasses() {
   const t = useTranslations("home.vehicleClasses");
   const router = useRouter();
   const locale = useLocale();
+  const { setSelectedVehicleType } = useReservationStore();
   
   // Use TanStack Query hook for data fetching with automatic caching
   const { data: vehicleTypes = [], isLoading: loading } = useVehicleTypes();
 
   const handleSelectVehicleType = (vehicleTypeId: string) => {
-    router.push(`/${locale}/reservation?vehicleType=${vehicleTypeId}`);
+    // Find the vehicle type object and save it to the store
+    const vehicleType = vehicleTypes.find(vt => vt.id === vehicleTypeId);
+    if (vehicleType) {
+      setSelectedVehicleType(vehicleType);
+    }
+    // Navigate to reservation page
+    router.push(`/${locale}/reservation`);
   };
 
   return (

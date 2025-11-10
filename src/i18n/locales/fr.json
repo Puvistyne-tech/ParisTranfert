@@ -41,25 +41,21 @@
     "airportTransfer": {
       "name": "Transfert Aéroport",
       "description": "Transfers fluides vers et depuis les aéroports Charles de Gaulle, Orly et Beauvais avec chauffeurs professionnels",
-      "price": "À partir de 45€",
       "features": ["Aéroport CDG", "Aéroport Orly", "Aéroport Beauvais"]
     },
     "disneyland": {
       "name": "Disneyland Paris",
       "description": "Transfers directs vers Disneyland Paris et ses hôtels avec confort magique pour toute la famille",
-      "price": "À partir de 55€",
       "features": ["Parc Disneyland", "Walt Disney Studios", "Hôtels Disney"]
     },
     "privateTour": {
       "name": "Visite Privée",
       "description": "Visites de Paris personnalisées de 4 heures adaptées à vos préférences avec guides locaux experts",
-      "price": "À partir de 120€",
       "features": ["Tour Eiffel", "Musée du Louvre", "Notre-Dame"]
     },
     "weddingTransfer": {
       "name": "Transfert Mariage",
       "description": "Transport élégant pour votre jour spécial",
-      "price": "À partir de 80€",
       "features": [
         "Véhicules de Luxe",
         "Service Professionnel",
@@ -69,7 +65,6 @@
     "businessTransfer": {
       "name": "Transfert Business",
       "description": "Transfers professionnels pour réunions d'affaires et événements",
-      "price": "À partir de 60€",
       "features": [
         "Wi-Fi Disponible",
         "Environnement Calme",
@@ -79,7 +74,6 @@
     "customTransfer": {
       "name": "Transfert Personnalisé",
       "description": "Solutions de transport sur mesure pour vos besoins spécifiques",
-      "price": "Devis sur Demande",
       "features": [
         "Itinéraires Flexibles",
         "Exigences Spéciales",
@@ -89,7 +83,6 @@
     "international": {
       "name": "Transfert International",
       "description": "Transferts longue distance vers des destinations internationales",
-      "price": "Devis sur Demande",
       "features": [
         "Destinations Internationales",
         "Longue Distance",
@@ -99,7 +92,6 @@
     "greeterService": {
       "name": "Service d'Accueil",
       "description": "Service d'accueil et d'assistance personnalisé",
-      "price": "Devis sur Demande",
       "features": [
         "Accueil Personnalisé",
         "Service d'Assistance",
@@ -109,13 +101,23 @@
     "serviceVip": {
       "name": "Service VIP",
       "description": "Profitez d'une expérience de voyage exclusive avec notre service de transport VIP. Discret, luxueux et adapté à vos besoins. Parfait pour les dirigeants d'entreprise, les célébrités ou tout client recherchant un service de première classe.",
-      "price": "120€-300€/heure",
       "features": [
         "Service Discret",
         "Véhicules de Direction",
         "Assistant Personnel",
         "Protocoles de Sécurité",
         "Expérience Personnalisée"
+      ]
+    },
+    "tourGuide": {
+      "name": "Service de Guide Touristique",
+      "description": "Visites guidées professionnelles de Paris avec des guides locaux experts. Découvrez l'histoire, la culture et les joyaux cachés de la ville avec des itinéraires personnalisés adaptés à vos intérêts.",
+      "features": [
+        "Guides Locaux Experts",
+        "Itinéraires Personnalisés",
+        "Plusieurs Langues",
+        "Visites Historiques et Culturelles",
+        "Durée Flexible"
       ]
     }
   },
@@ -193,9 +195,9 @@
     "title": "Contactez-Nous",
     "subtitle": "Prêt à découvrir le transport premium ? Contactez-nous aujourd'hui pour une expérience de réservation fluide !",
     "contactInfo": "Informations de Contact",
-    "phone": "+33 1 XX XX XX XX",
-    "phoneSubtitle": "Disponible 24h/24",
-    "email": "info@paristransfers.com",
+    "phone": "+33 6 19 97 51 36",
+    "phoneSubtitle": "Service 24h/24",
+    "email": "support@prestigeshuttlegroup.com",
     "emailSubtitle": "Réponse rapide garantie",
     "address": "Paris, France",
     "addressSubtitle": "Dessert tout Paris",
@@ -444,6 +446,7 @@
     "emailBody": "Veuillez trouver ci-joint la confirmation de réservation pour {customerName}.",
     "shareTitle": "Réservation #{reservationId}",
     "shareText": "Confirmation de réservation pour {customerName}",
+    "submissionFailed": "Échec de l'Envoi",
     "pdf": {
       "companyName": "PARIS TRANSFER",
       "companySubtitle": "Services de Transport Premium",

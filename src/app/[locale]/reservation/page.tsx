@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { ArrowLeft, AlertCircle, X } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale } from "next-intl";
 
 import { useReservationStore } from "@/store/reservationStore";
@@ -17,6 +17,7 @@ import { useVehicleTypes } from "@/hooks/useVehicleTypes";
 import { useLocations } from "@/hooks/useLocations";
 import { useServiceFields } from "@/hooks/useServiceFields";
 import { reservationSchema, createServiceFieldSchema, locationSchema } from "@/lib/validations";
+import { generateUUID } from "@/lib/utils";
 import { Step1Selection } from "@/components/reservation/Step1Selection";
 import { Step2TripDetails } from "@/components/reservation/Step2TripDetails";
 import { Step3BookingSummary } from "@/components/reservation/Step3BookingSummary";
@@ -37,6 +38,7 @@ export default function ReservationPage() {
   const tReservation = useTranslations("reservation");
   const router = useRouter();
   const locale = useLocale();
+  const searchParams = useSearchParams();
   
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [errorFields, setErrorFields] = useState<Set<string>>(new Set());
@@ -73,7 +75,7 @@ export default function ReservationPage() {
   // Generate reservation ID on mount if not exists (only if not completed)
   useEffect(() => {
     if (!isCompleted && !reservationId) {
-      const uuid = crypto.randomUUID();
+      const uuid = generateUUID();
       setReservationId(uuid);
     }
   }, [reservationId, isCompleted, setReservationId]);
@@ -86,6 +88,19 @@ export default function ReservationPage() {
   const { data: serviceFields = [] } = useServiceFields(selectedService?.id);
 
   const loading = categoriesLoading || servicesLoading || vehicleTypesLoading || locationsLoading;
+
+  // Handle vehicle type from query parameter (fallback if not already selected)
+  useEffect(() => {
+    const vehicleTypeParam = searchParams.get('vehicleType');
+    if (vehicleTypeParam && !selectedVehicleType && vehicleTypes.length > 0) {
+      const vehicleType = vehicleTypes.find(vt => vt.id === vehicleTypeParam);
+      if (vehicleType) {
+        setSelectedVehicleType(vehicleType);
+        // Clean up URL by removing query parameter
+        router.replace(`/${locale}/reservation`, { scroll: false });
+      }
+    }
+  }, [searchParams, selectedVehicleType, vehicleTypes, setSelectedVehicleType, locale, router]);
 
   // Extract only location fields that affect pricing
   // This ensures price only refetches when locations change, not when other fields like flight_number change
@@ -131,7 +146,7 @@ export default function ReservationPage() {
     // Use resetForm to completely clear everything
     const { resetForm, setReservationId } = useReservationStore.getState();
     resetForm();
-    setReservationId(crypto.randomUUID()); // Generate new ID
+    setReservationId(generateUUID()); // Generate new ID
     setShowExitConfirmation(false);
     router.push(`/${locale}`);
   };

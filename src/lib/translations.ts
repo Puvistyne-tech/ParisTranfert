@@ -15,6 +15,7 @@ const serviceIdToTranslationKey: Record<string, string> = {
   'transport-international': 'international',
   'greeter-service': 'greeterService',
   'service-vip': 'serviceVip',
+  'tour-guide': 'tourGuide',
 };
 
 /**

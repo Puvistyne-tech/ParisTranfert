@@ -153,10 +153,10 @@ export default function ServicesPage() {
           return (
             <motion.div
               key={category.id}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: categoryIndex * 0.1 }}
-              viewport={{ once: true }}
+              transition={{ duration: 0.3, delay: categoryIndex * 0.05 }}
+              viewport={{ once: true, margin: "-50px" }}
               className="mb-16"
             >
               <div className="text-center mb-12">
@@ -176,10 +176,10 @@ export default function ServicesPage() {
                   return (
                     <motion.div
                       key={service.id}
-                      initial={{ opacity: 0, y: 20 }}
+                      initial={{ opacity: 0, y: 10 }}
                       whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: serviceIndex * 0.1 }}
-                      viewport={{ once: true }}
+                      transition={{ duration: 0.3, delay: Math.min(serviceIndex * 0.03, 0.15) }}
+                      viewport={{ once: true, margin: "-50px" }}
                     >
                       <Card className="p-0 shadow-lg card-hover h-full flex flex-col group cursor-pointer hover:shadow-xl transition-all duration-300 relative overflow-hidden">
                         <CardContent className="text-center flex flex-col h-full relative p-0">
@@ -192,17 +192,17 @@ export default function ServicesPage() {
                                 fill
                                 className="object-cover"
                                 loading="lazy"
-                                placeholder="blur"
-                                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                quality={85}
                               />
                             ) : (
                               <div className="w-full h-full bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-700 flex items-center justify-center relative overflow-hidden">
-                                {/* Animated background pattern */}
+                                {/* Static background pattern - removed animations for performance */}
                                 <div className="absolute inset-0 opacity-20">
-                                  <div className="absolute top-4 left-4 w-8 h-8 bg-white/30 rounded-full animate-pulse"></div>
-                                  <div className="absolute top-12 right-8 w-6 h-6 bg-white/20 rounded-full animate-pulse delay-300"></div>
-                                  <div className="absolute bottom-8 left-8 w-4 h-4 bg-white/25 rounded-full animate-pulse delay-700"></div>
-                                  <div className="absolute bottom-4 right-4 w-10 h-10 bg-white/15 rounded-full animate-pulse delay-1000"></div>
+                                  <div className="absolute top-4 left-4 w-8 h-8 bg-white/30 rounded-full"></div>
+                                  <div className="absolute top-12 right-8 w-6 h-6 bg-white/20 rounded-full"></div>
+                                  <div className="absolute bottom-8 left-8 w-4 h-4 bg-white/25 rounded-full"></div>
+                                  <div className="absolute bottom-4 right-4 w-10 h-10 bg-white/15 rounded-full"></div>
                                 </div>
                                 
                                 {/* Large beautiful icon */}

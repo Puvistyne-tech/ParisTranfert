@@ -12,6 +12,7 @@ import {useReservationStore} from "@/store/reservationStore";
 import {downloadReservationPDF, type ReservationPDFData} from "@/lib/pdfUtils";
 import {usePricing} from "@/hooks/usePricing";
 import {getTranslatedVehicleDescription, getTranslatedServiceName} from "@/lib/translations";
+import {generateUUID} from "@/lib/utils";
 import Image from "next/image";
 
 export default function ConfirmationPage() {
@@ -181,7 +182,7 @@ export default function ConfirmationPage() {
         // Use resetForm to completely clear everything
         const { resetForm, setReservationId } = useReservationStore.getState();
         resetForm();
-        setReservationId(crypto.randomUUID()); // Generate new ID
+        setReservationId(generateUUID()); // Generate new ID
         setShowExitConfirmation(false);
         window.location.href = `/${locale}`;
     };
@@ -224,7 +225,7 @@ export default function ConfirmationPage() {
             {showExitConfirmation && (
                 <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <Card className="max-w-md w-full shadow-xl relative dark:bg-gray-800">
-                        <CardContent className="p-6">
+                        <CardContent className="p-4 sm:p-6">
                             {/* Close button in top right */}
                             <button
                                 onClick={handleCancelExit}
@@ -261,56 +262,56 @@ export default function ConfirmationPage() {
 
             {/* Header */}
             <div className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700 relative z-10">
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div className="flex items-center space-x-2 sm:space-x-4 flex-1 min-w-0">
                             <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={handleBackToHome}
-                                className="flex items-center space-x-2"
+                                className="flex items-center space-x-2 flex-shrink-0"
                             >
                                 <Home className="w-4 h-4"/>
-                                <span>{t("backToHome")}</span>
+                                <span className="hidden sm:inline">{t("backToHome")}</span>
                             </Button>
-                            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{t("title")}</h1>
+                            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 truncate">{t("title")}</h1>
                         </div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                            {t("reservationId")}: {reservationId}
+                        <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
+                            {t("reservationId")}: <span className="font-mono text-xs">{reservationId?.slice(0, 8)}...</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="space-y-6">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+                <div className="space-y-4 sm:space-y-6">
                     {/* Reservation Status - Full Width */}
                         <motion.div
                             initial={{opacity: 0, y: 20}}
                             animate={{opacity: 1, y: 0}}
                         >
                             <Card>
-                                <CardContent className="p-6">
-                                    <div className="flex items-center justify-between">
+                                <CardContent className="p-4 sm:p-6">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                                         <div className="flex items-center space-x-3">
                                         <div
-                                            className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                                            <Clock className="w-6 h-6 text-blue-600"/>
+                                            className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+                                            <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400"/>
                                         </div>
-                                        <div>
-                                                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{isSubmitted ? t("reservationSubmitted") : t("reservationPending")}</h2>
-                                                <p className="text-gray-600 dark:text-gray-400">{isSubmitted ? t("submittedSuccessfully") : t("awaitingApproval")}</p>
+                                        <div className="min-w-0">
+                                                <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">{isSubmitted ? t("reservationSubmitted") : t("reservationPending")}</h2>
+                                                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">{isSubmitted ? t("submittedSuccessfully") : t("awaitingApproval")}</p>
                                         </div>
                                     </div>
-                                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                                        <p className="text-blue-800 dark:text-blue-300 text-sm">
-                                            <strong>{t("referenceNumber")}:</strong> {reservationId}
+                                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 sm:p-4 mt-4">
+                                        <p className="text-blue-800 dark:text-blue-300 text-xs sm:text-sm">
+                                            <strong>{t("referenceNumber")}:</strong> <span className="font-mono break-all">{reservationId}</span>
                                         </p>
                                     </div>
                                     </div>
                                     {!isSubmitted && (
-                                        <div className="mt-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                                            <p className="text-blue-700 dark:text-blue-400 text-sm">
+                                        <div className="mt-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 sm:p-4">
+                                            <p className="text-blue-700 dark:text-blue-400 text-xs sm:text-sm">
                                             {t("confirmationEmailNote")}
                                         </p>
                                     </div>
@@ -319,9 +320,9 @@ export default function ConfirmationPage() {
                             </Card>
                         </motion.div>
 
-                <div className="grid lg:grid-cols-3 gap-8">
+                <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                     {/* Reservation Details */}
-                    <div className="lg:col-span-2 space-y-6">
+                    <div className="lg:col-span-2 space-y-4 sm:space-y-6">
                         {/* Category Details */}
                         <motion.div
                             initial={{opacity: 0, y: 20}}
@@ -329,23 +330,24 @@ export default function ConfirmationPage() {
                             transition={{delay: 0.1}}
                         >
                             <Card>
-                                <CardContent className="p-6">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
-                                        <Car className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400"/>
+                                <CardContent className="p-4 sm:p-6">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
+                                        <Car className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-blue-600 dark:text-blue-400"/>
                                             {t("vehicleCategory")}
                                     </h3>
                                         <Button
                                             variant="outline"
                                             size="sm"
                                             onClick={() => router.push(`/${locale}/reservation`)}
+                                            className="w-full sm:w-auto"
                                         >
                                             {t("modify")}
                                         </Button>
                                     </div>
-                                    <div className="flex items-start space-x-4">
+                                    <div className="flex items-start space-x-3 sm:space-x-4">
                                         {/* Vehicle Image */}
-                                        <div className="relative w-24 h-20 rounded-lg overflow-hidden flex-shrink-0 shadow-md">
+                                        <div className="relative w-16 h-12 sm:w-24 sm:h-20 rounded-lg overflow-hidden flex-shrink-0 shadow-md">
                                             {!imageError && selectedVehicleType.image ? (
                                                 <img 
                                                     src={selectedVehicleType.image}
@@ -410,22 +412,23 @@ export default function ConfirmationPage() {
                             transition={{delay: 0.2}}
                         >
                             <Card>
-                                <CardContent className="p-6">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
-                                        <Star className="w-5 h-5 mr-2 text-green-600 dark:text-green-400"/>
+                                <CardContent className="p-4 sm:p-6">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
+                                        <Star className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-green-600 dark:text-green-400"/>
                                         {t("serviceDetails")}
                                     </h3>
                                         <Button
                                             variant="outline"
                                             size="sm"
                                             onClick={() => router.push(`/${locale}/reservation`)}
+                                            className="w-full sm:w-auto"
                                         >
                                             {t("modify")}
                                         </Button>
                                     </div>
                                     <div>
-                                        <h4 className="font-semibold text-gray-900 dark:text-gray-100">
+                                        <h4 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">
                                             {getTranslatedServiceName(selectedService.id, selectedService.name, (key: string) => {
                                                 try {
                                                     return tServices(key) || undefined;
@@ -434,10 +437,10 @@ export default function ConfirmationPage() {
                                                 }
                                             })}
                                         </h4>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{selectedService.description}</p>
-                                        <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
-                                            <span>{t("duration")}: {selectedService.duration}</span>
-                                            <span>{t("priceRange")}: {selectedService.priceRange}</span>
+                                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">{selectedService.description}</p>
+                                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                                            {selectedService.duration && <span>{t("duration")}: {selectedService.duration}</span>}
+                                            {selectedService.priceRange && <span>{t("priceRange")}: {selectedService.priceRange}</span>}
                                         </div>
                                     </div>
                                 </CardContent>
@@ -451,9 +454,9 @@ export default function ConfirmationPage() {
                             transition={{delay: 0.3}}
                         >
                             <Card>
-                                <CardContent className="p-6">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
+                                <CardContent className="p-4 sm:p-6">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
                                         <Calendar className="w-5 h-5 mr-2 text-purple-600 dark:text-purple-400"/>
                                         {t("tripDetails")}
                                     </h3>
@@ -461,30 +464,31 @@ export default function ConfirmationPage() {
                                             variant="outline"
                                             size="sm"
                                             onClick={() => router.push(`/${locale}/reservation`)}
+                                            className="w-full sm:w-auto"
                                         >
                                             {t("modify")}
                                         </Button>
                                     </div>
-                                    <div className="grid md:grid-cols-2 gap-4">
-                                        <div className="flex items-center space-x-3">
-                                            <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500"/>
-                                            <div>
-                                                <p className="text-sm text-gray-600 dark:text-gray-400">{t("date")}</p>
-                                                <p className="font-medium text-gray-900 dark:text-gray-100">{formData.date || t("notAvailable")}</p>
+                                    <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
+                                        <div className="flex items-center space-x-2 sm:space-x-3">
+                                            <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0"/>
+                                            <div className="min-w-0">
+                                                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{t("date")}</p>
+                                                <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 truncate">{formData.date || t("notAvailable")}</p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center space-x-3">
-                                            <Clock className="w-4 h-4 text-gray-400 dark:text-gray-500"/>
-                                            <div>
-                                                <p className="text-sm text-gray-600 dark:text-gray-400">{t("time")}</p>
-                                                <p className="font-medium text-gray-900 dark:text-gray-100">{formData.time || t("notAvailable")}</p>
+                                        <div className="flex items-center space-x-2 sm:space-x-3">
+                                            <Clock className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0"/>
+                                            <div className="min-w-0">
+                                                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{t("time")}</p>
+                                                <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 truncate">{formData.time || t("notAvailable")}</p>
                                             </div>
                                         </div>
-                                        <div className="flex items-center space-x-3">
-                                            <Users className="w-4 h-4 text-gray-400 dark:text-gray-500"/>
-                                            <div>
-                                                <p className="text-sm text-gray-600 dark:text-gray-400">{t("passengers")}</p>
-                                                <p className="font-medium text-gray-900 dark:text-gray-100">{formData.passengers || t("notAvailable")}</p>
+                                        <div className="flex items-center space-x-2 sm:space-x-3">
+                                            <Users className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0"/>
+                                            <div className="min-w-0">
+                                                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{t("passengers")}</p>
+                                                <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 truncate">{formData.passengers || t("notAvailable")}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -500,16 +504,17 @@ export default function ConfirmationPage() {
                                 transition={{delay: 0.35}}
                             >
                                 <Card>
-                                    <CardContent className="p-6">
-                                        <div className="flex items-center justify-between mb-4">
-                                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
-                                                <FileText className="w-5 h-5 mr-2 text-indigo-600 dark:text-indigo-400"/>
+                                    <CardContent className="p-4 sm:p-6">
+                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                                            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
+                                                <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-indigo-600 dark:text-indigo-400"/>
                                                 {t("serviceDetails")}
                                             </h3>
                                             <Button
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => router.push(`/${locale}/reservation`)}
+                                                className="w-full sm:w-auto"
                                             >
                                                 {t("modify")}
                                             </Button>
@@ -543,21 +548,22 @@ export default function ConfirmationPage() {
                             transition={{delay: 0.4}}
                         >
                             <Card>
-                                <CardContent className="p-6">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
-                                        <User className="w-5 h-5 mr-2 text-orange-600 dark:text-orange-400"/>
+                                <CardContent className="p-4 sm:p-6">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 flex items-center">
+                                        <User className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-orange-600 dark:text-orange-400"/>
                                         {t("contactInfo")}
                                     </h3>
                                         <Button
                                             variant="outline"
                                             size="sm"
                                             onClick={() => router.push(`/${locale}/reservation`)}
+                                            className="w-full sm:w-auto"
                                         >
                                             {t("modify")}
                                         </Button>
                                     </div>
-                                    <div className="grid md:grid-cols-2 gap-4">
+                                    <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                                         <div>
                                             <p className="text-sm text-gray-600 dark:text-gray-400">{t("name")}</p>
                                             <p className="font-medium text-gray-900 dark:text-gray-100">{formData.firstName} {formData.lastName}</p>
@@ -587,13 +593,14 @@ export default function ConfirmationPage() {
                                 transition={{delay: 0.5}}
                             >
                                 <Card>
-                                    <CardContent className="p-6">
-                                        <div className="flex items-center justify-between mb-4">
-                                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t("additionalServices")}</h3>
+                                    <CardContent className="p-4 sm:p-6">
+                                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                                            <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">{t("additionalServices")}</h3>
                                             <Button
                                                 variant="outline"
                                                 size="sm"
                                                 onClick={() => router.push(`/${locale}/reservation`)}
+                                                className="w-full sm:w-auto"
                                             >
                                                 {t("modify")}
                                             </Button>
@@ -631,9 +638,9 @@ export default function ConfirmationPage() {
                                 transition={{delay: 0.6}}
                             >
                                 <Card>
-                                    <CardContent className="p-6">
-                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t("specialRequests")}</h3>
-                                        <p className="text-gray-600 dark:text-gray-400">{formData.notes}</p>
+                                    <CardContent className="p-4 sm:p-6">
+                                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">{t("specialRequests")}</h3>
+                                        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">{formData.notes}</p>
                                     </CardContent>
                                 </Card>
                             </motion.div>
@@ -651,8 +658,8 @@ export default function ConfirmationPage() {
                             {/* Price Summary - Only show for airport-transfers with pricing */}
                             {selectedService?.id === 'airport-transfers' && basePrice !== null && !priceLoading && (
                             <Card>
-                                <CardContent className="p-6">
-                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t("priceSummary")}</h3>
+                                <CardContent className="p-4 sm:p-6">
+                                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">{t("priceSummary")}</h3>
                                     <div className="space-y-2">
                                         <div className="flex justify-between">
                                                 <span className="text-sm text-gray-600 dark:text-gray-400">{t("basePrice")}</span>
@@ -672,8 +679,8 @@ export default function ConfirmationPage() {
                             {/* Additional Services Info - Always free */}
                             {(additionalServices.babySeats > 0 || additionalServices.boosters > 0 || additionalServices.meetAndGreet) && (
                                 <Card>
-                                    <CardContent className="p-6">
-                                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">{t("additionalServicesFree")}</h3>
+                                    <CardContent className="p-4 sm:p-6">
+                                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">{t("additionalServicesFree")}</h3>
                                         <div className="space-y-2">
                                         {additionalServices.babySeats > 0 && (
                                             <div className="flex justify-between">
@@ -700,7 +707,7 @@ export default function ConfirmationPage() {
 
                             {/* Actions */}
                             <Card>
-                                <CardContent className="p-6">
+                                <CardContent className="p-4 sm:p-6">
                                     <div className="space-y-3">
                                         <Button
                                             size="lg"

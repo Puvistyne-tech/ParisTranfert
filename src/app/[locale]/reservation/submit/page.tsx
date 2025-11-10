@@ -10,6 +10,7 @@ import { createClient, createReservation, getLocationById } from "@/lib/supabase
 import { usePricing } from "@/hooks/usePricing";
 import { useServiceFields } from "@/hooks/useServiceFields";
 import { ReservationStatus } from "@/components/models/reservations";
+import { generateUUID } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { 
@@ -325,28 +326,79 @@ export default function SubmitReservationPage() {
 
   const handleSharePDF = async () => {
     if (!pdfData) return;
+    
+    const pdfTranslations = getPDFTranslations();
+    
     try {
-      // Generate PDF blob
-      const { pdf } = await import('@react-pdf/renderer');
-      const pdfTranslations = getPDFTranslations();
-      const blob = await pdf(<ReservationPDF data={pdfData} translations={pdfTranslations} />).toBlob();
-      
-      // Create shareable file
-      const file = new File([blob], `reservation-${pdfData.reservationId}.pdf`, { type: 'application/pdf' });
-      
-      if (navigator.share && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          title: t("shareTitle", { reservationId: pdfData.reservationId }) || `Reservation #${pdfData.reservationId}`,
-          text: t("shareText", { customerName: pdfData.customerName }) || `Reservation confirmation for ${pdfData.customerName}`,
-          files: [file],
-        });
-      } else {
-        // Fallback: copy link or show share options
-        alert(t("sharingNotAvailable") || 'Sharing is not available on this device. Please use the download button instead.');
+      // Check if Web Share API is available (mobile browsers)
+      if (navigator.share) {
+        // Generate PDF blob
+        const { pdf } = await import('@react-pdf/renderer');
+        const blob = await pdf(<ReservationPDF data={pdfData} translations={pdfTranslations} />).toBlob();
+        
+        // Create shareable file
+        const file = new File([blob], `reservation-${pdfData.reservationId}.pdf`, { type: 'application/pdf' });
+        
+        // Try sharing with file first (works on some mobile browsers like Chrome Android)
+        try {
+          // Check if file sharing is supported
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              title: t("shareTitle", { reservationId: pdfData.reservationId }) || `Reservation #${pdfData.reservationId}`,
+              text: t("shareText", { customerName: pdfData.customerName }) || `Reservation confirmation for ${pdfData.customerName}`,
+              files: [file],
+            });
+            return; // Success, exit early
+          }
+        } catch (fileShareError: any) {
+          // File sharing not supported or failed, try text-only sharing as fallback
+          console.log('File sharing not supported, trying text-only share:', fileShareError);
+          
+          // Don't throw if it's just that file sharing isn't supported
+          if (fileShareError.name === 'NotSupportedError' || fileShareError.name === 'TypeError') {
+            // Continue to text-only fallback
+          } else if (fileShareError.name === 'AbortError') {
+            // User cancelled, exit silently
+            return;
+          } else {
+            // Other error, try text-only fallback
+          }
+        }
+        
+        // Fallback: Share text with reservation info (works on more devices)
+        // This allows users to share the reservation details even if file sharing isn't supported
+        try {
+          const shareText = `${t("shareText", { customerName: pdfData.customerName }) || `Reservation confirmation for ${pdfData.customerName}`}\n\n${t("shareTitle", { reservationId: pdfData.reservationId }) || `Reservation #${pdfData.reservationId}`}\n\nPlease download the PDF using the download button.`;
+          await navigator.share({
+            title: t("shareTitle", { reservationId: pdfData.reservationId }) || `Reservation #${pdfData.reservationId}`,
+            text: shareText,
+          });
+          return; // Success
+        } catch (textShareError: any) {
+          // User cancelled or error occurred
+          if (textShareError.name === 'AbortError') {
+            // User cancelled, exit silently
+            return;
+          }
+          // If it's a different error, fall through to download fallback
+          console.log('Text sharing failed, falling back to download:', textShareError);
+        }
       }
-    } catch (error) {
-      console.error('Error sharing PDF:', error);
-      alert(t("failedToSharePDF") || 'Failed to share PDF. Please use the download button instead.');
+      
+      // If Web Share API is not available or all sharing attempts failed,
+      // fall back to download (works on all devices)
+      await downloadReservationPDF(pdfData, pdfTranslations);
+    } catch (error: any) {
+      // Only show error if it's not a user cancellation
+      if (error.name !== 'AbortError') {
+        console.error('Error sharing PDF:', error);
+        // Fallback to download on error
+        try {
+          await downloadReservationPDF(pdfData, pdfTranslations);
+        } catch (downloadError) {
+          alert(t("failedToSharePDF") || 'Failed to share PDF. Please use the download button instead.');
+        }
+      }
     }
   };
 
@@ -355,7 +407,7 @@ export default function SubmitReservationPage() {
     if (reservationId) {
       localStorage.removeItem(`reservation-${reservationId}`);
     }
-    setReservationId(crypto.randomUUID());
+    setReservationId(generateUUID());
     router.push(`/${locale}/reservation`);
   };
 
@@ -404,7 +456,7 @@ export default function SubmitReservationPage() {
               </div>
             </div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-              Submission Failed
+              {t("submissionFailed")}
             </h2>
             <p className="text-gray-600 dark:text-gray-400 mb-6">
               {submissionError}
@@ -418,7 +470,7 @@ export default function SubmitReservationPage() {
                 className="w-full"
               >
                 <Home className="w-4 h-4 mr-2" />
-                Back to Home
+                {t("backToHome")}
               </Button>
             </div>
           </CardContent>
@@ -435,34 +487,34 @@ export default function SubmitReservationPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Reservation Confirmation</h1>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              Reservation ID: {reservationId}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">{t("title")}</h1>
+            <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
+              {t("reservationId")}: <span className="font-mono text-xs">{reservationId?.slice(0, 8)}...</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
         {/* Success Banner */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="mb-6 sm:mb-8"
         >
           <Card className="border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center flex-shrink-0">
-                  <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-start sm:items-center space-x-3 sm:space-x-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="w-6 h-6 sm:w-8 sm:h-8 text-green-600 dark:text-green-400" />
                 </div>
-                <div className="flex-1">
-                  <h1 className="text-2xl font-bold text-green-900 dark:text-green-300 mb-1">
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-green-900 dark:text-green-300 mb-1">
                     Reservation Submitted Successfully!
                   </h1>
-                  <p className="text-green-700 dark:text-green-400">
+                  <p className="text-sm sm:text-base text-green-700 dark:text-green-400 break-words">
                     Your reservation #{pdfData.reservationId} has been received and is pending approval.
                   </p>
                 </div>
@@ -479,21 +531,21 @@ export default function SubmitReservationPage() {
           className="mb-8"
         >
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center">
-                  <FileText className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" />
-                  Reservation Confirmation
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center">
+                  <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-blue-600 dark:text-blue-400" />
+                  {t("title")}
                 </h2>
               </div>
               
               {/* PDF Content Preview */}
-              <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg p-6 space-y-4">
-                <div className="border-b dark:border-gray-700 pb-4">
-                  <div className="flex justify-between items-start mb-2">
+              <div className="bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-lg p-4 sm:p-6 space-y-3 sm:space-y-4">
+                <div className="border-b dark:border-gray-700 pb-3 sm:pb-4">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">PARIS TRANSFER</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">Premium Transportation Services</p>
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">PARIS TRANSFER</h3>
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Premium Transportation Services</p>
                     </div>
                     <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-3 py-1 rounded text-sm font-medium">
                       #{pdfData.reservationId}
@@ -501,10 +553,10 @@ export default function SubmitReservationPage() {
                   </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
                   <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Trip Details</h4>
-                    <div className="space-y-2 text-sm">
+                    <h4 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3">Trip Details</h4>
+                    <div className="space-y-2 text-xs sm:text-sm">
                       <div className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-400">Date:</span>
                         <span className="font-medium text-gray-900 dark:text-gray-100">{pdfData.pickupDate}</span>
@@ -531,8 +583,8 @@ export default function SubmitReservationPage() {
                   </div>
 
                   <div>
-                    <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Service Details</h4>
-                    <div className="space-y-2 text-sm">
+                    <h4 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3">Service Details</h4>
+                    <div className="space-y-2 text-xs sm:text-sm">
                       <div className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-400">Vehicle:</span>
                         <span className="font-medium text-gray-900 dark:text-gray-100">{pdfData.vehicleTypeName}</span>
@@ -561,9 +613,9 @@ export default function SubmitReservationPage() {
                   </div>
                 </div>
 
-                <div className="border-t dark:border-gray-700 pt-4">
-                  <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Customer Information</h4>
-                  <div className="grid md:grid-cols-2 gap-4 text-sm">
+                <div className="border-t dark:border-gray-700 pt-3 sm:pt-4">
+                  <h4 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3">Customer Information</h4>
+                  <div className="grid sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
                     <div>
                       <span className="text-gray-600 dark:text-gray-400">Name: </span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">{pdfData.customerName}</span>
@@ -594,8 +646,8 @@ export default function SubmitReservationPage() {
           transition={{ delay: 0.2 }}
         >
           <Card>
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Actions</h3>
+            <CardContent className="p-4 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">Actions</h3>
               <div className="grid sm:grid-cols-2 gap-4">
                 <Button
                   onClick={handleDownloadPDF}

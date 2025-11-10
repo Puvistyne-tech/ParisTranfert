@@ -83,133 +83,67 @@ const destinationId = destination.toLowerCase().trim();
 3. `src/app/[locale]/reservation/page.tsx` - Enhance validation
 4. `supabase-imports/import-data.sql` - Verify and add missing pricing routes if needed
 
-
-
-
-
 Implement Location Field Types with Proper Mapping to Reservations
-
-
 
 Overview
 
-
-
 The service_fields table defines HOW to collect location data (dropdown, text, Google Maps, etc.) and can pre-fill values. The reservations table stores the actual location values. This plan implements proper field types and mapping.
-
-
 
 Changes Required
 
-
-
 1. Database Schema Updates (supabase-imports/schema.sql)
-
-
 
 • Keep location_select in service_field_type_enum • Add default_value TEXT column to service_fields table for pre-filling values (e.g., "Paris" for Paris Tour destination) • Keep is_pickup and is_destination columns (they indicate which reservation field to map to) • Add address_autocomplete to service_field_type_enum for Google Maps Places Autocomplete
 
-
-
 2. Update Service Fields Data (supabase-imports/import-data.sql)
-
-
 
 • Keep pickup_location and destination_location for airport-transfers (location_select type) • Add destination_location field for paris-city-tour with default_value = 'Paris' and is _destination = true • Add destination_location field for disneyland with default_value = 'Disneyland Paris' and is_destination = true • Update other services to use appropriate field types (text or address_autocomplete)
 
-
-
 3. Update ServiceField Model ( src/components/models/serviceFields.ts)
-
-
 
 • Add defaultValue?: string property • Keep location_select and address_autocomplete types • Keep isPickup and isDestination properties
 
-
-
 4. Update Step2TripDetails Component ( src/components/reservation/Step2TripDet ails.tsx)
-
-
 
 • For location_select type: Show dropdown with locations from locations table (fetch via getL ocationsByService) • For address_autocomplete type: Implement Google Maps Places Autocomplete input • For text type: Show regular text input (for simple address/city/country) • Map service field values to formData: • If isPickup = true: store in formData. location • If isDestination = true: store in formData.destination • Apply defaultValue when field is first rendered • Remove direct location/destination inputs - they come from service_fields
 
-
-
 5. Update Validation Logic ( src/app/[localel/reservation/page.tsx)
-
-
 
 • Check formData. location and formData.destination (mapped from service_fields) • Ensure both are filled for all services
 
-
-
 6. Update API Route (src/app/api/reservations/route.ts)
-
-
 
 • Use formData.location and formData. destination directly (already mapped from service fields)
 
-
-
 • Remove location ID to name conversion logic (no longer needed)
-
-
 
 7. Install Google Maps Package
 
-
-
 • Add areact-google-maps/api or use-places-autocomplete package to package. json • Set up Google Maps API key in environment variables
-
-
 
 8. Update Supabase Service (src/lib/supabaseService.ts)
 
-
-
 • Update mapServiceFieldRow to include defaultValue • Keep getLocationsByService function for location_select fields
-
-
 
 Implementation Details
 
-
-
 Location Field Type Mapping:
-
-
 
 • location_select: Dropdown from locations table (airport transfers) • address_autocomplete: Google Maps Places Autocomplete (other services needing addresses) • text: Simple text input (city, country, or simple address)
 
-
-
 Pre-filled Values:
-
-
 
 • Paris Tour: destination_location with default_value = "Paris' , is_destination = true • Disneyland: destination_location with default_value = "Disneyland Paris', is_destinati on = true
 
-
-
 • Airport Transfers: Both pickup and destination are selectors (no defaults)
-
-
 
 Data Flow:
 
-
-
 1. Service fields define location inputs (type, label, default value, pickup/destination flag) 2. User fills location fields in Step2TripDetails 3. Values are mapped to formData.location and formData.destination based on isPickup/isd estination
-
-
 
 4. API route saves to reservations. location and reservations.destination
 
-
-
 Files to Modify
-
-
 
 1. supabase-imports/schema.sql - Add default_value column and address_autocomplete enum 2. supabase-imports/import-data.sql - Add destination fields with defaults for Paris Tour and Disneyland 3. src/components/models/serviceFields.ts - Add defaultValue property 4. src/components/reservation/Step2TripDetails.tsx - Implement field type rendering and mapping 5. src/app/[locale]/reservation/page.tsx - Update validation 6. src/app/api/reservations/route.ts - Simplify location handling
 

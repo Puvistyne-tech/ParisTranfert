@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
@@ -42,6 +43,17 @@ export function Step1Selection({
   onContinue,
 }: Step1SelectionProps) {
   const t = useTranslations("reservation.step1");
+  const [imageError, setImageError] = useState(false);
+  const [vehicleImageErrors, setVehicleImageErrors] = useState<Record<string, boolean>>({});
+
+  // Reset image error when vehicle type changes
+  useEffect(() => {
+    setImageError(false);
+  }, [selectedVehicleType?.id]);
+
+  const handleVehicleImageError = (vehicleId: string) => {
+    setVehicleImageErrors(prev => ({ ...prev, [vehicleId]: true }));
+  };
   
   return (
     <>
@@ -106,35 +118,38 @@ export function Step1Selection({
             </div>
 
             {selectedVehicleType ? (
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-                <div className="flex justify-between items-start">
-                  <div className="flex items-center space-x-4">
-                    <div className="w-24 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                      <img
-                        src={
-                          selectedVehicleType.id === 'car'
-                            ? 'https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
-                            : 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
-                        }
-                        alt={selectedVehicleType.name}
-                        className="w-full h-full object-cover"
-                      />
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 md:p-6">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+                  <div className="flex items-start sm:items-center space-x-3 sm:space-x-4 flex-1 min-w-0">
+                    <div className="w-16 h-12 sm:w-24 sm:h-16 rounded-lg overflow-hidden flex-shrink-0">
+                      {!imageError && selectedVehicleType.image ? (
+                        <img
+                          src={selectedVehicleType.image}
+                          alt={selectedVehicleType.name}
+                          className="w-full h-full object-cover"
+                          onError={() => setImageError(true)}
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                          <Car className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                        </div>
+                      )}
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-300 mb-1">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base sm:text-lg font-semibold text-blue-900 dark:text-blue-300 mb-1">
                         {selectedVehicleType.name}
                       </h3>
                       {selectedVehicleType.description && (
-                        <p className="text-blue-700 dark:text-blue-400 text-sm mb-2">
+                        <p className="text-blue-700 dark:text-blue-400 text-xs sm:text-sm mb-1 line-clamp-2">
                           {selectedVehicleType.description}
                         </p>
                       )}
                       {(selectedVehicleType.minPassengers || selectedVehicleType.maxPassengers) && (
-                        <p className="text-blue-600 dark:text-blue-400 text-sm font-medium mb-1">
+                        <p className="text-blue-600 dark:text-blue-400 text-xs sm:text-sm font-medium mb-1">
                           {selectedVehicleType.minPassengers || 1}-{selectedVehicleType.maxPassengers || 8} {t("passengers")}
                         </p>
                       )}
-                      <p className="text-blue-600 dark:text-blue-400 text-xs italic">
+                      <p className="text-blue-600 dark:text-blue-400 text-xs italic hidden sm:block">
                         {t("youWillReceive", { vehicleType: selectedVehicleType.name.toLowerCase() })}
                       </p>
                     </div>
@@ -143,7 +158,7 @@ export function Step1Selection({
                     variant="outline"
                     size="sm"
                     onClick={onVehicleTypeModify}
-                    className="flex items-center space-x-2"
+                    className="flex items-center justify-center space-x-2 w-full sm:w-auto"
                   >
                     <span>{t("change")}</span>
                   </Button>
@@ -158,22 +173,17 @@ export function Step1Selection({
                     className="p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all text-left"
                   >
                     <div className="w-full h-32 rounded-lg overflow-hidden mb-3">
-                      {vehicleType.image ? (
+                      {!vehicleImageErrors[vehicleType.id] && vehicleType.image ? (
                         <img
                           src={vehicleType.image}
                           alt={vehicleType.name}
                           className="w-full h-full object-cover"
+                          onError={() => handleVehicleImageError(vehicleType.id)}
                         />
                       ) : (
-                        <img
-                          src={
-                            vehicleType.id === 'car'
-                              ? 'https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
-                              : 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
-                          }
-                          alt={vehicleType.name}
-                          className="w-full h-full object-cover"
-                        />
+                        <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                          <Car className="w-12 h-12 text-white" />
+                        </div>
                       )}
                     </div>
                     <div className="flex items-center space-x-3 mb-2">
@@ -222,16 +232,16 @@ export function Step1Selection({
             </div>
 
             {selectedService ? (
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-300 mb-2">
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 md:p-6">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-base sm:text-lg font-semibold text-blue-900 dark:text-blue-300 mb-2">
                       {selectedService.name}
                     </h3>
-                    <p className="text-blue-700 dark:text-blue-400 mb-3">
+                    <p className="text-blue-700 dark:text-blue-400 text-sm sm:text-base mb-3 line-clamp-2 sm:line-clamp-none">
                       {selectedService.description}
                     </p>
-                    <div className="flex items-center space-x-4 text-sm text-blue-600 dark:text-blue-400">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-blue-600 dark:text-blue-400">
                       {selectedService.duration && (
                         <span>{t("duration")}: {selectedService.duration}</span>
                       )}
@@ -244,15 +254,15 @@ export function Step1Selection({
                     variant="outline"
                     size="sm"
                     onClick={onServiceModify}
-                    className="flex items-center space-x-2"
+                    className="flex items-center justify-center space-x-2 w-full sm:w-auto"
                   >
                     <span>{t("change")}</span>
                   </Button>
                 </div>
               </div>
             ) : (
-              <div className="space-y-8">
-                {categories.map((category) => {
+              <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4 space-y-8">
+                {categories.map((category) => { 
                   const categoryServices = services.filter(
                     (s) => s.categoryId === category.id && s.isAvailable
                   );
