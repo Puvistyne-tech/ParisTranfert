@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { createClient, createReservation, getReservations, updateReservationStatus, getLocationById } from "@/lib/supabaseService";
 import type { ReservationStatus } from "@/components/models/reservations";
 
+export const runtime = "edge";
+
 export async function POST(request: NextRequest) {
   try {
     console.log("=== RESERVATION API CALL STARTED ===");

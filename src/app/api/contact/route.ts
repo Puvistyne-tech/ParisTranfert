@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { contactSchema } from "@/lib/validations";
 
+export const runtime = "edge";
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
