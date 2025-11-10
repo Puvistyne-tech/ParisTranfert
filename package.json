@@ -7,7 +7,6 @@
     "dev:turbo": "next dev --turbopack",
     "build": "next build",
     "build:turbo": "next build --turbopack",
-    "build:pages": "opennextjs-cloudflare build",
     "start": "next start",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",

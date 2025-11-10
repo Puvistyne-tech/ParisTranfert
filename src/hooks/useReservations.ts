@@ -2,6 +2,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { Reservation } from "@/components/models/reservations";
 
+interface ReservationsResponse {
+  success: boolean;
+  reservations?: Reservation[];
+  total?: number;
+  error?: string;
+}
+
 
 // Reservation hooks
 export function useReservations(params?: {
@@ -73,7 +80,7 @@ export function useCreateContactMessage() {
         body: JSON.stringify(data),
       });
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ message: "Failed to send contact message" }));
+        const error = (await response.json().catch(() => ({ message: "Failed to send contact message" }))) as { message?: string };
         throw new Error(error.message || "Failed to send contact message");
       }
       return response.json();
@@ -88,9 +95,9 @@ export function useReservationStats() {
     queryFn: async () => {
       const [allReservations, pendingReservations, todayReservations] =
         await Promise.all([
-          fetch("/api/reservations").then((res) => res.json()),
-          fetch("/api/reservations?status=pending").then((res) => res.json()),
-          fetch("/api/reservations?limit=100").then((res) => res.json()),
+          fetch("/api/reservations").then((res) => res.json() as Promise<ReservationsResponse>),
+          fetch("/api/reservations?status=pending").then((res) => res.json() as Promise<ReservationsResponse>),
+          fetch("/api/reservations?limit=100").then((res) => res.json() as Promise<ReservationsResponse>),
         ]);
 
       const today = new Date().toISOString().split("T")[0];
@@ -103,7 +110,7 @@ export function useReservationStats() {
         total: allReservations.total || 0,
         pending: pendingReservations.total || 0,
         today: todayCount,
-        confirmed: allReservations.total - pendingReservations.total || 0,
+        confirmed: (allReservations.total || 0) - (pendingReservations.total || 0),
       };
     },
     staleTime: 2 * 60 * 1000, // 2 minutes

@@ -3,13 +3,41 @@ import { NextResponse } from "next/server";
 import { createClient, createReservation, getReservations, updateReservationStatus, getLocationById } from "@/lib/supabaseService";
 import type { ReservationStatus } from "@/components/models/reservations";
 
-export const runtime = "edge";
+interface ReservationRequestBody {
+  vehicleType: { id: string };
+  service: { id: string };
+  additionalServices?: {
+    babySeats?: number;
+    boosters?: number;
+    meetAndGreet?: boolean;
+  };
+  serviceSubData?: Record<string, any>;
+  formData: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    date: string;
+    time: string;
+    pickup?: string;
+    destination?: string;
+    passengers?: number;
+    notes?: string;
+  };
+  status?: ReservationStatus;
+  totalPrice: number;
+}
+
+interface PatchRequestBody {
+  id: string;
+  status: ReservationStatus;
+}
 
 export async function POST(request: NextRequest) {
   try {
     console.log("=== RESERVATION API CALL STARTED ===");
     
-    const body = await request.json();
+    const body = await request.json() as ReservationRequestBody;
     console.log("Request body received:", JSON.stringify(body, null, 2));
     
     const { vehicleType, service, additionalServices, serviceSubData, formData, status, totalPrice } = body;
@@ -173,7 +201,7 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = await request.json() as PatchRequestBody;
     const { id, status } = body;
 
     if (!id || !status) {

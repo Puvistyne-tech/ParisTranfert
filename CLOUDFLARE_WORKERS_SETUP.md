@@ -1,15 +1,6 @@
-# Cloudflare Deployment Setup
+# Cloudflare Workers Deployment Setup
 
-This project is configured to deploy to **Cloudflare Workers** or **Cloudflare Pages** using the official [@opennextjs/cloudflare](https://developers.cloudflare.com/workers/framework-guides/web-apps/nextjs/) adapter.
-
-## ✅ Edge Runtime Configuration
-
-All routes have been configured with `export const runtime = "edge"` to work with Cloudflare's Edge runtime:
-- ✅ Root layout (`src/app/layout.tsx`)
-- ✅ Locale layout (`src/app/[locale]/layout.tsx`)
-- ✅ API routes (`src/app/api/contact/route.ts`, `src/app/api/reservations/route.ts`)
-
-This ensures all routes inherit the Edge runtime configuration required for Cloudflare deployment.
+This project is now configured to deploy to **Cloudflare Workers** using the official [@opennextjs/cloudflare](https://developers.cloudflare.com/workers/framework-guides/web-apps/nextjs/) adapter.
 
 ## What Was Configured
 
@@ -131,33 +122,12 @@ According to the [official documentation](https://developers.cloudflare.com/work
 - [@opennextjs/cloudflare Documentation](https://opennext.js.org/cloudflare)
 - [Wrangler CLI Documentation](https://developers.cloudflare.com/workers/wrangler/)
 
-## Cloudflare Pages Configuration
-
-If deploying to **Cloudflare Pages** (instead of Workers), configure the following in your Cloudflare Pages dashboard:
-
-### Build Settings:
-- **Build command:** `npm run build:pages`
-- **Build output directory:** `.open-next/assets`
-- **Node version:** 18 or 20
-
-### Alternative (if auto-detection fails):
-If Cloudflare Pages auto-detects the old `@cloudflare/next-on-pages` adapter, you can:
-1. Manually set the build command to: `npm run build:pages`
-2. Or use: `opennextjs-cloudflare build`
-
-### Important Notes:
-- The `wrangler.toml` file is for Cloudflare Workers, not Pages
-- For Pages, the build output goes to `.open-next/assets`
-- All routes now have `export const runtime = "edge"` which is required for Cloudflare
-
 ## Next Steps
 
 1. ✅ Configuration complete
-2. ✅ Edge runtime added to all routes
-3. ⏭️ For Workers: Run `npx wrangler login` to authenticate
-4. ⏭️ For Workers: Test locally with `npm run preview`
-5. ⏭️ For Workers: Deploy with `npm run deploy`
-6. ⏭️ For Pages: Configure build settings in dashboard (see above)
-7. ⏭️ Configure environment variables
-8. ⏭️ Set up custom domain (optional)
+2. ⏭️ Run `npx wrangler login` to authenticate
+3. ⏭️ Test locally with `npm run preview`
+4. ⏭️ Deploy with `npm run deploy`
+5. ⏭️ Configure environment variables
+6. ⏭️ Set up custom domain (optional)
 
