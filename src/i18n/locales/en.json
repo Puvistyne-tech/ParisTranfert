@@ -1,0 +1,601 @@
+{
+  "navigation": {
+    "home": "Home",
+    "services": "Services",
+    "vehicles": "Vehicles",
+    "reservation": "Reservation",
+    "about": "About",
+    "contact": "Contact",
+    "bookNow": "Book Now",
+    "admin": "Admin"
+  },
+  "hero": {
+    "title": "Premium Paris Transfers",
+    "subtitle": "Experience luxury transportation with our professional Mercedes fleet. Airport transfers, city tours, and special occasions made effortless.",
+    "quickBooking": "Quick Booking",
+    "from": "From",
+    "to": "To",
+    "date": "Date",
+    "time": "Time",
+    "getQuote": "Get Quote",
+    "viewServices": "View Services",
+    "pleaseFillAllFields": "Please fill in all fields",
+    "resumeBooking": "Resume Booking",
+    "continueReservation": "Continue Your Reservation",
+    "pendingReservation": "You have a pending reservation",
+    "dismiss": "Dismiss",
+    "trustIndicators": {
+      "insured": "Insured & Licensed",
+      "service": "24/7 Service",
+      "rated": "5★ Rated"
+    },
+    "selectPickupLocation": "Select pickup location",
+    "selectDestination": "Select destination",
+    "happyClients": "Happy Clients",
+    "service24": "Service"
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Professional transportation solutions tailored to your needs with premium comfort and reliability",
+    "bookNow": "Book Now",
+    "airportTransfer": {
+      "name": "Airport Transfer",
+      "description": "Seamless transfers to and from Charles de Gaulle, Orly, and Beauvais airports with professional drivers",
+      "price": "From €45",
+      "features": ["CDG Airport", "Orly Airport", "Beauvais Airport"]
+    },
+    "disneyland": {
+      "name": "Disneyland Paris",
+      "description": "Direct transfers to Disneyland Paris and its hotels with magical comfort for the whole family",
+      "price": "From €55",
+      "features": ["Disneyland Park", "Walt Disney Studios", "Disney Hotels"]
+    },
+    "privateTour": {
+      "name": "Private Tour",
+      "description": "Customized 4-hour Paris city tours tailored to your preferences with expert local guides",
+      "price": "From €120",
+      "features": ["Eiffel Tower", "Louvre Museum", "Notre-Dame"]
+    },
+    "weddingTransfer": {
+      "name": "Wedding Transfer",
+      "description": "Elegant transportation for your special day",
+      "price": "From €80",
+      "features": [
+        "Luxury Vehicles",
+        "Professional Service",
+        "Special Occasions"
+      ]
+    },
+    "businessTransfer": {
+      "name": "Business Transfer",
+      "description": "Professional transfers for business meetings and events",
+      "price": "From €60",
+      "features": ["Wi-Fi Available", "Quiet Environment", "Punctual Service"]
+    },
+    "customTransfer": {
+      "name": "Custom Transfer",
+      "description": "Tailored transportation solutions for your specific needs",
+      "price": "Quote on Request",
+      "features": [
+        "Flexible Routes",
+        "Special Requirements",
+        "Personalized Service"
+      ]
+    },
+    "international": {
+      "name": "International Transfer",
+      "description": "Long-distance transfers to international destinations",
+      "price": "Quote on Request",
+      "features": [
+        "International Destinations",
+        "Long Distance",
+        "Custom Routes"
+      ]
+    },
+    "greeterService": {
+      "name": "Greeter Service",
+      "description": "Personalized greeting and assistance service",
+      "price": "Quote on Request",
+      "features": [
+        "Personalized Greeting",
+        "Assistance Service",
+        "Professional Support"
+      ]
+    },
+    "serviceVip": {
+      "name": "VIP Service",
+      "description": "Enjoy an exclusive travel experience with our VIP transport service. Discreet, luxurious, and tailored to your needs. Perfect for business executives, celebrities, or any client looking for first-class service.",
+      "price": "€120-€300/hour",
+      "features": [
+        "Discreet Service",
+        "Executive Vehicles",
+        "Personal Assistant",
+        "Security Protocols",
+        "Customized Experience"
+      ]
+    }
+  },
+  "fleet": {
+    "title": "Our Premium Fleet",
+    "subtitle": "Experience luxury with our Mercedes vehicles, each equipped with premium amenities",
+    "sClass": {
+      "name": "Mercedes S-Class",
+      "description": "Ultimate Luxury Sedan",
+      "passengers": "1-3 passengers",
+      "features": ["Leather Seats", "Massage Function", "Premium Audio"]
+    },
+    "eClass": {
+      "name": "Mercedes E-Class",
+      "description": "Executive Sedan",
+      "passengers": "1-4 passengers",
+      "features": ["Comfort Seats", "Climate Control", "Navigation"]
+    },
+    "car": {
+      "description": "Business class sedan for comfortable transfers"
+    },
+    "van": {
+      "description": "Spacious van for group transfers"
+    },
+    "vClass": {
+      "name": "Mercedes V-Class",
+      "description": "Premium Van",
+      "passengers": "1-6 passengers",
+      "features": ["Spacious Interior", "Family Friendly", "Luggage Space"]
+    },
+    "vito": {
+      "name": "Mercedes Vito",
+      "description": "Spacious Van",
+      "passengers": "1-8 passengers",
+      "features": ["Large Capacity", "Group Travel", "Extra Storage"]
+    }
+  },
+  "features": {
+    "title": "Why Choose Us",
+    "subtitle": "Premium amenities and services designed for your ultimate comfort and satisfaction",
+    "wifi": {
+      "title": "Complimentary Wi-Fi",
+      "description": "Stay connected during your journey with high-speed internet"
+    },
+    "entertainment": {
+      "title": "Premium Entertainment",
+      "description": "Netflix, YouTube, and music streaming for your enjoyment"
+    },
+    "chargers": {
+      "title": "Device Chargers",
+      "description": "Keep your devices powered up with multiple charging options"
+    },
+    "childSafety": {
+      "title": "Child Safety",
+      "description": "Baby seats available for ages 0-10 years with safety certification"
+    },
+    "payment": {
+      "title": "Flexible Payment",
+      "description": "Multiple payment methods available both online and onboard"
+    },
+    "drivers": {
+      "title": "Professional Drivers",
+      "description": "Experienced, courteous, and multilingual professional chauffeurs"
+    }
+  },
+  "testimonials": {
+    "title": "What Our Clients Say",
+    "subtitle": "Don't just take our word for it - hear from our satisfied customers"
+  },
+  "contact": {
+    "title": "Get In Touch",
+    "subtitle": "Ready to experience premium transportation? Contact us today for a seamless booking experience!",
+    "contactInfo": "Contact Information",
+    "phone": "+33 1 XX XX XX XX",
+    "phoneSubtitle": "Available 24/7",
+    "email": "info@paristransfers.com",
+    "emailSubtitle": "Quick response guaranteed",
+    "address": "Paris, France",
+    "addressSubtitle": "Serving all of Paris",
+    "followUs": "Follow Us",
+    "sendMessage": "Send us a Message",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "emailAddress": "Email Address",
+    "phoneNumber": "Phone Number",
+    "yourMessage": "Your Message",
+    "sendButton": "Send Message",
+    "messageSent": "Message Sent!",
+    "thankYouContacting": "Thank you for contacting us. We'll get back to you soon.",
+    "sendAnotherMessage": "Send Another Message",
+    "tellUsHowHelp": "Tell us how we can help you..."
+  },
+  "reservation": {
+    "title": "Book Your Transfer",
+    "subtitle": "Experience premium transportation with our professional booking system",
+    "steps": {
+      "serviceSelection": "Service Selection",
+      "detailsTiming": "Details & Timing",
+      "confirmation": "Confirmation"
+    },
+    "step1": {
+      "title": "Select Your Service",
+      "subtitle": "Choose the perfect service for your transportation needs",
+      "continue": "Continue to Details",
+      "makeReservation": "Make a Reservation",
+      "selectVehicleService": "Select your vehicle type, service, and additional options",
+      "pleaseCompleteSelection": "Please complete your selection",
+      "selectVehicleType": "Select Vehicle Type",
+      "chooseVehicleType": "Choose the type of vehicle for your journey",
+      "change": "Change",
+      "passengers": "passengers",
+      "youWillReceive": "You will receive one of our available {vehicleType} vehicles",
+      "selectService": "Select Service",
+      "chooseService": "Choose the service that best fits your needs",
+      "duration": "Duration",
+      "price": "Price",
+      "popular": "Popular",
+      "additionalServices": "Additional Services",
+      "addExtraServices": "Add extra services to enhance your travel experience",
+      "babySeats": "Baby Seats",
+      "babySeatsDescription": "Child safety seats for infants",
+      "boosterSeats": "Booster Seats",
+      "boosterSeatsDescription": "Booster seats for older children",
+      "meetGreet": "Meet & Greet",
+      "meetGreetDescription": "Personalized airport greeting service",
+      "selected": "Selected",
+      "addService": "Add Service",
+      "continueToTripDetails": "Continue to Trip Details"
+    },
+    "step2": {
+      "title": "Trip Details & Timing",
+      "personalInfo": "Personal Information",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "tripDetails": "Trip Details",
+      "pickup": "Pickup Location",
+      "destination": "Destination",
+      "date": "Pickup Date",
+      "time": "Pickup Time",
+      "vehicleSelection": "Vehicle Selection",
+      "additionalOptions": "Additional Options",
+      "childSeat": "Child Safety Seat (€5)",
+      "meetGreet": "Meet & Greet Service (€10)",
+      "waitingTime": "Extra Waiting Time (€15/hour)",
+      "flightTracking": "Flight Tracking (€5)",
+      "specialRequests": "Special Requests or Notes",
+      "specialRequestsPlaceholder": "Any special requirements, accessibility needs, or additional information...",
+      "back": "Back",
+      "reviewConfirm": "Review & Confirm",
+      "tripDetailsTitle": "Trip Details",
+      "basicInformation": "Basic Information",
+      "pickupDate": "Pickup Date *",
+      "pickupTime": "Pickup Time *",
+      "numberOfPassengers": "Number of Passengers *",
+      "passenger": "passenger",
+      "passengers": "passengers",
+      "serviceDetails": "Service Details",
+      "pleaseProvideInfo": "Please provide the following information for your {serviceName} service:",
+      "contactInformation": "Contact Information",
+      "firstNameLabel": "First Name *",
+      "enterFirstName": "Enter first name",
+      "lastNameLabel": "Last Name *",
+      "enterLastName": "Enter last name",
+      "emailAddressLabel": "Email Address *",
+      "enterEmailAddress": "Enter email address",
+      "phoneNumberLabel": "Phone Number *",
+      "enterPhoneNumber": "Enter phone number",
+      "specialRequestsOptional": "Special Requests (Optional)",
+      "specialRequestsPlaceholderText": "Any special requests or notes...",
+      "pleaseCompleteAllFields": "Please complete all required fields",
+      "loadingServiceFields": "Loading service fields...",
+      "fieldRequired": "This field is required"
+    },
+    "step3": {
+      "title": "Review & Confirm",
+      "bookingSummary": "Booking Summary",
+      "serviceDetails": "Service Details",
+      "service": "Service",
+      "vehicle": "Vehicle",
+      "pickup": "Pickup",
+      "destination": "Destination",
+      "tripInformation": "Trip Information",
+      "date": "Date",
+      "time": "Time",
+      "passenger": "Passenger",
+      "contact": "Contact",
+      "specialRequests": "Special Requests",
+      "bookingGuarantee": "Booking Guarantee",
+      "instantConfirmation": "Instant Confirmation",
+      "freeCancellation": "Free Cancellation",
+      "support": "24/7 Support",
+      "back": "Back",
+      "confirmBooking": "Confirm Booking",
+      "vehicleType": "Vehicle Type",
+      "passengers": "passengers",
+      "basePrice": "Base Price",
+      "total": "Total",
+      "selectPickupDestination": "Select pickup and destination to see price",
+      "loadingPrice": "Loading price...",
+      "additionalServicesFree": "Additional Services (Free)",
+      "babySeats": "Baby Seats",
+      "boosterSeats": "Booster Seats",
+      "meetGreet": "Meet & Greet",
+      "free": "Free"
+    },
+    "success": {
+      "title": "Booking Confirmed!",
+      "message": "Thank you for choosing Paris Transfers. Your booking has been successfully submitted.",
+      "nextSteps": "What happens next?",
+      "emailConfirmation": "You'll receive a confirmation email within 5 minutes",
+      "teamContact": "Our team will contact you to confirm details",
+      "driverAssignment": "Your driver will be assigned 24 hours before pickup",
+      "trackingInfo": "You'll receive driver details and tracking information",
+      "backToHome": "Back to Home",
+      "newBooking": "New Booking"
+    }
+  },
+  "booking": {
+    "title": "Booking Details",
+    "subtitle": "Complete your reservation with trip and contact information",
+    "tripDetails": "Trip Details",
+    "pickupDate": "Pickup Date",
+    "pickupTime": "Pickup Time",
+    "pickupLocation": "Pickup Location",
+    "pickupLocationPlaceholder": "Enter pickup address",
+    "dropoffLocation": "Drop-off Location",
+    "dropoffLocationPlaceholder": "Enter drop-off address",
+    "passengerCount": "Number of Passengers",
+    "contactInformation": "Contact Information",
+    "firstName": "First Name",
+    "firstNamePlaceholder": "Enter first name",
+    "lastName": "Last Name",
+    "lastNamePlaceholder": "Enter last name",
+    "email": "Email Address",
+    "emailPlaceholder": "Enter email address",
+    "phone": "Phone Number",
+    "phonePlaceholder": "Enter phone number",
+    "specialRequests": "Special Requests (Optional)",
+    "specialRequestsPlaceholder": "Any special requests or notes...",
+    "bookingSummary": "Booking Summary",
+    "vehicle": "Vehicle",
+    "service": "Service",
+    "priceBreakdown": "Price Breakdown",
+    "vehiclePrice": "Vehicle Price",
+    "serviceFee": "Service Fee",
+    "total": "Total",
+    "confirmBooking": "Confirm Booking",
+    "backToReservation": "Back to Reservation",
+    "missingSelection": "Missing Selection",
+    "missingSelectionMessage": "Please select both a vehicle and service before proceeding to booking.",
+    "stepIndicator": "Step 2 of 3"
+  },
+  "footer": {
+    "companyName": "ParisTransfers",
+    "description": "Premium transportation services in Paris. Reliable, comfortable, and professional. Experience luxury with our Mercedes fleet and exceptional service.",
+    "services": "Services",
+    "airportTransfers": "Airport Transfers",
+    "disneylandParis": "Disneyland Paris",
+    "privateTours": "Private Tours",
+    "weddingTransfers": "Wedding Transfers",
+    "contactInfo": "Contact Info",
+    "service24": "24/7 Service",
+    "copyright": "© {year} Paris Transfers. All rights reserved. | Premium Transportation Services"
+  },
+  "confirmation": {
+    "title": "Reservation Confirmation",
+    "subtitle": "Review your reservation details before submitting",
+    "bookingSummary": "Booking Summary",
+    "tripDetails": "Trip Details",
+    "contactInfo": "Contact Information",
+    "serviceDetails": "Service Details",
+    "additionalServices": "Additional Services",
+    "specialRequests": "Special Requests",
+    "submitReservation": "Submit Reservation",
+    "askForQuote": "Ask for a Quote",
+    "downloadPDF": "Download PDF",
+    "modify": "Modify",
+    "vehicleCategory": "Vehicle Category",
+    "back": "Back",
+    "date": "Date",
+    "time": "Time",
+    "passengers": "Passengers",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "reservationSubmitted": "Reservation Submitted",
+    "reservationPending": "Reservation Pending",
+    "submittedSuccessfully": "Your reservation has been submitted successfully",
+    "awaitingApproval": "Awaiting admin approval",
+    "confirmationEmailNote": "You will receive a confirmation email once your reservation is approved.",
+    "backToHome": "Back to Home",
+    "referenceNumber": "Reference Number",
+    "reservationId": "Reservation ID",
+    "noReservationFound": "No Reservation Found",
+    "pleaseCompleteReservation": "Please complete your reservation first.",
+    "saveYourReservation": "Save Your Reservation?",
+    "unsavedSelections": "You have unsaved selections. Would you like to save your progress or start over?",
+    "cancel": "Cancel",
+    "saveAndExit": "Save & Exit",
+    "deleteAndStartOver": "Delete & Start Over",
+    "duration": "Duration",
+    "priceRange": "Price Range",
+    "babySeats": "Baby Seats",
+    "boosterSeats": "Booster Seats",
+    "meetAndGreet": "Meet & Greet",
+    "free": "Free",
+    "priceSummary": "Price Summary",
+    "basePrice": "Base Price",
+    "total": "Total",
+    "additionalServicesFree": "Additional Services (Free)",
+    "submitting": "Submitting...",
+    "submittedSuccessfullyButton": "Submitted Successfully!",
+    "makeNewReservation": "Make New Reservation",
+    "failedToDownloadPDF": "Failed to download PDF. Please try again.",
+    "notAvailable": "N/A",
+    "unknownError": "Unknown error",
+    "sharingNotAvailable": "Sharing is not available on this device. Please use the download button instead.",
+    "failedToSharePDF": "Failed to share PDF. Please use the download button instead.",
+    "emailSubject": "Reservation Confirmation #{reservationId}",
+    "emailBody": "Please find attached the reservation confirmation for {customerName}.",
+    "shareTitle": "Reservation #{reservationId}",
+    "shareText": "Reservation confirmation for {customerName}",
+    "pdf": {
+      "companyName": "PARIS TRANSFER",
+      "companySubtitle": "Premium Transportation Services",
+      "reservationStatus": "RESERVATION STATUS",
+      "tripDetails": "TRIP DETAILS",
+      "date": "Date",
+      "time": "Time",
+      "from": "From",
+      "to": "To",
+      "vehicleTypeService": "VEHICLE TYPE & SERVICE",
+      "vehicleType": "Vehicle Type",
+      "service": "Service",
+      "passengers": "Passengers",
+      "customer": "CUSTOMER",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "description": "Description",
+      "additionalServices": "ADDITIONAL SERVICES",
+      "babySeats": "Baby Seats",
+      "boosters": "Boosters",
+      "meetAndGreet": "Meet & Greet",
+      "free": "Free",
+      "pricing": "PRICING",
+      "basePrice": "Base Price",
+      "total": "TOTAL",
+      "notes": "NOTES",
+      "importantInformation": "IMPORTANT INFORMATION",
+      "importantNote1": "Please arrive 10 minutes before your scheduled pickup time",
+      "importantNote2": "Contact us immediately if you need to make any changes",
+      "importantNote3": "This reservation is subject to our terms and conditions",
+      "importantNote4": "Payment will be processed upon confirmation",
+      "importantNote5": "Keep this confirmation for your records",
+      "referenceNumber": "Reference Number",
+      "created": "Created",
+      "contactInformation": "Contact Information",
+      "thankYou": "Thank You",
+      "thankYouMessage": "We look forward to serving you!",
+      "generated": "Generated",
+      "quoteMessage": "A quote will be sent to you by our team. Please wait for our confirmation email with the final pricing."
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "required": "Required",
+    "optional": "Optional",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "export": "Export",
+    "import": "Import",
+    "refresh": "Refresh",
+    "retry": "Retry"
+  },
+  "home": {
+    "briefServices": {
+      "title": "Our Services",
+      "subtitle": "Professional transportation solutions tailored to your needs",
+      "viewAllServices": "View All Services",
+      "loadingServices": "Loading services...",
+      "learnMore": "Learn More →",
+      "needCustomSolution": "Need a custom solution? We offer specialized services for every occasion.",
+      "contactUsForCustom": "Contact Us for Custom Service"
+    },
+    "vehicleClasses": {
+      "title": "Choose Your Vehicle Class",
+      "subtitle": "Professional transportation tailored to your needs and preferences",
+      "loadingVehicleTypes": "Loading vehicle types...",
+      "bookNow": "Book Now",
+      "needHelpChoosing": "Need Help Choosing?",
+      "teamCanHelp": "Our team can help you select the perfect vehicle for your journey. Contact us for personalized recommendations.",
+      "makeReservation": "Make a Reservation",
+      "contactUs": "Contact Us"
+    }
+  },
+  "servicesPage": {
+    "backToHome": "Back to Home",
+    "title": "Our Services",
+    "subtitle": "Professional transportation solutions tailored to your needs with premium comfort and reliability",
+    "loadingServices": "Loading Services",
+    "preparingServices": "Preparing our premium service offerings...",
+    "bookNow": "Book Now",
+    "popular": "Popular",
+    "saveServiceSelection": "Save Your Service Selection?",
+    "selectedServiceMessage": "You have selected a service. Would you like to keep it for later or start fresh?",
+    "currentSelection": "Current Selection:",
+    "service": "Service:",
+    "keepGoHome": "Keep & Go Home",
+    "deleteStartFresh": "Delete & Start Fresh",
+    "cancel": "Cancel"
+  },
+  "reservationPage": {
+    "backToHome": "Back to Home",
+    "stepOf": "Step {current} of {total}",
+    "saveReservation": "Save Your Reservation?",
+    "unsavedSelections": "You have unsaved selections. Would you like to save your progress or start over?",
+    "saveExit": "Save & Exit",
+    "deleteStartOver": "Delete & Start Over",
+    "cancel": "Cancel",
+    "loading": "Loading..."
+  },
+  "about": {
+    "title": "About Paris Transfers",
+    "subtitle": "Your trusted partner for premium transportation services in Paris. Experience luxury, reliability, and exceptional service with our professional Mercedes fleet.",
+    "stats": {
+      "happyClients": "Happy Clients",
+      "mercedesFleet": "Mercedes Fleet",
+      "serviceAvailable": "Service Available",
+      "averageRating": "Average Rating"
+    },
+    "ourStory": {
+      "title": "Our Story",
+      "paragraph1": "Founded in 2020, Paris Transfers has quickly established itself as one of the most reliable and luxurious transportation services in Paris. What started as a small family business has grown into a premium service provider trusted by thousands of clients.",
+      "paragraph2": "Our mission is simple: to provide exceptional transportation services that exceed our clients' expectations. We believe that every journey should be comfortable, safe, and memorable.",
+      "paragraph3": "With our fleet of Mercedes vehicles and professional drivers, we ensure that whether you're traveling for business or pleasure, your experience with us will be nothing short of exceptional."
+    },
+    "whyChooseUs": {
+      "title": "Why Choose Us?",
+      "professionalFleet": "Professional Mercedes fleet",
+      "experiencedDrivers": "Experienced and licensed drivers",
+      "customerSupport": "24/7 customer support",
+      "competitivePricing": "Competitive pricing",
+      "freeCancellation": "Free cancellation policy"
+    },
+    "ourValues": {
+      "title": "Our Values",
+      "subtitle": "The principles that guide everything we do",
+      "safetyFirst": {
+        "title": "Safety First",
+        "description": "All our vehicles are regularly maintained and our drivers are fully licensed and insured."
+      },
+      "punctuality": {
+        "title": "Punctuality",
+        "description": "We understand the importance of time and ensure you reach your destination on schedule."
+      },
+      "excellence": {
+        "title": "Excellence",
+        "description": "We strive for excellence in every aspect of our service, from booking to arrival."
+      },
+      "professionalism": {
+        "title": "Professionalism",
+        "description": "Our team consists of experienced professionals dedicated to providing the best service."
+      }
+    },
+    "cta": {
+      "title": "Ready to Experience Premium Transportation?",
+      "subtitle": "Book your transfer today and discover why thousands of clients trust Paris Transfers for their transportation needs.",
+      "bookTransferNow": "Book Your Transfer Now"
+    }
+  }
+}

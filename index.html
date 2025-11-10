@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paris Transfers - Luxury Transportation Services</title>
+    <meta name="description" content="Premium taxi and transfer services in Paris. Airport transfers, Disneyland Paris, private tours. Mercedes fleet with Wi-Fi, child seats, and flexible payment options.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#2563eb',
+                        'secondary': '#7c3aed',
+                        'accent': '#f59e0b',
+                        'dark': '#1f2937',
+                        'light': '#f8fafc',
+                        'success': '#10b981',
+                        'warning': '#f59e0b',
+                        'error': '#ef4444',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                        'display': ['Poppins', 'Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'slide-in-left': 'slideInLeft 0.6s ease-out',
+                        'slide-in-right': 'slideInRight 0.6s ease-out',
+                        'scale-in': 'scaleIn 0.4s ease-out',
+                        'bounce-slow': 'bounce 2s infinite',
+                        'pulse-slow': 'pulse 3s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'gradient': 'gradient 8s ease infinite',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        slideInLeft: {
+                            '0%': { transform: 'translateX(-20px)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' }
+                        },
+                        slideInRight: {
+                            '0%': { transform: 'translateX(20px)', opacity: '0' },
+                            '100%': { transform: 'translateX(0)', opacity: '1' }
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.9)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        },
+                        gradient: {
+                            '0%, 100%': { backgroundPosition: '0% 50%' },
+                            '50%': { backgroundPosition: '100% 50%' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #06b6d4 100%);
+            background-size: 400% 400%;
+            animation: gradient 8s ease infinite;
+        }
+        
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+        
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient 3s ease infinite;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+        }
+        
+        .service-card {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .feature-icon:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+        
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .floating-element {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .parallax-bg {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        
+        .testimonial-card {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border-left: 4px solid #3b82f6;
+            transition: all 0.3s ease;
+        }
+        
+        .testimonial-card:hover {
+            transform: translateX(10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-counter {
+            font-variant-numeric: tabular-nums;
+        }
+        
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.3s ease-in-out;
+        }
+        
+        .mobile-menu.open {
+            transform: translateX(0);
+        }
+        
+        .scroll-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+            transform-origin: left;
+            z-index: 1000;
+        }
+        
+        .section-divider {
+            background: linear-gradient(90deg, transparent, #e5e7eb, transparent);
+            height: 1px;
+        }
+        
+        .pricing-card {
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .pricing-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-5px);
+        }
+        
+        .pricing-card.featured {
+            background: linear-gradient(145deg, #3b82f6, #1d4ed8);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .pricing-card.featured:hover {
+            transform: scale(1.05) translateY(-5px);
+        }
+    </style>
+</head>
+<body class="font-sans bg-light">
+    <!-- Scroll Progress Indicator -->
+    <div class="scroll-indicator" id="scrollIndicator"></div>
+    
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                        <i class="fas fa-car text-white text-lg"></i>
+                    </div>
+                    <span class="text-xl font-bold text-dark font-display">ParisTransfers</span>
+                </div>
+                
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="nav-link text-dark hover:text-primary font-medium">Home</a>
+                    <a href="#services" class="nav-link text-dark hover:text-primary font-medium">Services</a>
+                    <a href="#fleet" class="nav-link text-dark hover:text-primary font-medium">Fleet</a>
+                    <a href="#about" class="nav-link text-dark hover:text-primary font-medium">About</a>
+                    <a href="#contact" class="nav-link text-dark hover:text-primary font-medium">Contact</a>
+                    <a href="reservation.html" class="btn-primary text-white px-6 py-2 rounded-lg font-semibold hover:scale-105 transition-all duration-300">
+                        <i class="fas fa-calendar-alt mr-2"></i>Book Now
+                    </a>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors duration-300" id="mobileMenuBtn">
+                    <i class="fas fa-bars text-dark text-xl"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="mobile-menu fixed top-0 right-0 h-full w-80 bg-white shadow-2xl md:hidden" id="mobileMenu">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-8">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                            <i class="fas fa-car text-white"></i>
+                        </div>
+                        <span class="text-lg font-bold text-dark font-display">ParisTransfers</span>
+                    </div>
+                    <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-300" id="closeMobileMenu">
+                        <i class="fas fa-times text-dark text-xl"></i>
+                    </button>
+                </div>
+                
+                <nav class="space-y-4">
+                    <a href="#home" class="block py-3 text-dark hover:text-primary font-medium transition-colors duration-300">Home</a>
+                    <a href="#services" class="block py-3 text-dark hover:text-primary font-medium transition-colors duration-300">Services</a>
+                    <a href="#fleet" class="block py-3 text-dark hover:text-primary font-medium transition-colors duration-300">Fleet</a>
+                    <a href="#about" class="block py-3 text-dark hover:text-primary font-medium transition-colors duration-300">About</a>
+                    <a href="#contact" class="block py-3 text-dark hover:text-primary font-medium transition-colors duration-300">Contact</a>
+                    <a href="reservation.html" class="block mt-6 btn-primary text-white px-6 py-3 rounded-lg font-semibold text-center">
+                        <i class="fas fa-calendar-alt mr-2"></i>Book Now
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section id="home" class="hero-gradient min-h-screen flex items-center relative overflow-hidden">
+        <!-- Background Elements -->
+        <div class="absolute inset-0">
+            <div class="absolute top-20 left-20 w-32 h-32 bg-white/10 rounded-full floating-element"></div>
+            <div class="absolute top-40 right-32 w-24 h-24 bg-white/5 rounded-full floating-element" style="animation-delay: -2s;"></div>
+            <div class="absolute bottom-32 left-1/3 w-40 h-40 bg-white/5 rounded-full floating-element" style="animation-delay: -4s;"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <!-- Left Content -->
+                <div class="text-white animate-slide-in-left">
+                    <h1 class="text-5xl lg:text-7xl font-bold font-display mb-6 leading-tight">
+                        Premium <span class="text-gradient">Paris</span><br>Transfers
+                    </h1>
+                    <p class="text-xl lg:text-2xl mb-8 opacity-90 leading-relaxed">
+                        Experience luxury transportation with our professional Mercedes fleet. 
+                        Airport transfers, city tours, and special occasions made effortless.
+                    </p>
+                    
+                    <!-- CTA Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 mb-12">
+                        <a href="reservation.html" class="btn-primary text-white px-8 py-4 rounded-xl text-lg font-semibold text-center hover:scale-105 transition-all duration-300">
+                            <i class="fas fa-calendar-alt mr-3"></i>Book Your Ride
+                        </a>
+                        <a href="#services" class="glass-morphism text-white px-8 py-4 rounded-xl text-lg font-semibold text-center hover:bg-white/20 transition-all duration-300">
+                            <i class="fas fa-play mr-3"></i>Watch Demo
+                        </a>
+                    </div>
+                    
+                    <!-- Trust Indicators -->
+                    <div class="flex items-center space-x-8 text-sm opacity-80">
+                        <div class="flex items-center">
+                            <i class="fas fa-shield-alt mr-2"></i>
+                            <span>Insured & Licensed</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-clock mr-2"></i>
+                            <span>24/7 Service</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-star mr-2"></i>
+                            <span>5★ Rated</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Content - Hero Image/Visual -->
+                <div class="animate-slide-in-right">
+                    <div class="relative">
+                        <!-- Hero Car Image -->
+                        
+                        
+                        <!-- Main Card -->
+                        <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20">
+                            <div class="text-center text-white mb-6">
+                                <h3 class="text-2xl font-bold mb-2">Quick Booking</h3>
+                                <p class="opacity-80">Get instant quotes and book in seconds</p>
+                            </div>
+                            
+                            <!-- Mini Booking Form -->
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <input type="text" placeholder="From" class="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/70 focus:outline-none focus:border-white/40">
+                                    <input type="text" placeholder="To" class="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/70 focus:outline-none focus:border-white/40">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <input type="date" class="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-white/40">
+                                    <input type="time" class="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-white/40">
+                                </div>
+                                <button class="w-full bg-white text-primary py-3 rounded-lg font-semibold hover:bg-white/90 transition-colors duration-300">
+                                    Get Quote
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Floating Stats -->
+                        <div class="absolute -top-4 -left-4 bg-white rounded-2xl p-4 shadow-lg animate-bounce-slow">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-primary">500+</div>
+                                <div class="text-sm text-gray-600">Happy Clients</div>
+                            </div>
+                        </div>
+                        
+                        <div class="absolute -bottom-4 -right-4 bg-white rounded-2xl p-4 shadow-lg animate-bounce-slow" style="animation-delay: -1s;">
+                            <div class="text-center">
+                                <div class="text-2xl font-bold text-success">24/7</div>
+                                <div class="text-sm text-gray-600">Service</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <i class="fas fa-chevron-down text-white text-2xl opacity-70"></i>
+        </div>
+    </section>
+    
+    <!-- Services Section -->
+    <section id="services" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Section Header -->
+            <div class="text-center mb-16 animate-fade-in">
+                <h2 class="text-4xl lg:text-6xl font-bold font-display text-dark mb-6">
+                    Our <span class="text-gradient">Services</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                    Professional transportation solutions tailored to your needs with premium comfort and reliability
+                </p>
+            </div>
+            
+            <!-- Services Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Airport Transfer -->
+                <div class="service-card p-8 rounded-2xl card-hover animate-scale-in">
+                    <div class="text-center">
+                        <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-primary to-secondary rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-plane text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-dark mb-4">Airport Transfer</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            Seamless transfers to and from Charles de Gaulle, Orly, and Beauvais airports with professional drivers
+                        </p>
+                        <div class="space-y-2 text-left mb-6">
+                            <div class="flex items-center text-sm text-gray-500">
+                                <i class="fas fa-check-circle text-success mr-2"></i>
+                                <span>CDG Airport</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-500">
+                                <i class="fas fa-check-circle text-success mr-2"></i>
+                                <span>Orly Airport</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-500">
+                                <i class="fas fa-check-circle text-success mr-2"></i>
+                                <span>Beauvais Airport</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-primary">From €45</span>
+                            <a href="reservation.html" class="text-primary hover:text-secondary font-semibold transition-colors duration-300">
+                                Book Now <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Disneyland Paris -->
+                <div class="service-card p-8 rounded-2xl card-hover animate-scale-in" style="animation-delay: 0.1s;">
+                    <div class="text-center">
+                        <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-magic text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-dark mb-4">Disneyland Paris</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            Direct transfers to Disneyland Paris and its hotels with magical comfort for the whole family
+                        </p>
+                        <div class="space-y-2 text-left mb-6">
+                            <div class="flex items-center text-sm text-gray-500">
+                                <i class="fas fa-check-circle text-success mr-2"></i>
+                                <span>Disneyland Park</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-500">
+                                <i class="fas fa-check-circle text-success mr-2"></i>
+                                <span>Walt Disney Studios</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-500">
+                                <i class="fas fa-check-circle text-success mr-2"></i>
+                                <span>Disney Hotels</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-primary">From €55</span>
+                            <a href="reservation.html" class="text-primary hover:text-secondary font-semibold transition-colors duration-300">
+                                Book Now <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Private Tour -->
+                <div class="service-card p-8 rounded-2xl card-hover animate-scale-in" style="animation-delay: 0.2s;">
+                    <div class="text-center">
+                        <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-success to-emerald-500 rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-map-marked-alt text-white text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-dark mb-4">Private Tour</h3>
+                        <p class="text-gray-600 mb-6 leading-relaxed">
+                            Customized 4-hour Paris city tours tailored to your preferences with expert local guides
+                        </p>
+                        <div class="space-y-2 text-left mb-6">
+                            <div class="flex items-center text-sm text-gray-500">
+                                <i class="fas fa-check-circle text-success mr-2"></i>
+                                <span>Eiffel Tower</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-500">
+                                <i class="fas fa-check-circle text-success mr-2"></i>
+                                <span>Louvre Museum</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-500">
+                                <i class="fas fa-check-circle text-success mr-2"></i>
+                                <span>Notre-Dame</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-primary">From €120</span>
+                            <a href="reservation.html" class="text-primary hover:text-secondary font-semibold transition-colors duration-300">
+                                Book Now <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Fleet Section -->
+    <section id="fleet" class="py-20 bg-gradient-to-br from-gray-50 to-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Section Header -->
+            <div class="text-center mb-16 animate-fade-in">
+                <h2 class="text-4xl lg:text-6xl font-bold font-display text-dark mb-6">
+                    Our <span class="text-gradient">Premium Fleet</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                    Experience luxury with our Mercedes vehicles, each equipped with premium amenities
+                </p>
+            </div>
+            
+            <!-- Fleet Showcase -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Mercedes S-Class -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg card-hover animate-slide-up">
+                    <div class="text-center">
+                        <div class="w-full h-32 mx-auto mb-4 rounded-xl overflow-hidden group-hover:scale-105 transition-all duration-300 relative">
+                            <img src="https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
+                                 alt="Mercedes S-Class" 
+                                 class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                            <div class="absolute bottom-2 left-2 right-2">
+                                <div class="bg-accent text-white px-2 py-1 rounded text-xs font-semibold">
+                                    Mercedes S-Class
+                                </div>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-dark mb-2">Mercedes S-Class</h3>
+                        <p class="text-sm text-gray-600 mb-3">Ultimate Luxury Sedan</p>
+                        <div class="bg-accent text-white px-3 py-1 rounded-full text-sm font-semibold inline-block mb-3">
+                            1-3 passengers
+                        </div>
+                        <div class="space-y-1 text-xs text-gray-500">
+                            <div>✓ Leather Seats</div>
+                            <div>✓ Massage Function</div>
+                            <div>✓ Premium Audio</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mercedes E-Class -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg card-hover animate-slide-up" style="animation-delay: 0.1s;">
+                    <div class="text-center">
+                        <div class="w-full h-32 mx-auto mb-4 rounded-xl overflow-hidden group-hover:scale-105 transition-all duration-300 relative">
+                            <img src="https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
+                                 alt="Mercedes E-Class" 
+                                 class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                            <div class="absolute bottom-2 left-2 right-2">
+                                <div class="bg-primary text-white px-2 py-1 rounded text-xs font-semibold">
+                                    Mercedes E-Class
+                                </div>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-dark mb-2">Mercedes E-Class</h3>
+                        <p class="text-sm text-gray-600 mb-3">Executive Sedan</p>
+                        <div class="bg-primary text-white px-3 py-1 rounded-full text-sm font-semibold inline-block mb-3">
+                            1-4 passengers
+                        </div>
+                        <div class="space-y-1 text-xs text-gray-500">
+                            <div>✓ Comfort Seats</div>
+                            <div>✓ Climate Control</div>
+                            <div>✓ Navigation</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mercedes V-Class -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg card-hover animate-slide-up" style="animation-delay: 0.2s;">
+                    <div class="text-center">
+                        <div class="w-full h-32 mx-auto mb-4 rounded-xl overflow-hidden group-hover:scale-105 transition-all duration-300 relative">
+                            <img src="https://images.unsplash.com/photo-1544636331-e26879cd4d9b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
+                                 alt="Mercedes V-Class" 
+                                 class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                            <div class="absolute bottom-2 left-2 right-2">
+                                <div class="bg-success text-white px-2 py-1 rounded text-xs font-semibold">
+                                    Mercedes V-Class
+                                </div>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-dark mb-2">Mercedes V-Class</h3>
+                        <p class="text-sm text-gray-600 mb-3">Premium Van</p>
+                        <div class="bg-success text-white px-3 py-1 rounded-full text-sm font-semibold inline-block mb-3">
+                            1-6 passengers
+                        </div>
+                        <div class="space-y-1 text-xs text-gray-500">
+                            <div>✓ Spacious Interior</div>
+                            <div>✓ Family Friendly</div>
+                            <div>✓ Luggage Space</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mercedes Vito -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg card-hover animate-slide-up" style="animation-delay: 0.3s;">
+                    <div class="text-center">
+                        <div class="w-full h-32 mx-auto mb-4 rounded-xl overflow-hidden group-hover:scale-105 transition-all duration-300 relative">
+                            <img src="https://images.unsplash.com/photo-1563720223185-11003d516935?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" 
+                                 alt="Mercedes Vito" 
+                                 class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                            <div class="absolute bottom-2 left-2 right-2">
+                                <div class="bg-secondary text-white px-2 py-1 rounded text-xs font-semibold">
+                                    Mercedes Vito
+                                </div>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-dark mb-2">Mercedes Vito</h3>
+                        <p class="text-sm text-gray-600 mb-3">Spacious Van</p>
+                        <div class="bg-secondary text-white px-3 py-1 rounded-full text-sm font-semibold inline-block mb-3">
+                            1-8 passengers
+                        </div>
+                        <div class="space-y-1 text-xs text-gray-500">
+                            <div>✓ Large Capacity</div>
+                            <div>✓ Group Travel</div>
+                            <div>✓ Extra Storage</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section id="about" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Section Header -->
+            <div class="text-center mb-16 animate-fade-in">
+                <h2 class="text-4xl lg:text-6xl font-bold font-display text-dark mb-6">
+                    Why Choose <span class="text-gradient">Us</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                    Premium amenities and services designed for your ultimate comfort and satisfaction
+                </p>
+            </div>
+            
+            <!-- Features Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Wi-Fi -->
+                <div class="text-center animate-scale-in">
+                    <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center feature-icon">
+                        <i class="fas fa-wifi text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-dark mb-3">Complimentary Wi-Fi</h3>
+                    <p class="text-gray-600">Stay connected during your journey with high-speed internet</p>
+                </div>
+                
+                <!-- Entertainment -->
+                <div class="text-center animate-scale-in" style="animation-delay: 0.1s;">
+                    <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center feature-icon">
+                        <i class="fas fa-play-circle text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-dark mb-3">Premium Entertainment</h3>
+                    <p class="text-gray-600">Netflix, YouTube, and music streaming for your enjoyment</p>
+                </div>
+                
+                <!-- Device Chargers -->
+                <div class="text-center animate-scale-in" style="animation-delay: 0.2s;">
+                    <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center feature-icon">
+                        <i class="fas fa-charging-station text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-dark mb-3">Device Chargers</h3>
+                    <p class="text-gray-600">Keep your devices powered up with multiple charging options</p>
+                </div>
+                
+                <!-- Child Safety -->
+                <div class="text-center animate-scale-in" style="animation-delay: 0.3s;">
+                    <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-purple-500 to-violet-500 rounded-2xl flex items-center justify-center feature-icon">
+                        <i class="fas fa-child text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-dark mb-3">Child Safety</h3>
+                    <p class="text-gray-600">Baby seats available for ages 0-10 years with safety certification</p>
+                </div>
+                
+                <!-- Flexible Payment -->
+                <div class="text-center animate-scale-in" style="animation-delay: 0.4s;">
+                    <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-2xl flex items-center justify-center feature-icon">
+                        <i class="fas fa-credit-card text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-dark mb-3">Flexible Payment</h3>
+                    <p class="text-gray-600">Multiple payment methods available both online and onboard</p>
+                </div>
+                
+                <!-- Professional Drivers -->
+                <div class="text-center animate-scale-in" style="animation-delay: 0.5s;">
+                    <div class="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center feature-icon">
+                        <i class="fas fa-user-tie text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-dark mb-3">Professional Drivers</h3>
+                    <p class="text-gray-600">Experienced, courteous, and multilingual professional chauffeurs</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Testimonials Section -->
+    <section class="py-20 bg-gradient-to-br from-gray-50 to-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Section Header -->
+            <div class="text-center mb-16 animate-fade-in">
+                <h2 class="text-4xl lg:text-6xl font-bold font-display text-dark mb-6">
+                    What Our <span class="text-gradient">Clients Say</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                    Don't just take our word for it - hear from our satisfied customers
+                </p>
+            </div>
+            
+            <!-- Testimonials Grid -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="testimonial-card p-6 rounded-2xl animate-slide-up">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white font-bold mr-4">
+                            JS
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-dark">John Smith</h4>
+                            <div class="flex text-accent">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">
+                        "Exceptional service! The driver was professional, the car was spotless, and we arrived exactly on time. Highly recommended!"
+                    </p>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="testimonial-card p-6 rounded-2xl animate-slide-up" style="animation-delay: 0.1s;">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-success to-emerald-500 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                            MJ
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-dark">Maria Johnson</h4>
+                            <div class="flex text-accent">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">
+                        "Perfect for our family trip to Disneyland! The child seats were excellent and the driver was so friendly with our kids."
+                    </p>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="testimonial-card p-6 rounded-2xl animate-slide-up" style="animation-delay: 0.2s;">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-gradient-to-br from-secondary to-purple-600 rounded-full flex items-center justify-center text-white font-bold mr-4">
+                            RB
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-dark">Robert Brown</h4>
+                            <div class="flex text-accent">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">
+                        "Outstanding airport transfer service. The Mercedes S-Class was luxurious and the driver was knowledgeable about Paris."
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Section Header -->
+            <div class="text-center mb-16 animate-fade-in">
+                <h2 class="text-4xl lg:text-6xl font-bold font-display text-dark mb-6">
+                    Get In <span class="text-gradient">Touch</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                    Ready to experience premium transportation? Contact us today for a seamless booking experience!
+                </p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-12">
+                <!-- Contact Info -->
+                <div class="animate-slide-in-left">
+                    <h3 class="text-3xl font-bold text-dark mb-8">Contact Information</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-center group">
+                            <div class="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-all duration-300">
+                                <i class="fas fa-phone text-white"></i>
+                            </div>
+                            <div>
+                                <div class="text-lg font-semibold text-dark">+33 1 XX XX XX XX</div>
+                                <div class="text-sm text-gray-600">Available 24/7</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center group">
+                            <div class="w-12 h-12 bg-gradient-to-br from-success to-emerald-500 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-all duration-300">
+                                <i class="fas fa-envelope text-white"></i>
+                            </div>
+                            <div>
+                                <div class="text-lg font-semibold text-dark">info@paristransfers.com</div>
+                                <div class="text-sm text-gray-600">Quick response guaranteed</div>
+                            </div>
+                        </div>
+                        <div class="flex items-center group">
+                            <div class="w-12 h-12 bg-gradient-to-br from-accent to-yellow-500 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-all duration-300">
+                                <i class="fas fa-map-marker-alt text-white"></i>
+                            </div>
+                            <div>
+                                <div class="text-lg font-semibold text-dark">Paris, France</div>
+                                <div class="text-sm text-gray-600">Serving all of Paris</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Social Media -->
+                    <div class="mt-8">
+                        <h4 class="text-lg font-semibold text-dark mb-4">Follow Us</h4>
+                        <div class="flex space-x-4">
+                            <a href="#" class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center hover:scale-110 transition-all duration-300">
+                                <i class="fab fa-facebook-f text-white"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg flex items-center justify-center hover:scale-110 transition-all duration-300">
+                                <i class="fab fa-instagram text-white"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-500 rounded-lg flex items-center justify-center hover:scale-110 transition-all duration-300">
+                                <i class="fab fa-twitter text-white"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contact Form -->
+                <div class="animate-slide-in-right">
+                    <div class="bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl shadow-lg">
+                        <h3 class="text-2xl font-bold text-dark mb-6">Send us a Message</h3>
+                        <form class="space-y-6">
+                            <div class="grid md:grid-cols-2 gap-4">
+                                <input type="text" placeholder="First Name" class="w-full p-4 rounded-lg border border-gray-200 focus:border-primary focus:outline-none transition-colors duration-300">
+                                <input type="text" placeholder="Last Name" class="w-full p-4 rounded-lg border border-gray-200 focus:border-primary focus:outline-none transition-colors duration-300">
+                            </div>
+                            <input type="email" placeholder="Email Address" class="w-full p-4 rounded-lg border border-gray-200 focus:border-primary focus:outline-none transition-colors duration-300">
+                            <input type="tel" placeholder="Phone Number" class="w-full p-4 rounded-lg border border-gray-200 focus:border-primary focus:outline-none transition-colors duration-300">
+                            <textarea placeholder="Your Message" rows="4" class="w-full p-4 rounded-lg border border-gray-200 focus:border-primary focus:outline-none transition-colors duration-300 resize-none"></textarea>
+                            <button type="submit" class="w-full btn-primary text-white py-4 rounded-lg text-lg font-semibold hover:scale-105 transition-all duration-300">
+                                <i class="fas fa-paper-plane mr-3"></i>Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="md:col-span-2">
+                    <div class="flex items-center mb-6">
+                        <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center mr-3">
+                            <i class="fas fa-car text-white text-lg"></i>
+                        </div>
+                        <span class="text-2xl font-bold font-display">ParisTransfers</span>
+                    </div>
+                    <p class="text-gray-400 mb-6 leading-relaxed max-w-md">
+                        Premium transportation services in Paris. Reliable, comfortable, and professional. 
+                        Experience luxury with our Mercedes fleet and exceptional service.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center hover:scale-110 transition-all duration-300">
+                            <i class="fab fa-facebook-f text-white"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg flex items-center justify-center hover:scale-110 transition-all duration-300">
+                            <i class="fab fa-instagram text-white"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-500 rounded-lg flex items-center justify-center hover:scale-110 transition-all duration-300">
+                            <i class="fab fa-twitter text-white"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-6 text-primary">Services</h3>
+                    <ul class="space-y-3 text-gray-400">
+                        <li><a href="#services" class="hover:text-primary transition-colors duration-300">Airport Transfers</a></li>
+                        <li><a href="#services" class="hover:text-primary transition-colors duration-300">Disneyland Paris</a></li>
+                        <li><a href="#services" class="hover:text-primary transition-colors duration-300">Private Tours</a></li>
+                        <li><a href="#services" class="hover:text-primary transition-colors duration-300">Wedding Transfers</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-6 text-primary">Contact Info</h3>
+                    <ul class="space-y-3 text-gray-400">
+                        <li class="flex items-center">
+                            <i class="fas fa-phone text-primary mr-2"></i>
+                            <span>+33 1 XX XX XX XX</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope text-primary mr-2"></i>
+                            <span>info@paristransfers.com</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-clock text-primary mr-2"></i>
+                            <span>24/7 Service</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Paris Transfers. All rights reserved. | Premium Transportation Services</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- JavaScript -->
+    <script>
+        // Mobile menu functionality
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const closeMobileMenu = document.getElementById('closeMobileMenu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.add('open');
+        });
+        
+        closeMobileMenu.addEventListener('click', () => {
+            mobileMenu.classList.remove('open');
+        });
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!mobileMenu.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                mobileMenu.classList.remove('open');
+            }
+        });
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Navbar scroll effect
+        const navbar = document.getElementById('navbar');
+        const scrollIndicator = document.getElementById('scrollIndicator');
+        
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            
+            // Update scroll indicator
+            scrollIndicator.style.transform = `scaleX(${scrollPercent / 100})`;
+            
+            // Navbar background
+            if (scrollTop > 100) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+                navbar.style.backdropFilter = 'blur(20px)';
+                navbar.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.1)';
+            } else {
+                navbar.style.background = 'transparent';
+                navbar.style.backdropFilter = 'none';
+                navbar.style.boxShadow = 'none';
+            }
+        });
+        
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // Observe all animated elements
+        document.querySelectorAll('.animate-fade-in, .animate-slide-up, .animate-slide-in-left, .animate-slide-in-right, .animate-scale-in').forEach(el => {
+            observer.observe(el);
+        });
+        
+        // Counter animation
+        function animateCounter(element, target, duration = 2000) {
+            let start = 0;
+            const increment = target / (duration / 16);
+            
+            const timer = setInterval(() => {
+                start += increment;
+                if (start >= target) {
+                    element.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(start);
+                }
+            }, 16);
+        }
+        
+        // Trigger counter animation when stats section is visible
+        const statsElements = document.querySelectorAll('.stats-counter');
+        if (statsElements.length > 0) {
+            const statsObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const target = parseInt(entry.target.textContent.replace(/\D/g, ''));
+                        if (target) {
+                            animateCounter(entry.target, target);
+                        }
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            statsElements.forEach(el => {
+                statsObserver.observe(el);
+            });
+        }
+        
+        // Form submission
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-3"></i>Sending...';
+                submitBtn.disabled = true;
+                
+                setTimeout(() => {
+                    submitBtn.innerHTML = '<i class="fas fa-check mr-3"></i>Sent!';
+                    submitBtn.classList.add('bg-success');
+                    
+                    setTimeout(() => {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('bg-success');
+                        form.reset();
+                    }, 2000);
+                }, 2000);
+            });
+        });
+        
+        // Parallax effect for floating elements
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallaxElements = document.querySelectorAll('.floating-element');
+            
+            parallaxElements.forEach((element, index) => {
+                const speed = 0.5 + (index * 0.1);
+                element.style.transform = `translateY(${scrolled * speed}px)`;
+            });
+        });
+    </script>
+</body>
+</html>
