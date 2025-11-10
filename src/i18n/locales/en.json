@@ -385,6 +385,7 @@
     "subtitle": "Review your reservation details before submitting",
     "bookingSummary": "Booking Summary",
     "tripDetails": "Trip Details",
+    "reservationStatus": "Reservation Status",
     "contactInfo": "Contact Information",
     "serviceDetails": "Service Details",
     "additionalServices": "Additional Services",
@@ -397,6 +398,8 @@
     "back": "Back",
     "date": "Date",
     "time": "Time",
+    "pickup": "Pickup",
+    "destination": "Destination",
     "passengers": "Passengers",
     "name": "Name",
     "email": "Email",
@@ -600,5 +603,12 @@
       "subtitle": "Book your transfer today and discover why thousands of clients trust Paris Transfers for their transportation needs.",
       "bookTransferNow": "Book Your Transfer Now"
     }
+  },
+  "reservationStatus": {
+    "title": "Reservation Status",
+    "notFound": "Reservation not found",
+    "loading": "Loading reservation...",
+    "viewReservation": "View Reservation Status",
+    "error": "Error loading reservation"
   }
 }

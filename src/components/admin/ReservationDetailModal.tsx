@@ -186,6 +186,18 @@ export function ReservationDetailModal({
                   <label className="text-sm font-medium text-gray-700">Total Price</label>
                   <p className="text-gray-900">€{reservation.totalPrice}</p>
                 </div>
+                {reservation.createdAt && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Created At</label>
+                    <p className="text-gray-900">{new Date(reservation.createdAt).toLocaleString()}</p>
+                  </div>
+                )}
+                {reservation.updatedAt && (
+                  <div>
+                    <label className="text-sm font-medium text-gray-700">Last Modified</label>
+                    <p className="text-gray-900">{new Date(reservation.updatedAt).toLocaleString()}</p>
+                  </div>
+                )}
               </div>
             </div>
           )}

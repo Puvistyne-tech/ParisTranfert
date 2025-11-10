@@ -144,7 +144,7 @@ export function Footer() {
                 {/* Bottom Bar */}
                 <div className="border-t border-gray-800 mt-8 pt-8 relative">
                     <div className="text-center text-gray-400">
-                        <p>{t("copyright", { year: currentYear })}</p>
+                    <p>{t("copyright", { year: currentYear })}</p>
                     </div>
                     {/* Admin Login Button - Bottom Left */}
                     {!isAdminPage && (

@@ -9,12 +9,16 @@ import {
   Clock,
   TrendingUp,
   AlertCircle,
+  Search,
 } from "lucide-react";
-import { getReservations } from "@/lib/supabaseService";
+import { getReservations, getReservationById } from "@/lib/supabaseService";
 import type { Reservation } from "@/components/models/reservations";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import { supabase } from "@/lib/supabase";
+import { Input } from "@/components/ui/Input";
+import { Button } from "@/components/ui/Button";
+import { ReservationDetailModal } from "@/components/admin/ReservationDetailModal";
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -53,41 +57,80 @@ export default function AdminDashboard() {
     recentReservations: [] as Reservation[],
   });
   const [loading, setLoading] = useState(true);
+  const [searchId, setSearchId] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [foundReservation, setFoundReservation] = useState<Reservation | null>(null);
+  const [showDetails, setShowDetails] = useState(false);
+
+  const fetchStats = async () => {
+    try {
+      const { data: allReservations } = await getReservations({
+        limit: 1000,
+        offset: 0,
+      });
+
+      const pending = allReservations.filter(
+        (r) => r.status === "pending"
+      );
+      const confirmed = allReservations.filter(
+        (r) => r.status === "confirmed"
+      );
+      const revenue = allReservations
+        .filter((r) => r.status === "confirmed" || r.status === "completed")
+        .reduce((sum, r) => sum + Number(r.totalPrice), 0);
+
+      setStats({
+        totalReservations: allReservations.length,
+        pendingQuotes: pending.length,
+        confirmedReservations: confirmed.length,
+        totalRevenue: revenue,
+        recentReservations: allReservations.slice(0, 5),
+      });
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const { data: allReservations } = await getReservations({
-          limit: 1000,
-          offset: 0,
-        });
-
-        const pending = allReservations.filter(
-          (r) => r.status === "pending"
-        );
-        const confirmed = allReservations.filter(
-          (r) => r.status === "confirmed"
-        );
-        const revenue = allReservations
-          .filter((r) => r.status === "confirmed" || r.status === "completed")
-          .reduce((sum, r) => sum + Number(r.totalPrice), 0);
-
-        setStats({
-          totalReservations: allReservations.length,
-          pendingQuotes: pending.length,
-          confirmedReservations: confirmed.length,
-          totalRevenue: revenue,
-          recentReservations: allReservations.slice(0, 5),
-        });
-      } catch (error) {
-        console.error("Error fetching stats:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchStats();
   }, []);
+
+  const handleSearchReservation = async () => {
+    if (!searchId.trim()) return;
+    
+    setSearching(true);
+    try {
+      const reservation = await getReservationById(searchId.trim());
+      if (reservation) {
+        setFoundReservation(reservation);
+        setShowDetails(true);
+      } else {
+        // If not found, navigate to reservations page with search filter
+        router.push(`/${locale}/admin/reservations?search=${encodeURIComponent(searchId.trim())}`);
+      }
+    } catch (error) {
+      console.error("Error searching reservation:", error);
+      // Navigate to reservations page with search filter anyway
+      router.push(`/${locale}/admin/reservations?search=${encodeURIComponent(searchId.trim())}`);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearchReservation();
+    }
+  };
+
+  const handleUpdateReservation = () => {
+    fetchStats();
+    setShowDetails(false);
+    setFoundReservation(null);
+    setSearchId("");
+  };
 
   if (loading) {
     return (
@@ -105,6 +148,32 @@ export default function AdminDashboard() {
           Overview of your reservations and business metrics
         </p>
       </div>
+
+      {/* Quick Reservation Search */}
+      <Card className="dark:bg-gray-800 dark:border-gray-700">
+        <CardContent className="p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            Quick Search Reservation
+          </h2>
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              placeholder="Enter Reservation ID..."
+              value={searchId}
+              onChange={(e) => setSearchId(e.target.value)}
+              onKeyPress={handleSearchKeyPress}
+              className="flex-1"
+            />
+            <Button
+              onClick={handleSearchReservation}
+              disabled={searching || !searchId.trim()}
+            >
+              <Search className="w-4 h-4 mr-2" />
+              {searching ? "Searching..." : "Search"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -212,7 +281,7 @@ export default function AdminDashboard() {
                   }
                 >
                   <div className="flex-1">
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-4 flex-wrap gap-2">
                       <span className="text-sm font-medium text-gray-900 dark:text-white">
                         #{reservation.id.slice(0, 8)}
                       </span>
@@ -232,6 +301,18 @@ export default function AdminDashboard() {
                       {reservation.date} at {reservation.time} • €
                       {reservation.totalPrice}
                     </p>
+                    <div className="flex items-center space-x-4 mt-1 flex-wrap gap-2">
+                      {reservation.createdAt && (
+                        <span className="text-xs text-gray-500 dark:text-gray-500">
+                          Created: {new Date(reservation.createdAt).toLocaleString()}
+                        </span>
+                      )}
+                      {reservation.updatedAt && reservation.updatedAt !== reservation.createdAt && (
+                        <span className="text-xs text-gray-500 dark:text-gray-500">
+                          Modified: {new Date(reservation.updatedAt).toLocaleString()}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -239,6 +320,20 @@ export default function AdminDashboard() {
           )}
         </CardContent>
       </Card>
+
+      {/* Reservation Detail Modal */}
+      {foundReservation && (
+        <ReservationDetailModal
+          reservation={foundReservation}
+          isOpen={showDetails}
+          onClose={() => {
+            setShowDetails(false);
+            setFoundReservation(null);
+            setSearchId("");
+          }}
+          onUpdate={handleUpdateReservation}
+        />
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react"; 
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useReservationStore } from "@/store/reservationStore";
@@ -10,7 +10,6 @@ import { createClient, createReservation, getLocationById } from "@/lib/supabase
 import { usePricing } from "@/hooks/usePricing";
 import { useServiceFields } from "@/hooks/useServiceFields";
 import { ReservationStatus } from "@/components/models/reservations";
-import { generateUUID } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { 
@@ -22,7 +21,9 @@ import {
   Home, 
   Plus,
   ArrowLeft,
-  FileText
+  FileText,
+  Copy,
+  Check
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { ReservationPDF } from "@/components/pdf/ReservationPDF";
@@ -34,20 +35,27 @@ export default function SubmitReservationPage() {
   
   const {
     reservationId,
+    submittedReservationId,
     isCompleted,
+    isSubmitting: storeIsSubmitting,
     selectedVehicleType,
     selectedService,
     additionalServices,
     serviceSubData,
     formData,
     setCompleted,
+    setSubmittedReservationId,
+    setSubmitting,
     clearSelections,
     resetForm,
-    setReservationId,
   } = useReservationStore();
 
+  // Use ref to track submission attempt (survives remounts)
+  const submissionAttemptedRef = useRef(false);
+  
   const [isSubmitting, setIsSubmitting] = useState(true);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [pdfData, setPdfData] = useState<ReservationPDFData | null>(null);
 
@@ -90,8 +98,9 @@ export default function SubmitReservationPage() {
     }
 
     // Prepare PDF data (will be updated when basePrice changes)
+    // Use submittedReservationId if available, otherwise use reservationId for display
     const pdfData: ReservationPDFData = {
-      reservationId: reservationId || 'unknown',
+      reservationId: submittedReservationId || reservationId || 'unknown',
       customerName: `${formData.firstName || ''} ${formData.lastName || ''}`.trim(),
       customerEmail: formData.email || '',
       customerPhone: formData.phone || '',
@@ -113,7 +122,7 @@ export default function SubmitReservationPage() {
       createdAt: new Date().toISOString(),
     };
     setPdfData(pdfData);
-  }, [selectedService, selectedVehicleType, serviceSubData, formData, additionalServices, reservationId, basePrice]);
+  }, [selectedService, selectedVehicleType, serviceSubData, formData, additionalServices, submittedReservationId, reservationId, basePrice]);
 
   // Update PDF data when basePrice changes
   useEffect(() => {
@@ -125,9 +134,56 @@ export default function SubmitReservationPage() {
     }
   }, [basePrice]);
 
+  // Helper function to generate hash of reservation data for duplicate detection
+  const generateReservationHash = (): string => {
+    const data = JSON.stringify({
+      serviceId: selectedService?.id,
+      vehicleTypeId: selectedVehicleType?.id,
+      date: formData.date,
+      time: formData.time,
+      pickup: serviceSubData?.pickup_location || formData.pickup,
+      destination: serviceSubData?.destination_location || formData.destination,
+      email: formData.email,
+    });
+    // Simple hash function (for duplicate detection, not security)
+    let hash = 0;
+    for (let i = 0; i < data.length; i++) {
+      const char = data.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return hash.toString();
+  };
+
   // Submit reservation - only if we have valid data and haven't submitted yet
   useEffect(() => {
-    // Don't submit if already submitted or if there's an error
+    // GUARD 1: Check if already completed
+    if (isCompleted) {
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+      return;
+    }
+
+    // GUARD 2: Check if already submitted (has submittedReservationId)
+    if (submittedReservationId) {
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+      return;
+    }
+
+    // GUARD 3: Check if submission already in progress (store flag)
+    if (storeIsSubmitting) {
+      // Don't reset isSubmitting state, let it continue
+      return;
+    }
+
+    // GUARD 4: Check if submission already attempted (ref - survives remounts)
+    if (submissionAttemptedRef.current) {
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Don't submit if already submitted locally or if there's an error
     if (isSubmitted || submissionError) {
       return;
     }
@@ -139,11 +195,14 @@ export default function SubmitReservationPage() {
     }
 
     async function submitReservation() {
-      if (!selectedService || !selectedVehicleType || !formData.firstName || !formData.lastName || !formData.email || !formData.phone || !formData.date || !formData.time) {
-        throw new Error('Missing required reservation data');
-      }
+      // Mark submission as attempted immediately (prevents duplicate attempts)
+      submissionAttemptedRef.current = true;
+      setSubmitting(true);
 
       try {
+        if (!selectedService || !selectedVehicleType || !formData.firstName || !formData.lastName || !formData.email || !formData.phone || !formData.date || !formData.time) {
+          throw new Error('Missing required reservation data');
+        }
         // Create or find client
         const client = await createClient({
           firstName: formData.firstName,
@@ -236,19 +295,38 @@ export default function SubmitReservationPage() {
 
         console.log('Reservation submitted successfully:', reservation);
         
-        // Update reservation ID in store
-        setReservationId(reservation.id);
+        // Update submitted reservation ID in store (from server)
+        setSubmittedReservationId(reservation.id);
         
-        // Mark as completed
+        // Mark as completed (synchronously before history manipulation)
         setCompleted(true);
+        
+        // Clear local storage
         if (reservationId) {
           localStorage.removeItem(`reservation-${reservationId}`);
         }
         
         setIsSubmitted(true);
+        setIsSubmitting(false);
+        setSubmitting(false);
+
+        // CRITICAL: Manipulate browser history so back button/gesture goes to Home
+        // Strategy: Push home entry to history, then replace current entry to stay on page
+        // This ensures when user presses back/gesture, they go to home (not back through reservation flow)
+        // This prevents duplicate submissions if user navigates back
+        
+        // Push home entry to history (this becomes the "back" target)
+        window.history.pushState({}, '', `/${locale}`);
+        
+        // Replace current entry to stay on submit page (showing success message)
+        // Now history is: [previous pages] -> home -> submit (current)
+        // When user presses back, they go to home
+        window.history.replaceState({}, '', `/${locale}/reservation/submit`);
       } catch (error) {
         console.error('Error submitting reservation:', error);
         setSubmissionError(error instanceof Error ? error.message : t("unknownError") || 'Unknown error');
+        setSubmitting(false);
+        submissionAttemptedRef.current = false; // Allow retry on error
       } finally {
         setIsSubmitting(false);
       }
@@ -260,7 +338,7 @@ export default function SubmitReservationPage() {
     }, 100); // Small delay to ensure all state is ready
 
     return () => clearTimeout(timeoutId);
-  }, []); // Only run once on mount
+  }, [isCompleted, submittedReservationId, storeIsSubmitting, selectedService, selectedVehicleType, formData, isSubmitted, submissionError, locale, setCompleted, setSubmittedReservationId, setSubmitting]); // Include all dependencies for guards
 
   const getPDFTranslations = (): PDFTranslations => {
     return {
@@ -407,7 +485,6 @@ export default function SubmitReservationPage() {
     if (reservationId) {
       localStorage.removeItem(`reservation-${reservationId}`);
     }
-    setReservationId(generateUUID());
     router.push(`/${locale}/reservation`);
   };
 
@@ -490,9 +567,6 @@ export default function SubmitReservationPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">{t("title")}</h1>
-            <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
-              {t("reservationId")}: <span className="font-mono text-xs">{reservationId?.slice(0, 8)}...</span>
-            </div>
           </div>
         </div>
       </div>
@@ -547,9 +621,62 @@ export default function SubmitReservationPage() {
                       <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">PARIS TRANSFER</h3>
                       <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Premium Transportation Services</p>
                     </div>
-                    <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-3 py-1 rounded text-sm font-medium">
+                    <div className="flex items-center gap-2">
+                      <span className="bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-3 py-1 rounded text-sm font-medium font-mono">
                       #{pdfData.reservationId}
                     </span>
+                      <button
+                        onClick={async () => {
+                          try {
+                            const textToCopy = pdfData.reservationId;
+                            
+                            // Check if clipboard API is available
+                            if (navigator.clipboard && navigator.clipboard.writeText) {
+                              await navigator.clipboard.writeText(textToCopy);
+                            } else {
+                              // Fallback for browsers that don't support clipboard API
+                              const textArea = document.createElement('textarea');
+                              textArea.value = textToCopy;
+                              textArea.style.position = 'fixed';
+                              textArea.style.left = '-999999px';
+                              textArea.style.top = '-999999px';
+                              document.body.appendChild(textArea);
+                              textArea.focus();
+                              textArea.select();
+                              
+                              try {
+                                const successful = document.execCommand('copy');
+                                if (!successful) {
+                                  throw new Error('Copy command failed');
+                                }
+                              } catch (err) {
+                                console.error('Fallback copy failed:', err);
+                                // Last resort: show the ID in an alert
+                                alert(`Reservation ID: ${textToCopy}`);
+                              } finally {
+                                document.body.removeChild(textArea);
+                              }
+                            }
+                            
+                            setCopied(true);
+                            setTimeout(() => setCopied(false), 2000);
+                          } catch (err) {
+                            console.error('Failed to copy:', err);
+                            // Show fallback alert
+                            alert(`Reservation ID: ${pdfData.reservationId}`);
+                          }
+                        }}
+                        className="p-1.5 hover:bg-blue-200 dark:hover:bg-blue-800 rounded transition-colors"
+                        aria-label="Copy reservation ID"
+                        title="Copy reservation ID"
+                      >
+                        {copied ? (
+                          <Check className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        ) : (
+                          <Copy className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
 

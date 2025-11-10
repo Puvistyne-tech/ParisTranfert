@@ -11,11 +11,20 @@ export interface AdditionalServices {
 }
 
 interface ReservationState {
-  // Reservation ID - created in step 1
+  // Reservation ID - local tracking only (not sent to server)
   reservationId: string | null;
+  
+  // Final reservation ID from server after successful submission
+  submittedReservationId: string | null;
   
   // Whether reservation is completed (prevents going back to sections)
   isCompleted: boolean;
+  
+  // Whether reservation submission is in progress
+  isSubmitting: boolean;
+  
+  // Hash of reservation data to track submission attempts
+  submissionAttemptHash: string | null;
   
   // Current step in the reservation process
   currentStep: number;
@@ -35,7 +44,10 @@ interface ReservationState {
 
   // Actions
   setReservationId: (id: string) => void;
+  setSubmittedReservationId: (id: string) => void;
   setCompleted: (completed: boolean) => void;
+  setSubmitting: (submitting: boolean) => void;
+  setSubmissionAttemptHash: (hash: string | null) => void;
   setCurrentStep: (step: number) => void;
   updateFormData: (data: Partial<ReservationFormData>) => void;
   setSelectedService: (service: Service | null) => void;
@@ -53,7 +65,10 @@ export const useReservationStore = create<ReservationState>()(
   persist(
     (set, get) => ({
       reservationId: null,
+      submittedReservationId: null,
       isCompleted: false,
+      isSubmitting: false,
+      submissionAttemptHash: null,
       currentStep: 1,
       formData: {},
       selectedService: null,
@@ -66,7 +81,10 @@ export const useReservationStore = create<ReservationState>()(
       serviceSubData: {},
 
       setReservationId: (id) => set({ reservationId: id }),
+      setSubmittedReservationId: (id) => set({ submittedReservationId: id }),
       setCompleted: (completed) => set({ isCompleted: completed }),
+      setSubmitting: (submitting) => set({ isSubmitting: submitting }),
+      setSubmissionAttemptHash: (hash) => set({ submissionAttemptHash: hash }),
       setCurrentStep: (step) => {
         const state = get();
         // Prevent going back to sections if reservation is completed
@@ -114,7 +132,10 @@ export const useReservationStore = create<ReservationState>()(
       resetForm: () =>
         set({
           reservationId: null,
+          submittedReservationId: null,
           isCompleted: false,
+          isSubmitting: false,
+          submissionAttemptHash: null,
           currentStep: 1,
           formData: {},
           selectedService: null,
@@ -139,6 +160,8 @@ export const useReservationStore = create<ReservationState>()(
             meetAndGreet: false
           },
           isCompleted: false,
+          isSubmitting: false,
+          submissionAttemptHash: null,
           currentStep: 1,
         }),
 
@@ -158,7 +181,10 @@ export const useReservationStore = create<ReservationState>()(
       name: "reservation-store",
       partialize: (state) => ({
         reservationId: state.reservationId,
+        submittedReservationId: state.submittedReservationId,
         isCompleted: state.isCompleted,
+        isSubmitting: state.isSubmitting,
+        submissionAttemptHash: state.submissionAttemptHash,
         currentStep: state.currentStep,
         formData: state.formData,
         selectedService: state.selectedService,

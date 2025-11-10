@@ -103,6 +103,8 @@ export function mapReservationRow(row: Tables<'reservations'>): Reservation {
     notes: row.notes || undefined,
     totalPrice: Number(row.total_price),
     status: row.status as ReservationStatus,
+    createdAt: row.created_at || undefined,
+    updatedAt: row.updated_at || undefined,
   };
 }
 
@@ -503,6 +505,31 @@ export async function createReservation(reservationData: {
   totalPrice: number;
   status?: ReservationStatus;
 }): Promise<Reservation> {
+  // Check for duplicate reservation BEFORE inserting
+  // Duplicate = same client_id + date + time + pickup_location
+  const { data: existingReservation, error: checkError } = await supabase
+    .from('reservations')
+    .select('*')
+    .eq('client_id', reservationData.clientId)
+    .eq('date', reservationData.date)
+    .eq('time', reservationData.time)
+    .eq('pickup_location', reservationData.pickupLocation)
+    .limit(1)
+    .maybeSingle();
+
+  if (checkError && checkError.code !== 'PGRST116') {
+    // PGRST116 is "not found" which is expected, other errors are real issues
+    console.error('Error checking for duplicate reservation:', checkError);
+    throw new Error(`Failed to check for duplicate reservation: ${checkError.message}`);
+  }
+
+  // If duplicate found, return existing reservation (idempotent operation)
+  if (existingReservation) {
+    console.log('Duplicate reservation detected, returning existing reservation:', existingReservation.id);
+    return mapReservationRow(existingReservation);
+  }
+
+  // No duplicate found, create new reservation
   const insertData: TablesInsert<'reservations'> = {
     client_id: reservationData.clientId,
     service_id: reservationData.serviceId,

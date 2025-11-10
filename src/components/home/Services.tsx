@@ -52,7 +52,7 @@ export function Services() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-100px" }}
         >
           <h2 className="text-4xl lg:text-6xl font-bold font-display text-gray-900 dark:text-gray-100 mb-6">
             {t("title")}
@@ -92,8 +92,8 @@ export function Services() {
                 key={service.id}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
-                viewport={{ once: true }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true, margin: "-100px" }}
               >
                 <Card className="service-card p-8 card-hover h-full">
                   <CardContent className="text-center h-full flex flex-col">

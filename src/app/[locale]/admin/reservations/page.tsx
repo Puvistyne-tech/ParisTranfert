@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Eye, Download, Calendar } from "lucide-react";
@@ -13,6 +14,7 @@ import { StatusBadge } from "@/components/admin/StatusBadge";
 import { ReservationDetailModal } from "@/components/admin/ReservationDetailModal";
 
 export default function AdminReservationsPage() {
+  const searchParams = useSearchParams();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
@@ -20,7 +22,7 @@ export default function AdminReservationsPage() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [filters, setFilters] = useState({
-    search: "",
+    search: searchParams.get("search") || "",
     status: "",
     dateFrom: "",
     dateTo: "",
@@ -54,13 +56,39 @@ export default function AdminReservationsPage() {
 
       // Apply additional filters
       if (filters.search) {
-        const searchLower = filters.search.toLowerCase();
-        filtered = filtered.filter(
-          (r) =>
-            r.id.toLowerCase().includes(searchLower) ||
-            r.pickupLocation.toLowerCase().includes(searchLower) ||
-            r.destinationLocation?.toLowerCase().includes(searchLower)
-        );
+        const searchLower = filters.search.toLowerCase().trim();
+        // Check if search is an exact UUID match (reservation ID)
+        // UUIDs are typically 36 characters with hyphens: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+        const isUUIDFormat = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(filters.search.trim());
+        const isPartialUUID = /^[0-9a-f-]{8,}$/i.test(filters.search.trim());
+        
+        if (isUUIDFormat) {
+          // Exact UUID match - prioritize this result
+          const exactMatch = filtered.find(r => r.id.toLowerCase() === searchLower);
+          if (exactMatch) {
+            filtered = [exactMatch];
+          } else {
+            // No exact match found
+            filtered = [];
+          }
+        } else if (isPartialUUID) {
+          // Partial UUID - prioritize ID matches
+          const idMatches = filtered.filter(r => r.id.toLowerCase().includes(searchLower));
+          const otherMatches = filtered.filter(
+            r => !r.id.toLowerCase().includes(searchLower) &&
+            (r.pickupLocation.toLowerCase().includes(searchLower) ||
+            r.destinationLocation?.toLowerCase().includes(searchLower))
+          );
+          filtered = [...idMatches, ...otherMatches];
+        } else {
+          // Regular search - check all fields
+          filtered = filtered.filter(
+            (r) =>
+              r.id.toLowerCase().includes(searchLower) ||
+              r.pickupLocation.toLowerCase().includes(searchLower) ||
+              r.destinationLocation?.toLowerCase().includes(searchLower)
+          );
+        }
       }
 
       if (filters.serviceId) {
@@ -139,7 +167,7 @@ export default function AdminReservationsPage() {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <div className="flex items-center space-x-4 mb-2">
+                      <div className="flex items-center space-x-4 mb-2 flex-wrap gap-2">
                         <StatusBadge status={reservation.status as any} />
                         <span className="text-sm text-gray-500 dark:text-gray-400">
                           ID: {reservation.id.slice(0, 8)}
@@ -147,6 +175,16 @@ export default function AdminReservationsPage() {
                         <span className="text-sm text-gray-500 dark:text-gray-400">
                           {reservation.date} at {reservation.time}
                         </span>
+                        {reservation.createdAt && (
+                          <span className="text-xs text-gray-400 dark:text-gray-500">
+                            Created: {new Date(reservation.createdAt).toLocaleString()}
+                          </span>
+                        )}
+                        {reservation.updatedAt && reservation.updatedAt !== reservation.createdAt && (
+                          <span className="text-xs text-gray-400 dark:text-gray-500">
+                            Modified: {new Date(reservation.updatedAt).toLocaleString()}
+                          </span>
+                        )}
                       </div>
                       <div className="grid md:grid-cols-4 gap-4 text-sm">
                         <div>

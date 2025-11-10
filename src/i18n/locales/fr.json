@@ -393,6 +393,7 @@
     "subtitle": "Vérifiez les détails de votre réservation avant de soumettre",
     "bookingSummary": "Résumé de la Réservation",
     "tripDetails": "Détails du Voyage",
+    "reservationStatus": "Statut de la Réservation",
     "contactInfo": "Informations de Contact",
     "serviceDetails": "Détails du Service",
     "additionalServices": "Services Supplémentaires",
@@ -405,6 +406,8 @@
     "back": "Retour",
     "date": "Date",
     "time": "Heure",
+    "pickup": "Prise en Charge",
+    "destination": "Destination",
     "passengers": "Passagers",
     "name": "Nom",
     "email": "Email",
@@ -608,5 +611,12 @@
       "subtitle": "Réservez votre transfert dès aujourd'hui et découvrez pourquoi des milliers de clients font confiance à Paris Transfers pour leurs besoins de transport.",
       "bookTransferNow": "Réservez Votre Transfert Maintenant"
     }
+  },
+  "reservationStatus": {
+    "title": "Statut de la Réservation",
+    "notFound": "Réservation introuvable",
+    "loading": "Chargement de la réservation...",
+    "viewReservation": "Voir le Statut de la Réservation",
+    "error": "Erreur lors du chargement de la réservation"
   }
 }

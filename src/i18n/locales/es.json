@@ -393,6 +393,7 @@
     "subtitle": "Revise los detalles de su reserva antes de enviar",
     "bookingSummary": "Resumen de la Reserva",
     "tripDetails": "Detalles del Viaje",
+    "reservationStatus": "Estado de la Reserva",
     "contactInfo": "Información de Contacto",
     "serviceDetails": "Detalles del Servicio",
     "additionalServices": "Servicios Adicionales",
@@ -405,6 +406,8 @@
     "back": "Volver",
     "date": "Fecha",
     "time": "Hora",
+    "pickup": "Recogida",
+    "destination": "Destino",
     "passengers": "Pasajeros",
     "name": "Nombre",
     "email": "Email",
@@ -608,5 +611,12 @@
       "subtitle": "Reserva tu transfer hoy y descubre por qué miles de clientes confían en Paris Transfers para sus necesidades de transporte.",
       "bookTransferNow": "Reserva Tu Transfer Ahora"
     }
+  },
+  "reservationStatus": {
+    "title": "Estado de la Reserva",
+    "notFound": "Reserva no encontrada",
+    "loading": "Cargando reserva...",
+    "viewReservation": "Ver Estado de la Reserva",
+    "error": "Error al cargar la reserva"
   }
 }

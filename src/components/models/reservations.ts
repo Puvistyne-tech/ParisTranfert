@@ -25,4 +25,6 @@ export interface Reservation {
   notes?: string;
   totalPrice: number;
   status: ReservationStatus;
+  createdAt?: string; // ISO timestamp
+  updatedAt?: string; // ISO timestamp
 }

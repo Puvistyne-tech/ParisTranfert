@@ -17,7 +17,6 @@ import { useVehicleTypes } from "@/hooks/useVehicleTypes";
 import { useLocations } from "@/hooks/useLocations";
 import { useServiceFields } from "@/hooks/useServiceFields";
 import { reservationSchema, createServiceFieldSchema, locationSchema } from "@/lib/validations";
-import { generateUUID } from "@/lib/utils";
 import { Step1Selection } from "@/components/reservation/Step1Selection";
 import { Step2TripDetails } from "@/components/reservation/Step2TripDetails";
 import { Step3BookingSummary } from "@/components/reservation/Step3BookingSummary";
@@ -72,13 +71,8 @@ export default function ReservationPage() {
     }
   }, [isCompleted, locale, router]);
 
-  // Generate reservation ID on mount if not exists (only if not completed)
-  useEffect(() => {
-    if (!isCompleted && !reservationId) {
-      const uuid = generateUUID();
-      setReservationId(uuid);
-    }
-  }, [reservationId, isCompleted, setReservationId]);
+  // Note: reservationId is for local tracking only, not sent to server
+  // Server generates the actual reservation ID after submission
 
   // Use TanStack Query hooks for data fetching with automatic caching
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
@@ -144,9 +138,8 @@ export default function ReservationPage() {
     // Explicitly clear the Zustand persisted store BEFORE resetForm
     localStorage.removeItem('reservation-store');
     // Use resetForm to completely clear everything
-    const { resetForm, setReservationId } = useReservationStore.getState();
+    const { resetForm } = useReservationStore.getState();
     resetForm();
-    setReservationId(generateUUID()); // Generate new ID
     setShowExitConfirmation(false);
     router.push(`/${locale}`);
   };

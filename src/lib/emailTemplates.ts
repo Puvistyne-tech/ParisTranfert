@@ -189,14 +189,15 @@ export function generateCustomerConfirmationEmail(reservation: any, status: 'con
           ` : ''}
           
           <div style="text-align: center; margin-top: 30px;">
-            <a href="mailto:info@paristransfer.com" class="button">Contact Us</a>
-            ${isConfirmed ? `<a href="${process.env.NEXT_PUBLIC_APP_URL}/confirmation?download=${reservation.reservationId || reservation.id}" class="button">Download PDF</a>` : ''}
+            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://prestigeparistransfert.com'}/en/reservation/${reservation.reservationId || reservation.id}" class="button" style="background: #10b981; margin-bottom: 10px; display: block;">View Reservation Status</a>
+            <a href="mailto:support@prestigeshuttlegroup.com" class="button" style="background: #6b7280;">Contact Us</a>
+            ${isConfirmed ? `<a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://prestigeparistransfert.com'}/confirmation?download=${reservation.reservationId || reservation.id}" class="button" style="background: #2563eb;">Download PDF</a>` : ''}
           </div>
         </div>
         
         <div class="footer">
           <p>Thank you for choosing Paris Transfer!</p>
-          <p>Email: info@paristransfer.com | Phone: +33 1 23 45 67 89</p>
+          <p>Email: support@prestigeshuttlegroup.com | Phone: +33 6 19 97 51 36</p>
         </div>
       </div>
     </body>
@@ -233,7 +234,10 @@ Important Information:
 - Contact us immediately if you need to make changes
 ` : ''}
 
-Contact us at info@paristransfer.com or +33 1 23 45 67 89
+View your reservation status online:
+https://${process.env.NEXT_PUBLIC_APP_URL?.replace(/^https?:\/\//, '') || 'prestigeparistransfert.com'}/en/reservation/${reservation.reservationId || reservation.id}
+
+Contact us at support@prestigeshuttlegroup.com or +33 6 19 97 51 36
 
 Thank you for choosing Paris Transfer!
   `.trim();

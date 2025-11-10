@@ -131,19 +131,14 @@ export default function ServicesPage() {
               <span>{t("backToHome")}</span>
             </Button>
           </div>
-          <motion.div
-            className="text-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          <div className="text-center">
             <h1 className="text-4xl lg:text-6xl font-bold font-display text-gray-900 dark:text-gray-100 mb-6">
               {t("title")}
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
               {t("subtitle")}
             </p>
-          </motion.div>
+          </div>
         </div>
       </div>
 
@@ -155,8 +150,8 @@ export default function ServicesPage() {
               key={category.id}
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: categoryIndex * 0.05 }}
-              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.3 }}
+              viewport={{ once: true, margin: "-100px" }}
               className="mb-16"
             >
               <div className="text-center mb-12">
@@ -178,13 +173,16 @@ export default function ServicesPage() {
                       key={service.id}
                       initial={{ opacity: 0, y: 10 }}
                       whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: Math.min(serviceIndex * 0.03, 0.15) }}
-                      viewport={{ once: true, margin: "-50px" }}
+                      transition={{ duration: 0.3 }}
+                      viewport={{ once: true, margin: "-100px" }}
                     >
-                      <Card className="p-0 shadow-lg card-hover h-full flex flex-col group cursor-pointer hover:shadow-xl transition-all duration-300 relative overflow-hidden">
+                      <Card 
+                        className="p-0 shadow-lg card-hover h-full flex flex-col group cursor-pointer hover:shadow-xl transition-all duration-300 relative overflow-hidden"
+                        onClick={() => handleBookService(service)}
+                      >
                         <CardContent className="text-center flex flex-col h-full relative p-0">
                           {/* Service Image - Full Width */}
-                          <div className="w-full h-48 relative overflow-hidden group-hover:scale-105 transition-all duration-300">
+                          <div className="w-full h-48 relative overflow-hidden group-hover:scale-105 md:group-hover:scale-105 transition-all duration-300">
                             {service.image ? (
                               <Image
                                 src={service.image}
@@ -236,15 +234,34 @@ export default function ServicesPage() {
                             </div>
                           </div>
 
-                          {/* Hover Overlay with Book Button */}
-                          <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-20">
+                          {/* Hover Overlay with Book Button - Visible on hover (desktop) and always on mobile */}
+                          <div className="absolute inset-0 bg-black/30 opacity-0 md:group-hover:opacity-100 md:transition-opacity duration-300 flex items-center justify-center z-20 pointer-events-none">
                             <Button
                               variant="primary"
                               size="lg"
-                              className="btn-premium scale-110 shadow-2xl"
-                              onClick={() => handleBookService(service)}
+                              className="btn-premium scale-110 shadow-2xl pointer-events-auto"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleBookService(service);
+                              }}
                             >
                               <Calendar className="w-5 h-5 mr-2" />
+                              {t("bookNow")}
+                            </Button>
+                          </div>
+                          
+                          {/* Mobile Book Button - Always visible on mobile */}
+                          <div className="md:hidden absolute bottom-4 left-4 right-4 z-20">
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              className="w-full btn-premium shadow-xl"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleBookService(service);
+                              }}
+                            >
+                              <Calendar className="w-4 h-4 mr-2" />
                               {t("bookNow")}
                             </Button>
                           </div>

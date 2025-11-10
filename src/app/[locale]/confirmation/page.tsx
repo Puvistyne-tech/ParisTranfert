@@ -12,7 +12,6 @@ import {useReservationStore} from "@/store/reservationStore";
 import {downloadReservationPDF, type ReservationPDFData} from "@/lib/pdfUtils";
 import {usePricing} from "@/hooks/usePricing";
 import {getTranslatedVehicleDescription, getTranslatedServiceName} from "@/lib/translations";
-import {generateUUID} from "@/lib/utils";
 import Image from "next/image";
 
 export default function ConfirmationPage() {
@@ -24,6 +23,7 @@ export default function ConfirmationPage() {
 
     const {
         reservationId: storeReservationId,
+        submittedReservationId,
         isCompleted,
         selectedVehicleType,
         selectedService,
@@ -46,8 +46,8 @@ export default function ConfirmationPage() {
     const [imageError, setImageError] = useState(false);
     const [showExitConfirmation, setShowExitConfirmation] = useState(false);
 
-    // Use reservation ID from store
-    const reservationId = storeReservationId || '';
+    // Use submitted reservation ID from server if available, otherwise use local tracking ID
+    const reservationId = submittedReservationId || storeReservationId || '';
 
     // Extract only location fields that affect pricing
     // This ensures price only refetches when locations change, not when other fields change
@@ -180,9 +180,8 @@ export default function ConfirmationPage() {
         // Explicitly clear the Zustand persisted store BEFORE resetForm
         localStorage.removeItem('reservation-store');
         // Use resetForm to completely clear everything
-        const { resetForm, setReservationId } = useReservationStore.getState();
+        const { resetForm } = useReservationStore.getState();
         resetForm();
-        setReservationId(generateUUID()); // Generate new ID
         setShowExitConfirmation(false);
         window.location.href = `/${locale}`;
     };
@@ -276,50 +275,12 @@ export default function ConfirmationPage() {
                             </Button>
                             <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 truncate">{t("title")}</h1>
                         </div>
-                        <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
-                            {t("reservationId")}: <span className="font-mono text-xs">{reservationId?.slice(0, 8)}...</span>
-                        </div>
                     </div>
                 </div>
             </div>
 
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
                 <div className="space-y-4 sm:space-y-6">
-                    {/* Reservation Status - Full Width */}
-                        <motion.div
-                            initial={{opacity: 0, y: 20}}
-                            animate={{opacity: 1, y: 0}}
-                        >
-                            <Card>
-                                <CardContent className="p-4 sm:p-6">
-                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                                        <div className="flex items-center space-x-3">
-                                        <div
-                                            className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center flex-shrink-0">
-                                            <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400"/>
-                                        </div>
-                                        <div className="min-w-0">
-                                                <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">{isSubmitted ? t("reservationSubmitted") : t("reservationPending")}</h2>
-                                                <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">{isSubmitted ? t("submittedSuccessfully") : t("awaitingApproval")}</p>
-                                        </div>
-                                    </div>
-                                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 sm:p-4 mt-4">
-                                        <p className="text-blue-800 dark:text-blue-300 text-xs sm:text-sm">
-                                            <strong>{t("referenceNumber")}:</strong> <span className="font-mono break-all">{reservationId}</span>
-                                        </p>
-                                    </div>
-                                    </div>
-                                    {!isSubmitted && (
-                                        <div className="mt-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 sm:p-4">
-                                            <p className="text-blue-700 dark:text-blue-400 text-xs sm:text-sm">
-                                            {t("confirmationEmailNote")}
-                                        </p>
-                                    </div>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        </motion.div>
-
                 <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
                     {/* Reservation Details */}
                     <div className="lg:col-span-2 space-y-4 sm:space-y-6">

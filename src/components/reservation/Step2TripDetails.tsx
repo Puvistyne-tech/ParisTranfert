@@ -425,8 +425,8 @@ export function Step2TripDetails({
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
               {t("basicInformation")}
             </h3>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              <div className="w-full">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Calendar className="w-4 h-4 inline mr-2" />
                   {t("pickupDate")}
@@ -439,7 +439,7 @@ export function Step2TripDetails({
                 />
               </div>
               
-              <div>
+              <div className="w-full">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Clock className="w-4 h-4 inline mr-2" />
                   {t("pickupTime")}
@@ -452,7 +452,7 @@ export function Step2TripDetails({
                 />
               </div>
               
-              <div>
+              <div className="w-full md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Users className="w-4 h-4 inline mr-2" />
                   {t("numberOfPassengers")}
@@ -468,7 +468,7 @@ export function Step2TripDetails({
                     value: (i + 1).toString(),
                     label: `${i + 1} ${i === 0 ? t("passenger") : t("passengers")}`
                   }))}
-                  className={errorFields.has('passengers') ? 'border-red-500 dark:border-red-500 border-2' : ''}
+                  className={`w-full ${errorFields.has('passengers') ? 'border-red-500 dark:border-red-500 border-2' : ''}`}
                 />
               </div>
             </div>
@@ -487,11 +487,11 @@ export function Step2TripDetails({
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                 {t("pleaseProvideInfo", { serviceName: selectedService?.name || "" })}
               </p>
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 {serviceFields.map((field) => {
                   const Icon = fieldIcons[field.fieldKey] || FileText;
                   return (
-                    <div key={field.id} className="space-y-2">
+                    <div key={field.id} className="space-y-2 w-full">
                       <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300">
                         <Icon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                         <span>
@@ -512,7 +512,7 @@ export function Step2TripDetails({
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
               {t("contactInformation")}
             </h3>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <User className="w-4 h-4 inline mr-2" />

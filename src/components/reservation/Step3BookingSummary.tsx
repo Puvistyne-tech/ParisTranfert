@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Car, Baby, Users, UserCheck, Image as ImageIcon } from "lucide-react";
@@ -68,17 +67,17 @@ export function Step3BookingSummary({
   }, [selectedVehicleType?.id]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1 }}
-      className="sticky top-20"
-    >
+    <div className="sticky top-20">
       <Card>
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
             {t("bookingSummary")}
           </h3>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Please verify your information before confirming
+            </p>
+          </div>
           
           {selectedVehicleType && (
             <div className="mb-6">
@@ -221,7 +220,7 @@ export function Step3BookingSummary({
           </Button>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }
 

@@ -1,3 +1,6 @@
+
+
+//hero
 "use client";
 
 import { motion } from "framer-motion";
@@ -18,7 +21,7 @@ import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useServices } from "@/hooks/useServices";
 import { useVehicleTypes } from "@/hooks/useVehicleTypes";
 import { useLocationsByService } from "@/hooks/useLocationsByService";
@@ -40,6 +43,7 @@ export function Hero() {
   const [airportLocations, setAirportLocations] = useState<Location[]>([]);
   const [airportService, setAirportService] = useState<Service | null>(null);
   const [carVehicleType, setCarVehicleType] = useState<VehicleType | null>(null);
+  const prevLocationsRef = useRef<string>('');
   const [quickBookingData, setQuickBookingData] = useState({
     pickup: "",
     destination: "",
@@ -255,15 +259,36 @@ export function Hero() {
   
   // Find airport transfers service and car vehicle type
   useEffect(() => {
+    // Only initialize once or when data actually changes
+    if (services.length === 0 || vehicleTypes.length === 0) return;
+    
     const airportServiceData = services.find(s => s.id === 'airport-transfers');
     if (airportServiceData) {
-      setAirportService(airportServiceData);
-      setAirportLocations(airportLocationsData);
+      setAirportService(prev => {
+        if (!prev || prev.id !== airportServiceData.id) {
+          return airportServiceData;
+        }
+        return prev;
+      });
+    }
+    
+    if (airportLocationsData.length > 0) {
+      // Compare by serializing IDs to avoid reference equality issues
+      const newIds = JSON.stringify(airportLocationsData.map(l => l.id).sort());
+      if (prevLocationsRef.current !== newIds) {
+        prevLocationsRef.current = newIds;
+        setAirportLocations(airportLocationsData);
+      }
     }
     
     const carType = vehicleTypes.find(vt => vt.id === 'car');
     if (carType) {
-      setCarVehicleType(carType);
+      setCarVehicleType(prev => {
+        if (!prev || prev.id !== carType.id) {
+          return carType;
+        }
+        return prev;
+      });
     }
   }, [services, vehicleTypes, airportLocationsData]);
 
@@ -712,13 +737,8 @@ export function Hero() {
 
       {/* Pending Reservation Notification Banner - Fixed/Sticky */}
       {showPendingNotification && (
-        <motion.div
-          initial={{ opacity: 0, x: 100 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 100 }}
-          className="fixed top-16 md:top-20 right-4 z-[60] w-full max-w-sm"
-        >
-          <div className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 rounded-xl shadow-2xl p-3 border-2 border-yellow-300 relative overflow-hidden">
+        <div className="fixed top-20 md:top-24 left-4 right-4 md:right-4 md:left-auto z-[60] w-auto md:w-full md:max-w-sm">
+          <div className="bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 rounded-xl shadow-2xl p-2 sm:p-3 border-2 border-yellow-300 relative overflow-hidden">
             {/* Sparkle animation */}
             <motion.div
               className="absolute inset-0"
@@ -736,51 +756,42 @@ export function Hero() {
               }}
             />
             
-            <div className="relative flex items-center gap-2">
-              <motion.div
-                animate={{ rotate: [0, 360] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="flex-shrink-0"
-              >
-                <Sparkles className="w-4 h-4 text-white" />
-              </motion.div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-white text-sm leading-tight mb-0.5">
+            <div className="relative flex items-center gap-1.5 sm:gap-2 min-w-0">
+              <div className="flex-shrink-0">
+                <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
+              </div>
+              <div className="flex-1 min-w-0 overflow-hidden">
+                <h3 className="font-bold text-white text-xs sm:text-sm leading-tight mb-0.5 truncate">
                   {t("continueReservation")}
                 </h3>
-                <p className="text-white/90 text-xs leading-tight line-clamp-2">
+                <p className="text-white/90 text-[10px] sm:text-xs leading-tight line-clamp-1">
                   {t("pendingReservation")}
                 </p>
               </div>
-              <div className="flex items-center gap-1.5 flex-shrink-0">
+              <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
                 <Button
                   onClick={handleContinueReservation}
-                  className="bg-white text-orange-600 hover:bg-white/90 font-semibold px-2.5 py-1 text-xs rounded-md shadow-md whitespace-nowrap"
+                  className="bg-white text-orange-600 hover:bg-white/90 font-semibold px-1.5 sm:px-2.5 py-0.5 sm:py-1 text-[9px] sm:text-xs rounded-md shadow-md whitespace-nowrap"
                 >
                   {t("resumeBooking")}
                 </Button>
                 <button
                   onClick={handleDismissNotification}
-                  className="text-white hover:text-white/80 p-1 rounded-full hover:bg-white/20 transition-colors flex-shrink-0"
+                  className="text-white hover:text-white/80 p-0.5 sm:p-1 rounded-full hover:bg-white/20 transition-colors flex-shrink-0"
                   aria-label={t("dismiss")}
                 >
-                  <X className="w-3.5 h-3.5" />
+                  <X className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 </button>
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       )}
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-8 md:py-12">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
-          <motion.div
-            className="text-white animate-slide-in-left"
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-          >
+          <div className="text-white">
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold font-display mb-6 leading-tight">
               Premium <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">Paris</span>
               <br />
@@ -804,7 +815,7 @@ export function Hero() {
               <Button
                 variant="outline"
                 size="lg"
-                className="bg-white/10 backdrop-blur-sm text-white border-white/30 hover:bg-white/20 hover:border-white/50"
+                className="bg-white/10 backdrop-blur-sm text-white border-white/30 hover:bg-white/20 hover:border-white/50 dark:bg-white/10 dark:text-white dark:border-white/30 dark:hover:bg-white/20 dark:hover:border-white/50"
                 onClick={() =>
                   document
                     .getElementById("services")
@@ -831,15 +842,10 @@ export function Hero() {
                 <span>{t("trustIndicators.rated")}</span>
               </div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Right Content - Quick Booking Form */}
-          <motion.div
-            className="animate-slide-in-right"
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-          >
+          <div>
             <div className="relative">
               {/* Main Card */}
               <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-lg rounded-3xl p-8 border border-white/50 dark:border-gray-700/50 shadow-2xl">
@@ -949,7 +955,7 @@ export function Hero() {
                 </div>
               </motion.div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
 
