@@ -200,9 +200,11 @@ export async function confirmReservation(
         "confirmed" as any
     );
 
+    // Admin emails always use "en" locale
     const emailTemplate = generateConfirmedEmail(
         reservationData,
-        `${client.firstName} ${client.lastName}`
+        `${client.firstName} ${client.lastName}`,
+        "en"
     );
 
     // Generate PDF attachment for confirmed reservations

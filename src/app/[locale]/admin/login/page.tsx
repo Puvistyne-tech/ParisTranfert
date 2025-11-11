@@ -31,9 +31,24 @@ export default function AdminLoginPage() {
         if (user) {
           const adminCheck = await isAdmin();
 
-          // If user is authenticated and is an admin, redirect to admin dashboard
+          // If user is authenticated and is an admin, redirect to returnUrl or admin dashboard
           if (adminCheck) {
+            const returnUrl = searchParams.get("returnUrl");
+            if (returnUrl) {
+              try {
+                const decodedUrl = decodeURIComponent(returnUrl);
+                // Validate that the URL is within the admin section for security
+                if (decodedUrl.startsWith(`/${locale}/admin`)) {
+                  router.push(decodedUrl);
+                } else {
+                  router.push(`/${locale}/admin`);
+                }
+              } catch {
+                router.push(`/${locale}/admin`);
+              }
+            } else {
             router.push(`/${locale}/admin`);
+            }
             return;
           }
 
@@ -64,7 +79,24 @@ export default function AdminLoginPage() {
 
     try {
       await signIn(email, password);
+      
+      // Redirect to returnUrl if present, otherwise to admin dashboard
+      const returnUrl = searchParams.get("returnUrl");
+      if (returnUrl) {
+        try {
+          const decodedUrl = decodeURIComponent(returnUrl);
+          // Validate that the URL is within the admin section for security
+          if (decodedUrl.startsWith(`/${locale}/admin`)) {
+            router.push(decodedUrl);
+          } else {
+            router.push(`/${locale}/admin`);
+          }
+        } catch {
+          router.push(`/${locale}/admin`);
+        }
+      } else {
       router.push(`/${locale}/admin`);
+      }
       router.refresh();
     } catch (err: any) {
       setError(err.message || "Invalid email or password");
@@ -78,7 +110,28 @@ export default function AdminLoginPage() {
     setGoogleLoading(true);
 
     try {
-      await signInWithGoogle(`${window.location.origin}/${locale}/admin`);
+      // Get returnUrl and pass it to OAuth redirect
+      const returnUrl = searchParams.get("returnUrl");
+      let redirectTo = `${window.location.origin}/${locale}/admin`;
+      
+      if (returnUrl) {
+        try {
+          const decodedUrl = decodeURIComponent(returnUrl);
+          // Validate that the URL is within the admin section for security
+          if (decodedUrl.startsWith(`/${locale}/admin`)) {
+            redirectTo = `${window.location.origin}${decodedUrl}`;
+          }
+        } catch {
+          // Use default redirect if decoding fails
+        }
+      }
+      
+      // Store returnUrl in the redirect URL as a query parameter so we can retrieve it after OAuth
+      const finalRedirect = returnUrl 
+        ? `${redirectTo}?returnUrl=${encodeURIComponent(returnUrl)}`
+        : redirectTo;
+      
+      await signInWithGoogle(finalRedirect);
     } catch (err: any) {
       setError(err.message || "Failed to sign in with Google");
       setGoogleLoading(false);

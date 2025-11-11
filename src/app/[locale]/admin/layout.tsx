@@ -51,9 +51,27 @@ export default function AdminLayout({
               );
             }
 
+            // Check for returnUrl in query params and redirect after OAuth
+            const urlParams = new URLSearchParams(window.location.search);
+            const returnUrl = urlParams.get("returnUrl");
+            
             // Clean up the URL by removing the hash (after Supabase has processed it)
             const cleanUrl = window.location.pathname + window.location.search;
             window.history.replaceState({}, "", cleanUrl);
+
+            // If returnUrl exists and is valid, redirect there after OAuth
+            if (returnUrl) {
+              try {
+                const decodedUrl = decodeURIComponent(returnUrl);
+                // Validate that the URL is within the admin section for security
+                if (decodedUrl.startsWith(`/${locale}/admin`)) {
+                  router.push(decodedUrl);
+                  return;
+                }
+              } catch {
+                // If decoding fails, continue to normal flow
+              }
+            }
 
             // Refresh to update auth state throughout the app
             router.refresh();
@@ -80,7 +98,10 @@ export default function AdminLayout({
         const adminCheck = await isAdmin();
 
         if (!currentUser || !adminCheck) {
-          router.push(`/${locale}/admin/login`);
+          // Capture the intended destination URL and pass it as returnUrl
+          const currentPath = pathname || "";
+          const returnUrl = encodeURIComponent(currentPath);
+          router.push(`/${locale}/admin/login?returnUrl=${returnUrl}`);
           return;
         }
 

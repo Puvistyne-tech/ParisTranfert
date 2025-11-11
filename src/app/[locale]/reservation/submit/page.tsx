@@ -343,6 +343,7 @@ export default function SubmitReservationPage() {
           notes: formData.notes || undefined,
           totalPrice: basePrice || 0,
           status: reservationStatus,
+          locale: locale, // Pass locale for email URLs
         });
 
         console.log("Reservation submitted successfully:", reservation);

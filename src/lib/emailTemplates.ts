@@ -47,9 +47,11 @@ const baseStyles = `
 
 /**
  * Generate reservation detail URL
+ * @param reservationId - The reservation ID
+ * @param locale - The locale to use (defaults to "en" for admin emails)
  */
-function getReservationUrl(reservationId: string): string {
-  return `${APP_URL}/reservation/${reservationId}`;
+function getReservationUrl(reservationId: string, locale: string = "en"): string {
+  return `${APP_URL}/${locale}/reservation/${reservationId}`;
 }
 
 /**
@@ -58,9 +60,10 @@ function getReservationUrl(reservationId: string): string {
 export function generateQuoteRequestedEmail(
   reservation: any,
   customerName: string,
+  locale: string = "en",
 ): EmailTemplate {
   const subject = `Quote Request Received - Reservation ${reservation.id}`;
-  const reservationUrl = getReservationUrl(reservation.id);
+  const reservationUrl = getReservationUrl(reservation.id, locale);
 
   const html = `
     <!DOCTYPE html>
@@ -173,9 +176,10 @@ export function generateQuoteSentEmail(
   reservation: any,
   customerName: string,
   quotePrice: number,
+  locale: string = "en",
 ): EmailTemplate {
   const subject = `Your Quote is Ready - Reservation ${reservation.id}`;
-  const reservationUrl = getReservationUrl(reservation.id);
+  const reservationUrl = getReservationUrl(reservation.id, locale);
 
   const html = `
     <!DOCTYPE html>
@@ -304,9 +308,10 @@ Thank you for choosing Paris Transfer!
 export function generateQuoteAcceptedEmail(
   reservation: any,
   customerName: string,
+  locale: string = "en",
 ): EmailTemplate {
   const subject = `Quote Accepted - Reservation ${reservation.id}`;
-  const reservationUrl = getReservationUrl(reservation.id);
+  const reservationUrl = getReservationUrl(reservation.id, locale);
 
   const html = `
     <!DOCTYPE html>
@@ -418,9 +423,10 @@ Thank you for choosing Paris Transfer!
 export function generatePendingEmail(
   reservation: any,
   customerName: string,
+  locale: string = "en",
 ): EmailTemplate {
   const subject = `Reservation Received - Reservation ${reservation.id}`;
-  const reservationUrl = getReservationUrl(reservation.id);
+  const reservationUrl = getReservationUrl(reservation.id, locale);
 
   const html = `
     <!DOCTYPE html>
@@ -521,9 +527,10 @@ Thank you for choosing Paris Transfer!
 export function generateConfirmedEmail(
   reservation: any,
   customerName: string,
+  locale: string = "en",
 ): EmailTemplate {
   const subject = `Reservation Confirmed - Reservation ${reservation.id}`;
-  const reservationUrl = getReservationUrl(reservation.id);
+  const reservationUrl = getReservationUrl(reservation.id, locale);
 
   const html = `
     <!DOCTYPE html>
@@ -640,9 +647,10 @@ Thank you for choosing Paris Transfer!
 export function generateCancelledEmail(
   reservation: any,
   customerName: string,
+  locale: string = "en",
 ): EmailTemplate {
   const subject = `Reservation Cancelled - Reservation ${reservation.id}`;
-  const reservationUrl = getReservationUrl(reservation.id);
+  const reservationUrl = getReservationUrl(reservation.id, locale);
 
   const html = `
     <!DOCTYPE html>
@@ -831,7 +839,8 @@ export function generateAdminNotificationEmail(
   reservation: any,
 ): EmailTemplate {
   const subject = `New Reservation: ${reservation.id}`;
-  const adminUrl = `${APP_URL}/reservation/${reservation.id}`;
+  // Admin emails always use "en" locale
+  const adminUrl = getReservationUrl(reservation.id, "en");
 
   const html = `
     <!DOCTYPE html>
@@ -969,7 +978,8 @@ export function generateAdminQuoteAcceptedEmail(
   reservation: any,
 ): EmailTemplate {
   const subject = `Quote Accepted - Reservation ${reservation.id}`;
-  const adminUrl = `${APP_URL}/reservation/${reservation.id}`;
+  // Admin emails always use "en" locale
+  const adminUrl = getReservationUrl(reservation.id, "en");
 
   const html = `
     <!DOCTYPE html>
@@ -1108,7 +1118,8 @@ export function generateAdminQuoteDeclinedEmail(
   reservation: any,
 ): EmailTemplate {
   const subject = `Quote Declined - Reservation ${reservation.id}`;
-  const adminUrl = `${APP_URL}/reservation/${reservation.id}`;
+  // Admin emails always use "en" locale
+  const adminUrl = getReservationUrl(reservation.id, "en");
 
   const html = `
     <!DOCTYPE html>

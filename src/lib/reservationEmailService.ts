@@ -100,6 +100,7 @@ export async function sendReservationStatusEmail(
   status: ReservationStatus,
   customerEmail: string,
   customerName: string,
+  locale: string = "en",
 ): Promise<void> {
   const data = await getCompleteReservationData(reservationId);
   const { reservation, service, vehicleType } = data;
@@ -122,26 +123,27 @@ export async function sendReservationStatusEmail(
   let emailTemplate;
   switch (status) {
     case "quote_requested":
-      emailTemplate = generateQuoteRequestedEmail(reservationData, customerName);
+      emailTemplate = generateQuoteRequestedEmail(reservationData, customerName, locale);
       break;
     case "quote_sent":
       emailTemplate = generateQuoteSentEmail(
         reservationData,
         customerName,
         reservation.totalPrice,
+        locale,
       );
       break;
     case "quote_accepted":
-      emailTemplate = generateQuoteAcceptedEmail(reservationData, customerName);
+      emailTemplate = generateQuoteAcceptedEmail(reservationData, customerName, locale);
       break;
     case "pending":
-      emailTemplate = generatePendingEmail(reservationData, customerName);
+      emailTemplate = generatePendingEmail(reservationData, customerName, locale);
       break;
     case "confirmed":
-      emailTemplate = generateConfirmedEmail(reservationData, customerName);
+      emailTemplate = generateConfirmedEmail(reservationData, customerName, locale);
       break;
     case "cancelled":
-      emailTemplate = generateCancelledEmail(reservationData, customerName);
+      emailTemplate = generateCancelledEmail(reservationData, customerName, locale);
       break;
     case "completed":
       emailTemplate = generateCompletedEmail(reservationData, customerName);
@@ -249,6 +251,7 @@ export async function sendQuoteEmail(
   customerEmail: string,
   customerName: string,
   quotePrice: number,
+  locale: string = "en",
 ): Promise<void> {
   const data = await getCompleteReservationData(reservationId);
   const { reservation, service, vehicleType } = data;
@@ -269,7 +272,7 @@ export async function sendQuoteEmail(
     status: reservation.status,
   };
 
-  const emailTemplate = generateQuoteSentEmail(reservationData, customerName, quotePrice);
+  const emailTemplate = generateQuoteSentEmail(reservationData, customerName, quotePrice, locale);
 
   // PDFs are only sent when reservation is confirmed by admin, not for quotes
   // No PDF attachment for quote emails

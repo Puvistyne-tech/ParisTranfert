@@ -525,6 +525,7 @@ export async function createReservation(reservationData: {
     notes?: string;
     totalPrice: number;
     status?: ReservationStatus;
+    locale?: string; // Locale for email URLs (not stored in database)
 }): Promise<Reservation> {
     // Check for duplicate reservation BEFORE inserting
     // Duplicate = same client_id + date + time + pickup_location
@@ -613,7 +614,8 @@ export async function createReservation(reservationData: {
                                 createdReservation.id,
                                 createdReservation.status,
                                 client.email,
-                                `${client.firstName} ${client.lastName}`
+                                `${client.firstName} ${client.lastName}`,
+                                reservationData.locale || "en"
                             ).catch((err) => {
                                 console.error(
                                     "Failed to send customer email:",

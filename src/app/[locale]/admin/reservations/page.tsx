@@ -36,6 +36,32 @@ export default function AdminReservationsPage() {
   });
   const pageSize = 20;
 
+  // Check URL for reservation ID to auto-open modal
+  useEffect(() => {
+    // Check for reservation ID in URL path (e.g., /{locale}/admin/reservation/{id})
+    const pathname = window.location.pathname;
+    const reservationMatch = pathname.match(/\/[^/]+\/admin\/reservation\/([^/]+)/);
+    
+    // Also check for reservation query parameter
+    const reservationParam = searchParams.get("reservation");
+    
+    if (reservationMatch && reservationMatch[1]) {
+      setSelectedReservationId(reservationMatch[1]);
+      // Clean up URL by removing the reservation path
+      const newPath = pathname.replace(/\/reservation\/[^/]+/, "");
+      if (newPath !== pathname) {
+        window.history.replaceState({}, "", newPath);
+      }
+    } else if (reservationParam) {
+      setSelectedReservationId(reservationParam);
+      // Clean up URL by removing the reservation query parameter
+      const newSearchParams = new URLSearchParams(searchParams.toString());
+      newSearchParams.delete("reservation");
+      const newUrl = `${window.location.pathname}${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ""}`;
+      window.history.replaceState({}, "", newUrl);
+    }
+  }, [searchParams]);
+
   // Use TanStack Query hooks for data fetching with automatic caching
   const { data: servicesData = [] } = useServices();
   const { data: vehiclesData = [] } = useVehicleTypes();
