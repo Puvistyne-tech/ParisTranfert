@@ -4,7 +4,7 @@ import { Edit, FolderTree, Plus, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { CategoryModal } from "@/components/admin/CategoryModal";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
-import type { Category } from "@/components/models/categories";
+import type { Category, CategoryType } from "@/components/models/categories";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import {
@@ -59,15 +59,24 @@ export default function AdminCategoriesPage() {
   const handleSave = async (categoryData: {
     id: string;
     name: string;
-    categoryType: string;
+    categoryType: CategoryType;
     description?: string;
   }) => {
     setSaving(true);
     try {
       if (selectedCategory) {
-        await updateCategory(selectedCategory.id, categoryData);
+        await updateCategory(selectedCategory.id, {
+          name: categoryData.name,
+          categoryType: categoryData.categoryType,
+          description: categoryData.description,
+        });
       } else {
-        await createCategory(categoryData);
+        await createCategory({
+          id: categoryData.id,
+          name: categoryData.name,
+          categoryType: categoryData.categoryType,
+          description: categoryData.description,
+        });
       }
       await fetchCategories();
       setIsModalOpen(false);

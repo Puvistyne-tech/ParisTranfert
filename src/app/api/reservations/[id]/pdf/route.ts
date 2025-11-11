@@ -14,10 +14,10 @@ import {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const reservationId = params.id;
+    const { id: reservationId } = await params;
 
     if (!reservationId) {
       return NextResponse.json(

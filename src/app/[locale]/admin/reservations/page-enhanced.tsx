@@ -285,13 +285,13 @@ export default function AdminReservationsPage() {
 
       {showDetails && selectedReservation && (
         <ReservationDetailModal
-          reservation={selectedReservation}
+          reservationId={selectedReservation.id}
           isOpen={showDetails}
           onClose={() => {
             setShowDetails(false);
             setSelectedReservation(null);
+            handleUpdate();
           }}
-          onUpdate={handleUpdate}
         />
       )}
     </div>
