@@ -1574,3 +1574,93 @@ export async function deleteFeature(key: string): Promise<void> {
         throw new Error(`Failed to delete feature: ${error.message}`);
     }
 }
+
+/**
+ * Storage: Upload service image to Supabase storage
+ */
+const SERVICE_IMAGES_BUCKET = "service-images";
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_MIME_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+
+/**
+ * Upload a service image to Supabase storage
+ * @param file - The image file to upload
+ * @param serviceId - The service ID to associate with the image
+ * @returns The public URL of the uploaded image
+ */
+export async function uploadServiceImage(
+    file: File,
+    serviceId: string
+): Promise<string> {
+    // Validate file type
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+        throw new Error(
+            `Invalid file type. Allowed types: ${ALLOWED_MIME_TYPES.join(", ")}`
+        );
+    }
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+        throw new Error(
+            `File size exceeds limit of ${MAX_FILE_SIZE / 1024 / 1024}MB`
+        );
+    }
+
+    // Generate unique filename
+    const fileExt = file.name.split(".").pop() || "jpg"; // Default to jpg if no extension
+    const timestamp = Date.now();
+    const fileName = `service-${serviceId}-${timestamp}.${fileExt}`;
+    const filePath = `${serviceId}/${fileName}`;
+
+    // Upload file to storage
+    const { data, error } = await supabase.storage
+        .from(SERVICE_IMAGES_BUCKET)
+        .upload(filePath, file, {
+            cacheControl: "3600",
+            upsert: false, // Don't overwrite existing files
+        });
+
+    if (error) {
+        console.error("Error uploading image:", error);
+        throw new Error(`Failed to upload image: ${error.message}`);
+    }
+
+    // Get public URL
+    const {
+        data: { publicUrl },
+    } = supabase.storage.from(SERVICE_IMAGES_BUCKET).getPublicUrl(filePath);
+
+    return publicUrl;
+}
+
+/**
+ * Delete a service image from Supabase storage
+ * @param imageUrl - The public URL of the image to delete
+ */
+export async function deleteServiceImage(imageUrl: string): Promise<void> {
+    try {
+        // Extract file path from URL
+        // URL format: https://{project}.supabase.co/storage/v1/object/public/service-images/{path}
+        const urlParts = imageUrl.split("/service-images/");
+        if (urlParts.length !== 2) {
+            console.warn("Invalid image URL format, skipping deletion:", imageUrl);
+            return;
+        }
+
+        const filePath = urlParts[1];
+
+        // Delete file from storage
+        const { error } = await supabase.storage
+            .from(SERVICE_IMAGES_BUCKET)
+            .remove([filePath]);
+
+        if (error) {
+            console.error("Error deleting image:", error);
+            // Don't throw - deletion is optional cleanup
+            console.warn(`Failed to delete image: ${error.message}`);
+        }
+    } catch (error) {
+        // Don't throw - deletion is optional cleanup
+        console.warn("Error deleting service image:", error);
+    }
+}
