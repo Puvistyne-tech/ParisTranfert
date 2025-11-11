@@ -1,7 +1,8 @@
+import { Check, CheckCircle, Clock, Send, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { CheckCircle, XCircle, Clock, Send, Check } from "lucide-react";
 
 export type StatusType =
+  | "quote_requested"
   | "pending"
   | "quote_sent"
   | "quote_accepted"
@@ -16,14 +17,19 @@ interface StatusBadgeProps {
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
   const statusConfig = {
+    quote_requested: {
+      label: "Quote Requested",
+      className: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400",
+      icon: Clock,
+    },
     pending: {
-      label: "Pending / Quote Requested",
-      className: "bg-yellow-100 text-yellow-800",
+      label: "Pending",
+      className: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
       icon: Clock,
     },
     quote_sent: {
       label: "Quote Sent",
-      className: "bg-purple-100 text-purple-800",
+      className: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
       icon: Send,
     },
     quote_accepted: {
@@ -56,7 +62,7 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
       className={cn(
         "inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium",
         config.className,
-        className
+        className,
       )}
     >
       <Icon className="w-3 h-3" />
@@ -64,4 +70,3 @@ export function StatusBadge({ status, className }: StatusBadgeProps) {
     </span>
   );
 }
-

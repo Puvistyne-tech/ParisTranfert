@@ -1,46 +1,49 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Card, CardContent } from "@/components/ui/Card";
 import {
-  Calendar,
-  Users,
-  DollarSign,
-  Clock,
-  TrendingUp,
   AlertCircle,
+  Calendar,
+  Clock,
+  DollarSign,
   Search,
+  TrendingUp,
+  Users,
 } from "lucide-react";
-import { getReservations, getReservationById } from "@/lib/supabaseService";
-import type { Reservation } from "@/components/models/reservations";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
-import { supabase } from "@/lib/supabase";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
+import { useEffect, useState } from "react";
 import { ReservationDetailModal } from "@/components/admin/ReservationDetailModal";
+import type { Reservation } from "@/components/models/reservations";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { supabase } from "@/lib/supabase";
+import { getReservationById, getReservations } from "@/lib/supabaseService";
 
 export default function AdminDashboard() {
   const router = useRouter();
   const locale = useLocale();
+  const [selectedReservationId, setSelectedReservationId] = useState<string | null>(null);
 
   // Handle OAuth callback - extract tokens from URL hash and clean URL
   useEffect(() => {
     const handleOAuthCallback = async () => {
       // Check if there's a hash in the URL (OAuth tokens)
-      if (typeof window !== 'undefined' && window.location.hash) {
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        
+      if (typeof window !== "undefined" && window.location.hash) {
+        const hashParams = new URLSearchParams(
+          window.location.hash.substring(1),
+        );
+
         // If we have OAuth tokens in the hash, Supabase will handle them
         // We just need to clean up the URL
-        if (hashParams.has('access_token') || hashParams.has('error')) {
+        if (hashParams.has("access_token") || hashParams.has("error")) {
           // Wait a bit for Supabase to process the session
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
+          await new Promise((resolve) => setTimeout(resolve, 500));
+
           // Clean up the URL by removing the hash
           const cleanUrl = window.location.pathname + window.location.search;
-          window.history.replaceState({}, '', cleanUrl);
-          
+          window.history.replaceState({}, "", cleanUrl);
+
           // Refresh to update auth state
           router.refresh();
         }
@@ -59,8 +62,6 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [searchId, setSearchId] = useState("");
   const [searching, setSearching] = useState(false);
-  const [foundReservation, setFoundReservation] = useState<Reservation | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
 
   const fetchStats = async () => {
     try {
@@ -69,12 +70,8 @@ export default function AdminDashboard() {
         offset: 0,
       });
 
-      const pending = allReservations.filter(
-        (r) => r.status === "pending"
-      );
-      const confirmed = allReservations.filter(
-        (r) => r.status === "confirmed"
-      );
+      const pending = allReservations.filter((r) => r.status === "pending" || r.status === "quote_requested");
+      const confirmed = allReservations.filter((r) => r.status === "confirmed");
       const revenue = allReservations
         .filter((r) => r.status === "confirmed" || r.status === "completed")
         .reduce((sum, r) => sum + Number(r.totalPrice), 0);
@@ -99,37 +96,38 @@ export default function AdminDashboard() {
 
   const handleSearchReservation = async () => {
     if (!searchId.trim()) return;
-    
+
     setSearching(true);
     try {
       const reservation = await getReservationById(searchId.trim());
       if (reservation) {
-        setFoundReservation(reservation);
-        setShowDetails(true);
+        // Open reservation in modal
+        setSelectedReservationId(reservation.id);
       } else {
         // If not found, navigate to reservations page with search filter
-        router.push(`/${locale}/admin/reservations?search=${encodeURIComponent(searchId.trim())}`);
+        router.push(
+          `/${locale}/admin/reservations?search=${encodeURIComponent(searchId.trim())}`,
+        );
       }
     } catch (error) {
       console.error("Error searching reservation:", error);
       // Navigate to reservations page with search filter anyway
-      router.push(`/${locale}/admin/reservations?search=${encodeURIComponent(searchId.trim())}`);
+      router.push(
+        `/${locale}/admin/reservations?search=${encodeURIComponent(searchId.trim())}`,
+      );
     } finally {
       setSearching(false);
     }
   };
 
   const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleSearchReservation();
     }
   };
 
   const handleUpdateReservation = () => {
     fetchStats();
-    setShowDetails(false);
-    setFoundReservation(null);
-    setSearchId("");
   };
 
   if (loading) {
@@ -143,7 +141,9 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Dashboard
+        </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-2">
           Overview of your reservations and business metrics
         </p>
@@ -268,7 +268,9 @@ export default function AdminDashboard() {
           {stats.recentReservations.length === 0 ? (
             <div className="text-center py-12">
               <AlertCircle className="w-12 h-12 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-600 dark:text-gray-400">No reservations yet</p>
+              <p className="text-gray-600 dark:text-gray-400">
+                No reservations yet
+              </p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -276,9 +278,7 @@ export default function AdminDashboard() {
                 <div
                   key={reservation.id}
                   className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
-                  onClick={() =>
-                    router.push(`/${locale}/admin/reservations?id=${reservation.id}`)
-                  }
+                  onClick={() => setSelectedReservationId(reservation.id)}
                 >
                   <div className="flex-1">
                     <div className="flex items-center space-x-4 flex-wrap gap-2">
@@ -290,8 +290,8 @@ export default function AdminDashboard() {
                           reservation.status === "confirmed"
                             ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
                             : reservation.status === "pending"
-                            ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400"
-                            : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300"
+                              ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400"
+                              : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300"
                         }`}
                       >
                         {reservation.status}
@@ -304,14 +304,17 @@ export default function AdminDashboard() {
                     <div className="flex items-center space-x-4 mt-1 flex-wrap gap-2">
                       {reservation.createdAt && (
                         <span className="text-xs text-gray-500 dark:text-gray-500">
-                          Created: {new Date(reservation.createdAt).toLocaleString()}
+                          Created:{" "}
+                          {new Date(reservation.createdAt).toLocaleString()}
                         </span>
                       )}
-                      {reservation.updatedAt && reservation.updatedAt !== reservation.createdAt && (
-                        <span className="text-xs text-gray-500 dark:text-gray-500">
-                          Modified: {new Date(reservation.updatedAt).toLocaleString()}
-                        </span>
-                      )}
+                      {reservation.updatedAt &&
+                        reservation.updatedAt !== reservation.createdAt && (
+                          <span className="text-xs text-gray-500 dark:text-gray-500">
+                            Modified:{" "}
+                            {new Date(reservation.updatedAt).toLocaleString()}
+                          </span>
+                        )}
                     </div>
                   </div>
                 </div>
@@ -322,19 +325,14 @@ export default function AdminDashboard() {
       </Card>
 
       {/* Reservation Detail Modal */}
-      {foundReservation && (
         <ReservationDetailModal
-          reservation={foundReservation}
-          isOpen={showDetails}
+        reservationId={selectedReservationId}
+        isOpen={!!selectedReservationId}
           onClose={() => {
-            setShowDetails(false);
-            setFoundReservation(null);
-            setSearchId("");
+          setSelectedReservationId(null);
+          fetchStats(); // Refresh stats when modal closes
           }}
-          onUpdate={handleUpdateReservation}
         />
-      )}
     </div>
   );
 }
-

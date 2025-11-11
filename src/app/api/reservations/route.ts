@@ -1,7 +1,13 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { createClient, createReservation, getReservations, updateReservationStatus, getLocationById } from "@/lib/supabaseService";
-import type { ReservationStatus } from "@/components/models/reservations";
+import { ReservationStatus } from "@/components/models/reservations";
+import {
+  createClient,
+  createReservation,
+  getLocationById,
+  getReservations,
+  updateReservationStatus,
+} from "@/lib/supabaseService";
 
 interface ReservationRequestBody {
   vehicleType: { id: string };
@@ -36,39 +42,47 @@ interface PatchRequestBody {
 export async function POST(request: NextRequest) {
   try {
     console.log("=== RESERVATION API CALL STARTED ===");
-    
-    const body = await request.json() as ReservationRequestBody;
+
+    const body = (await request.json()) as ReservationRequestBody;
     console.log("Request body received:", JSON.stringify(body, null, 2));
-    
-    const { vehicleType, service, additionalServices, serviceSubData, formData, status, totalPrice } = body;
+
+    const {
+      vehicleType,
+      service,
+      additionalServices,
+      serviceSubData,
+      formData,
+      status,
+      totalPrice,
+    } = body;
 
     // Validate required fields
     if (!vehicleType || !service || !formData) {
-      console.error("Missing required fields:", { 
-        vehicleType: !!vehicleType, 
-        service: !!service, 
-        formData: !!formData 
+      console.error("Missing required fields:", {
+        vehicleType: !!vehicleType,
+        service: !!service,
+        formData: !!formData,
       });
       return NextResponse.json(
         {
           success: false,
           error: "Missing required fields",
-          details: `Missing: ${!vehicleType ? 'vehicleType ' : ''}${!service ? 'service ' : ''}${!formData ? 'formData' : ''}`
+          details: `Missing: ${!vehicleType ? "vehicleType " : ""}${!service ? "service " : ""}${!formData ? "formData" : ""}`,
         },
         { status: 400 },
       );
     }
 
     console.log("Starting client creation/lookup...");
-    
+
     // Create or find client
     let client;
     try {
       client = await createClient({
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: formData.email,
-            phone: formData.phone,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
       });
       console.log("Client created/found:", client.id);
     } catch (userError) {
@@ -77,41 +91,55 @@ export async function POST(request: NextRequest) {
         {
           success: false,
           error: "Failed to create or find client",
-          details: userError instanceof Error ? userError.message : "Unknown error",
+          details:
+            userError instanceof Error ? userError.message : "Unknown error",
         },
         { status: 500 },
       );
     }
 
     console.log("Starting reservation creation...");
-    
+
     // Get location and destination from formData (already mapped from service_fields)
     // For airport transfers, formData.pickup/destination may contain location IDs, so convert to names
-    let pickupLocationName = formData.pickup || '';
-    let destinationName = formData.destination || '';
-    
+    let pickupLocationName = formData.pickup || "";
+    let destinationName = formData.destination || "";
+
     // For airport transfers, if location/destination are IDs, convert to names
-    if (service.id === 'airport-transfers' && serviceSubData) {
+    if (service.id === "airport-transfers" && serviceSubData) {
       // Check if location is an ID (short string like 'paris', 'cdg')
-      if (pickupLocationName && pickupLocationName.length < 20 && /^[a-z0-9_-]+$/.test(pickupLocationName.toLowerCase())) {
+      if (
+        pickupLocationName &&
+        pickupLocationName.length < 20 &&
+        /^[a-z0-9_-]+$/.test(pickupLocationName.toLowerCase())
+      ) {
         const pickupLocation = await getLocationById(pickupLocationName);
         if (pickupLocation) {
           pickupLocationName = pickupLocation.name;
         }
       }
-      
+
       // Check if destination is an ID
-      if (destinationName && destinationName.length < 20 && /^[a-z0-9_-]+$/.test(destinationName.toLowerCase())) {
+      if (
+        destinationName &&
+        destinationName.length < 20 &&
+        /^[a-z0-9_-]+$/.test(destinationName.toLowerCase())
+      ) {
         const destinationLocation = await getLocationById(destinationName);
         if (destinationLocation) {
           destinationName = destinationLocation.name;
         }
       }
     }
-    
+
     // Validate that we have pickup location (destination is optional for some services)
     if (!pickupLocationName) {
-      console.error("Missing pickup location:", { locationName: pickupLocationName, destinationName, serviceSubData, formData });
+      console.error("Missing pickup location:", {
+        locationName: pickupLocationName,
+        destinationName,
+        serviceSubData,
+        formData,
+      });
       return NextResponse.json(
         {
           success: false,
@@ -120,11 +148,16 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-    
+
+    // Determine status based on price: if price is 0, it's a quote request, otherwise pending
+    const reservationStatus = totalPrice === 0 
+      ? ReservationStatus.QUOTE_REQUESTED 
+      : ReservationStatus.PENDING;
+
     // Create reservation in Supabase
     const reservation = await createReservation({
       clientId: client.id,
-        serviceId: service.id,
+      serviceId: service.id,
       vehicleTypeId: vehicleType.id,
       date: formData.date,
       time: formData.time,
@@ -136,8 +169,8 @@ export async function POST(request: NextRequest) {
       meetAndGreet: additionalServices?.meetAndGreet || false,
       serviceSubData: serviceSubData || undefined,
       notes: formData.notes || undefined,
-        totalPrice: totalPrice,
-      status: (status as ReservationStatus) || 'pending',
+      totalPrice: totalPrice,
+      status: (status as ReservationStatus) || reservationStatus,
     });
 
     console.log("Reservation created successfully:", reservation.id);
@@ -201,7 +234,7 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
-    const body = await request.json() as PatchRequestBody;
+    const body = (await request.json()) as PatchRequestBody;
     const { id, status } = body;
 
     if (!id || !status) {
@@ -214,7 +247,10 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const updatedReservation = await updateReservationStatus(id, status as ReservationStatus);
+    const updatedReservation = await updateReservationStatus(
+      id,
+      status as ReservationStatus,
+    );
 
     return NextResponse.json({
       success: true,

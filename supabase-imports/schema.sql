@@ -5,7 +5,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Create ENUM types
 CREATE TYPE category_type_enum AS ENUM ('transport', 'luxury', 'tour', 'security', 'special');
-CREATE TYPE reservation_status_enum AS ENUM ('pending', 'quote_sent', 'quote_accepted', 'confirmed', 'completed', 'cancelled');
+CREATE TYPE reservation_status_enum AS ENUM ('quote_requested', 'pending', 'quote_sent', 'quote_accepted', 'confirmed', 'completed', 'cancelled');
 CREATE TYPE service_field_type_enum AS ENUM ('text', 'number', 'select', 'textarea', 'date', 'time', 'location_select', 'address_autocomplete');
 
 -- Categories Table
@@ -127,7 +127,6 @@ CREATE TABLE IF NOT EXISTS service_vehicle_pricing (
 -- Clients Table
 CREATE TABLE IF NOT EXISTS clients (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    client_id TEXT UNIQUE,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     email TEXT NOT NULL,
@@ -178,7 +177,6 @@ CREATE INDEX IF NOT EXISTS idx_service_vehicle_pricing_vehicle_type_id ON servic
 CREATE INDEX IF NOT EXISTS idx_service_vehicle_pricing_route ON service_vehicle_pricing(pickup_location_id, destination_location_id);
 
 CREATE INDEX IF NOT EXISTS idx_clients_email ON clients(email);
-CREATE INDEX IF NOT EXISTS idx_clients_client_id ON clients(client_id);
 
 -- Create updated_at trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()

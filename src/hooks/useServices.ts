@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { getServices } from "@/lib/supabaseService";
 import type { Service } from "@/components/models";
+import { getServices } from "@/lib/supabaseService";
 
 /**
  * Hook to fetch services with TanStack Query caching
@@ -16,4 +16,3 @@ export function useServices() {
     refetchOnWindowFocus: false,
   });
 }
-

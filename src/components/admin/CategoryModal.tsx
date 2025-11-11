@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { X } from "lucide-react";
+import { useEffect, useState } from "react";
+import type { CategoryType } from "@/components/models/categories";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import type { CategoryType } from "@/components/models/categories";
 
 interface CategoryModalProps {
   isOpen: boolean;
@@ -19,7 +19,13 @@ interface CategoryModalProps {
   loading?: boolean;
 }
 
-export function CategoryModal({ isOpen, onClose, onSave, category, loading = false }: CategoryModalProps) {
+export function CategoryModal({
+  isOpen,
+  onClose,
+  onSave,
+  category,
+  loading = false,
+}: CategoryModalProps) {
   const [formData, setFormData] = useState({
     id: "",
     name: "",
@@ -100,7 +106,9 @@ export function CategoryModal({ isOpen, onClose, onSave, category, loading = fal
             </label>
             <Input
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
               required
               className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
             />
@@ -112,7 +120,12 @@ export function CategoryModal({ isOpen, onClose, onSave, category, loading = fal
             </label>
             <select
               value={formData.categoryType}
-              onChange={(e) => setFormData({ ...formData, categoryType: e.target.value as CategoryType })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  categoryType: e.target.value as CategoryType,
+                })
+              }
               required
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
             >
@@ -127,18 +140,29 @@ export function CategoryModal({ isOpen, onClose, onSave, category, loading = fal
             </label>
             <textarea
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
             />
           </div>
 
           <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={loading}
+            >
               Cancel
             </Button>
             <Button type="submit" variant="primary" disabled={loading}>
-              {loading ? "Saving..." : category ? "Update Category" : "Create Category"}
+              {loading
+                ? "Saving..."
+                : category
+                  ? "Update Category"
+                  : "Create Category"}
             </Button>
           </div>
         </form>
@@ -146,4 +170,3 @@ export function CategoryModal({ isOpen, onClose, onSave, category, loading = fal
     </div>
   );
 }
-

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { Reservation } from "@/components/models/reservations";
+import type { Reservation } from "@/components/models/reservations";
 
 interface ReservationsResponse {
   success: boolean;
@@ -8,7 +8,6 @@ interface ReservationsResponse {
   total?: number;
   error?: string;
 }
-
 
 // Reservation hooks
 export function useReservations(params?: {
@@ -73,14 +72,24 @@ export function useUpdateReservationStatus() {
 // Contact hooks
 export function useCreateContactMessage() {
   return useMutation({
-    mutationFn: async (data: { firstName: string; lastName: string; email: string; phone?: string; message: string }) => {
+    mutationFn: async (data: {
+      firstName: string;
+      lastName: string;
+      email: string;
+      phone?: string;
+      message: string;
+    }) => {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
       if (!response.ok) {
-        const error = (await response.json().catch(() => ({ message: "Failed to send contact message" }))) as { message?: string };
+        const error = (await response
+          .json()
+          .catch(() => ({ message: "Failed to send contact message" }))) as {
+          message?: string;
+        };
         throw new Error(error.message || "Failed to send contact message");
       }
       return response.json();
@@ -95,9 +104,15 @@ export function useReservationStats() {
     queryFn: async () => {
       const [allReservations, pendingReservations, todayReservations] =
         await Promise.all([
-          fetch("/api/reservations").then((res) => res.json() as Promise<ReservationsResponse>),
-          fetch("/api/reservations?status=pending").then((res) => res.json() as Promise<ReservationsResponse>),
-          fetch("/api/reservations?limit=100").then((res) => res.json() as Promise<ReservationsResponse>),
+          fetch("/api/reservations").then(
+            (res) => res.json() as Promise<ReservationsResponse>,
+          ),
+          fetch("/api/reservations?status=pending").then(
+            (res) => res.json() as Promise<ReservationsResponse>,
+          ),
+          fetch("/api/reservations?limit=100").then(
+            (res) => res.json() as Promise<ReservationsResponse>,
+          ),
         ]);
 
       const today = new Date().toISOString().split("T")[0];
@@ -110,7 +125,8 @@ export function useReservationStats() {
         total: allReservations.total || 0,
         pending: pendingReservations.total || 0,
         today: todayCount,
-        confirmed: (allReservations.total || 0) - (pendingReservations.total || 0),
+        confirmed:
+          (allReservations.total || 0) - (pendingReservations.total || 0),
       };
     },
     staleTime: 2 * 60 * 1000, // 2 minutes

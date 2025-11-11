@@ -1,19 +1,27 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Calendar, Eye } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { FilterBar } from "@/components/admin/FilterBar";
+import { ReservationDetailModal } from "@/components/admin/ReservationDetailModal";
+import { StatusBadge, type StatusType } from "@/components/admin/StatusBadge";
+import type {
+  Reservation,
+  ReservationStatus,
+} from "@/components/models/reservations";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
-import { Eye, Download, Calendar } from "lucide-react";
-import { getReservations, getServices, getVehicleTypes } from "@/lib/supabaseService";
-import type { Reservation, ReservationStatus } from "@/components/models/reservations";
-import { FilterBar } from "@/components/admin/FilterBar";
-import { StatusBadge } from "@/components/admin/StatusBadge";
-import { ReservationDetailModal } from "@/components/admin/ReservationDetailModal";
+import {
+  getReservations,
+  getServices,
+  getVehicleTypes,
+} from "@/lib/supabaseService";
 
 export default function AdminReservationsPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
+  const [selectedReservation, setSelectedReservation] =
+    useState<Reservation | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
@@ -27,18 +35,14 @@ export default function AdminReservationsPage() {
   });
   const pageSize = 20;
 
-  const [services, setServices] = useState<{ value: string; label: string }[]>([]);
-  const [vehicles, setVehicles] = useState<{ value: string; label: string }[]>([]);
+  const [services, setServices] = useState<{ value: string; label: string }[]>(
+    [],
+  );
+  const [vehicles, setVehicles] = useState<{ value: string; label: string }[]>(
+    [],
+  );
 
-  useEffect(() => {
-    fetchInitialData();
-  }, []);
-
-  useEffect(() => {
-    fetchReservations();
-  }, [filters, page]);
-
-  const fetchInitialData = async () => {
+  const fetchInitialData = useCallback(async () => {
     try {
       const [servicesData, vehiclesData] = await Promise.all([
         getServices(),
@@ -49,12 +53,18 @@ export default function AdminReservationsPage() {
     } catch (error) {
       console.error("Error fetching initial data:", error);
     }
-  };
+  }, []);
 
-  const fetchReservations = async () => {
+  useEffect(() => {
+    fetchInitialData();
+  }, [fetchInitialData]);
+
+  const fetchReservations = useCallback(async () => {
     setLoading(true);
     try {
-      const statusFilter = filters.status ? (filters.status as ReservationStatus) : undefined;
+      const statusFilter = filters.status
+        ? (filters.status as ReservationStatus)
+        : undefined;
       const result = await getReservations({
         status: statusFilter,
         limit: pageSize,
@@ -70,7 +80,7 @@ export default function AdminReservationsPage() {
           (r) =>
             r.id.toLowerCase().includes(searchLower) ||
             r.pickupLocation.toLowerCase().includes(searchLower) ||
-            r.destinationLocation?.toLowerCase().includes(searchLower)
+            r.destinationLocation?.toLowerCase().includes(searchLower),
         );
       }
 
@@ -79,7 +89,9 @@ export default function AdminReservationsPage() {
       }
 
       if (filters.vehicleTypeId) {
-        filtered = filtered.filter((r) => r.vehicleTypeId === filters.vehicleTypeId);
+        filtered = filtered.filter(
+          (r) => r.vehicleTypeId === filters.vehicleTypeId,
+        );
       }
 
       if (filters.dateFrom) {
@@ -97,10 +109,15 @@ export default function AdminReservationsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, page]);
+
+  useEffect(() => {
+    fetchReservations();
+  }, [fetchReservations]);
 
   const statusOptions = [
-    { value: "pending", label: "Pending / Quote Requested" },
+    { value: "quote_requested", label: "Quote Requested" },
+    { value: "pending", label: "Pending" },
     { value: "quote_sent", label: "Quote Sent" },
     { value: "quote_accepted", label: "Quote Accepted" },
     { value: "confirmed", label: "Confirmed" },
@@ -122,8 +139,12 @@ export default function AdminReservationsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Reservations & Quotes</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">Manage all reservations and quotes</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Reservations & Quotes
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
+          Manage all reservations and quotes
+        </p>
       </div>
 
       <FilterBar
@@ -140,18 +161,25 @@ export default function AdminReservationsPage() {
       {loading ? (
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 dark:border-primary-400 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading reservations...</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            Loading reservations...
+          </p>
         </div>
       ) : (
         <>
           <div className="grid gap-4">
             {reservations.map((reservation) => (
-              <Card key={reservation.id} className="dark:bg-gray-800 dark:border-gray-700">
+              <Card
+                key={reservation.id}
+                className="dark:bg-gray-800 dark:border-gray-700"
+              >
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-4 mb-2">
-                        <StatusBadge status={reservation.status as any} />
+                        <StatusBadge
+                          status={reservation.status as StatusType}
+                        />
                         <span className="text-sm text-gray-500 dark:text-gray-400">
                           ID: {reservation.id.slice(0, 8)}
                         </span>
@@ -161,15 +189,25 @@ export default function AdminReservationsPage() {
                       </div>
                       <div className="grid md:grid-cols-4 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">Service:</span>{" "}
-                          <span className="font-medium text-gray-900 dark:text-white">{reservation.serviceId}</span>
+                          <span className="text-gray-600 dark:text-gray-400">
+                            Service:
+                          </span>{" "}
+                          <span className="font-medium text-gray-900 dark:text-white">
+                            {reservation.serviceId}
+                          </span>
                         </div>
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">Vehicle:</span>{" "}
-                          <span className="font-medium text-gray-900 dark:text-white">{reservation.vehicleTypeId}</span>
+                          <span className="text-gray-600 dark:text-gray-400">
+                            Vehicle:
+                          </span>{" "}
+                          <span className="font-medium text-gray-900 dark:text-white">
+                            {reservation.vehicleTypeId}
+                          </span>
                         </div>
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">Route:</span>{" "}
+                          <span className="text-gray-600 dark:text-gray-400">
+                            Route:
+                          </span>{" "}
                           <span className="font-medium text-gray-900 dark:text-white">
                             {reservation.pickupLocation}
                             {reservation.destinationLocation
@@ -178,8 +216,12 @@ export default function AdminReservationsPage() {
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">Price:</span>{" "}
-                          <span className="font-semibold text-lg text-gray-900 dark:text-white">€{reservation.totalPrice}</span>
+                          <span className="text-gray-600 dark:text-gray-400">
+                            Price:
+                          </span>{" "}
+                          <span className="font-semibold text-lg text-gray-900 dark:text-white">
+                            €{reservation.totalPrice}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -217,8 +259,8 @@ export default function AdminReservationsPage() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between">
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, total)} of{" "}
-                {total} reservations
+                Showing {(page - 1) * pageSize + 1} to{" "}
+                {Math.min(page * pageSize, total)} of {total} reservations
               </p>
               <div className="flex items-center space-x-2">
                 <Button
@@ -255,4 +297,3 @@ export default function AdminReservationsPage() {
     </div>
   );
 }
-

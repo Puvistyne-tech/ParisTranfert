@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { getServiceFields } from "@/lib/supabaseService";
 import type { ServiceField } from "@/components/models/serviceFields";
+import { getServiceFields } from "@/lib/supabaseService";
 
 /**
  * Hook to fetch service fields with TanStack Query caching
@@ -22,4 +22,3 @@ export function useServiceFields(serviceId: string | null | undefined) {
     refetchOnWindowFocus: false,
   });
 }
-

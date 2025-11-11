@@ -1,32 +1,42 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
 import {
-  useReactTable,
-  getCoreRowModel,
-  getSortedRowModel,
-  getFilteredRowModel,
-  flexRender,
   type ColumnDef,
-  type SortingState,
   type ColumnFiltersState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
+  type SortingState,
+  useReactTable,
   type VisibilityState,
 } from "@tanstack/react-table";
-import { Card, CardContent } from "@/components/ui/Card";
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  Columns,
+  DollarSign,
+  Edit,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
+import type { ServiceVehiclePricing } from "@/components/models/pricing";
 import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { Plus, DollarSign, Columns, ArrowUpDown, ArrowUp, ArrowDown, Edit, Trash2, X } from "lucide-react";
-import { 
-  getAllPricing,
-  createPricing,
-  updatePricing,
-  deletePricing,
-} from "@/lib/supabaseService";
+import { useLocations } from "@/hooks/useLocations";
 import { useServices } from "@/hooks/useServices";
 import { useVehicleTypes } from "@/hooks/useVehicleTypes";
-import { useLocations } from "@/hooks/useLocations";
-import type { ServiceVehiclePricing } from "@/components/models/pricing";
-import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
+import {
+  createPricing,
+  deletePricing,
+  getAllPricing,
+  updatePricing,
+} from "@/lib/supabaseService";
 
 type PricingRow = ServiceVehiclePricing & {
   serviceName: string;
@@ -38,7 +48,7 @@ type PricingRow = ServiceVehiclePricing & {
 export default function AdminPricingPage() {
   const [pricing, setPricing] = useState<ServiceVehiclePricing[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Use TanStack Query hooks for data fetching with automatic caching
   const { data: services = [] } = useServices();
   const { data: vehicles = [] } = useVehicleTypes();
@@ -53,12 +63,18 @@ export default function AdminPricingPage() {
     price: true,
   });
   const [showColumnMenu, setShowColumnMenu] = useState(false);
-  const [editingCell, setEditingCell] = useState<{ rowId: string; columnId: string } | null>(null);
+  const [editingCell, setEditingCell] = useState<{
+    rowId: string;
+    columnId: string;
+  } | null>(null);
   const [editValue, setEditValue] = useState("");
   const [saving, setSaving] = useState(false);
   const [savingCellId, setSavingCellId] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; pricingId: string | null }>({
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean;
+    pricingId: string | null;
+  }>({
     isOpen: false,
     pricingId: null,
   });
@@ -89,28 +105,30 @@ export default function AdminPricingPage() {
   };
 
   const getServiceName = (serviceId: string) => {
-    const service = services.find(s => s.id === serviceId);
+    const service = services.find((s) => s.id === serviceId);
     return service?.name || serviceId;
   };
 
   const getVehicleName = (vehicleId: string) => {
-    const vehicle = vehicles.find(v => v.id === vehicleId);
+    const vehicle = vehicles.find((v) => v.id === vehicleId);
     return vehicle?.name || vehicleId;
   };
 
   const getLocationName = (locationId: string) => {
-    const location = locations.find(l => l.id === locationId);
+    const location = locations.find((l) => l.id === locationId);
     return location?.name || locationId;
   };
 
   // Transform data for table
   const tableData = useMemo<PricingRow[]>(() => {
-    return pricing.map(item => ({
+    return pricing.map((item) => ({
       ...item,
       serviceName: getServiceName(item.serviceId),
       vehicleName: getVehicleName(item.vehicleTypeId),
       pickupName: getLocationName(item.pickupLocationId),
-      destinationName: item.destinationLocationId ? getLocationName(item.destinationLocationId) : "N/A",
+      destinationName: item.destinationLocationId
+        ? getLocationName(item.destinationLocationId)
+        : "N/A",
     }));
   }, [pricing, services, vehicles, locations]);
 
@@ -130,9 +148,14 @@ export default function AdminPricingPage() {
       return; // Already saving this cell
     }
 
-    const row = pricing.find(p => p.id === rowId);
+    const row = pricing.find((p) => p.id === rowId);
     if (!row) {
-      console.error("Row not found in pricing array:", rowId, "Available IDs:", pricing.map(p => p.id));
+      console.error(
+        "Row not found in pricing array:",
+        rowId,
+        "Available IDs:",
+        pricing.map((p) => p.id),
+      );
       alert("Row not found. Please refresh the page.");
       setEditingCell(null);
       setEditValue("");
@@ -146,7 +169,9 @@ export default function AdminPricingPage() {
     } else if (columnId === "pickupName") {
       currentValue = getLocationName(row.pickupLocationId);
     } else if (columnId === "destinationName") {
-      currentValue = row.destinationLocationId ? getLocationName(row.destinationLocationId) : "N/A";
+      currentValue = row.destinationLocationId
+        ? getLocationName(row.destinationLocationId)
+        : "N/A";
     }
 
     // If value hasn't changed, just cancel editing
@@ -180,7 +205,7 @@ export default function AdminPricingPage() {
         updates.price = priceValue;
       } else if (columnId === "pickupName") {
         // editValue is the location name, find the location ID
-        const location = locations.find(l => l.name === editValue);
+        const location = locations.find((l) => l.name === editValue);
         if (!location) {
           alert("Location not found");
           setSavingCellId(null);
@@ -198,7 +223,7 @@ export default function AdminPricingPage() {
         updates.pickupLocationId = location.id;
       } else if (columnId === "destinationName") {
         // editValue is the location name, find the location ID
-        const location = locations.find(l => l.name === editValue);
+        const location = locations.find((l) => l.name === editValue);
         if (!location) {
           alert("Location not found");
           setSavingCellId(null);
@@ -229,13 +254,16 @@ export default function AdminPricingPage() {
         await updatePricing(rowId, updates);
       } catch (updateError: any) {
         // If update says "could not retrieve", it likely succeeded, just refresh
-        if (updateError.message?.includes("could not retrieve") || updateError.message?.includes("Please refresh")) {
+        if (
+          updateError.message?.includes("could not retrieve") ||
+          updateError.message?.includes("Please refresh")
+        ) {
           console.log("Update likely succeeded, refreshing data...");
         } else {
           throw updateError;
         }
       }
-      
+
       // Always refresh data after update attempt
       await fetchInitialData();
       setEditingCell(null);
@@ -271,7 +299,13 @@ export default function AdminPricingPage() {
   };
 
   const handleCreate = async () => {
-    if (!newPricing.serviceId || !newPricing.vehicleTypeId || !newPricing.pickupLocationId || !newPricing.destinationLocationId || !newPricing.price) {
+    if (
+      !newPricing.serviceId ||
+      !newPricing.vehicleTypeId ||
+      !newPricing.pickupLocationId ||
+      !newPricing.destinationLocationId ||
+      !newPricing.price
+    ) {
       alert("Please fill in all fields");
       return;
     }
@@ -315,7 +349,9 @@ export default function AdminPricingPage() {
         header: ({ column }) => {
           return (
             <button
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
               className="flex items-center space-x-1 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               <span>Service</span>
@@ -346,7 +382,9 @@ export default function AdminPricingPage() {
         header: ({ column }) => {
           return (
             <button
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
               className="flex items-center space-x-1 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               <span>Vehicle</span>
@@ -377,7 +415,9 @@ export default function AdminPricingPage() {
         header: ({ column }) => {
           return (
             <button
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
               className="flex items-center space-x-1 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               <span>Pickup</span>
@@ -392,7 +432,9 @@ export default function AdminPricingPage() {
           );
         },
         cell: ({ row, column }) => {
-          const isEditing = editingCell?.rowId === row.original.id && editingCell?.columnId === column.id;
+          const isEditing =
+            editingCell?.rowId === row.original.id &&
+            editingCell?.columnId === column.id;
           const value = row.getValue(column.id) as string;
 
           if (isEditing) {
@@ -403,12 +445,18 @@ export default function AdminPricingPage() {
                   onChange={(e) => setEditValue(e.target.value)}
                   onBlur={(e) => {
                     // Prevent blur if clicking on the select itself
-                    if (e.relatedTarget && (e.relatedTarget as HTMLElement).closest('select')) {
+                    if (
+                      e.relatedTarget &&
+                      (e.relatedTarget as HTMLElement).closest("select")
+                    ) {
                       return;
                     }
                     // Small delay to allow Enter key to process first
                     setTimeout(() => {
-                      if (editingCell?.rowId === row.original.id && editingCell?.columnId === column.id) {
+                      if (
+                        editingCell?.rowId === row.original.id &&
+                        editingCell?.columnId === column.id
+                      ) {
                         handleCellSave(row.original.id, column.id);
                       }
                     }, 100);
@@ -439,7 +487,9 @@ export default function AdminPricingPage() {
           return (
             <div className="group relative">
               <div
-                onClick={() => handleCellClick(row.original.id, column.id, value)}
+                onClick={() =>
+                  handleCellClick(row.original.id, column.id, value)
+                }
                 className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded transition-colors"
               >
                 {value}
@@ -458,7 +508,10 @@ export default function AdminPricingPage() {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    setDeleteConfirm({ isOpen: true, pricingId: row.original.id });
+                    setDeleteConfirm({
+                      isOpen: true,
+                      pricingId: row.original.id,
+                    });
                   }}
                   className="p-1 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                   title="Delete row"
@@ -477,7 +530,9 @@ export default function AdminPricingPage() {
         header: ({ column }) => {
           return (
             <button
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
               className="flex items-center space-x-1 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               <span>Destination</span>
@@ -492,7 +547,9 @@ export default function AdminPricingPage() {
           );
         },
         cell: ({ row, column }) => {
-          const isEditing = editingCell?.rowId === row.original.id && editingCell?.columnId === column.id;
+          const isEditing =
+            editingCell?.rowId === row.original.id &&
+            editingCell?.columnId === column.id;
           const value = row.getValue(column.id) as string;
 
           if (isEditing) {
@@ -503,12 +560,18 @@ export default function AdminPricingPage() {
                   onChange={(e) => setEditValue(e.target.value)}
                   onBlur={(e) => {
                     // Prevent blur if clicking on the select itself
-                    if (e.relatedTarget && (e.relatedTarget as HTMLElement).closest('select')) {
+                    if (
+                      e.relatedTarget &&
+                      (e.relatedTarget as HTMLElement).closest("select")
+                    ) {
                       return;
                     }
                     // Small delay to allow Enter key to process first
                     setTimeout(() => {
-                      if (editingCell?.rowId === row.original.id && editingCell?.columnId === column.id) {
+                      if (
+                        editingCell?.rowId === row.original.id &&
+                        editingCell?.columnId === column.id
+                      ) {
                         handleCellSave(row.original.id, column.id);
                       }
                     }, 100);
@@ -539,7 +602,9 @@ export default function AdminPricingPage() {
           return (
             <div className="group relative">
               <div
-                onClick={() => handleCellClick(row.original.id, column.id, value)}
+                onClick={() =>
+                  handleCellClick(row.original.id, column.id, value)
+                }
                 className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded transition-colors"
               >
                 {value}
@@ -558,7 +623,10 @@ export default function AdminPricingPage() {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    setDeleteConfirm({ isOpen: true, pricingId: row.original.id });
+                    setDeleteConfirm({
+                      isOpen: true,
+                      pricingId: row.original.id,
+                    });
                   }}
                   className="p-1 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                   title="Delete row"
@@ -577,7 +645,9 @@ export default function AdminPricingPage() {
         header: ({ column }) => {
           return (
             <button
-              onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
               className="flex items-center space-x-1 hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               <span>Price</span>
@@ -592,7 +662,9 @@ export default function AdminPricingPage() {
           );
         },
         cell: ({ row, column }) => {
-          const isEditing = editingCell?.rowId === row.original.id && editingCell?.columnId === column.id;
+          const isEditing =
+            editingCell?.rowId === row.original.id &&
+            editingCell?.columnId === column.id;
           const value = row.getValue(column.id) as number;
 
           if (isEditing) {
@@ -607,12 +679,18 @@ export default function AdminPricingPage() {
                   onChange={(e) => setEditValue(e.target.value)}
                   onBlur={(e) => {
                     // Prevent blur if clicking on the input itself
-                    if (e.relatedTarget && (e.relatedTarget as HTMLElement).closest('input')) {
+                    if (
+                      e.relatedTarget &&
+                      (e.relatedTarget as HTMLElement).closest("input")
+                    ) {
                       return;
                     }
                     // Small delay to allow Enter key to process first
                     setTimeout(() => {
-                      if (editingCell?.rowId === row.original.id && editingCell?.columnId === column.id) {
+                      if (
+                        editingCell?.rowId === row.original.id &&
+                        editingCell?.columnId === column.id
+                      ) {
                         handleCellSave(row.original.id, column.id);
                       }
                     }, 100);
@@ -636,7 +714,9 @@ export default function AdminPricingPage() {
           return (
             <div className="group relative">
               <div
-                onClick={() => handleCellClick(row.original.id, column.id, value)}
+                onClick={() =>
+                  handleCellClick(row.original.id, column.id, value)
+                }
                 className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded transition-colors font-semibold"
               >
                 €{value}
@@ -655,7 +735,10 @@ export default function AdminPricingPage() {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    setDeleteConfirm({ isOpen: true, pricingId: row.original.id });
+                    setDeleteConfirm({
+                      isOpen: true,
+                      pricingId: row.original.id,
+                    });
                   }}
                   className="p-1 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors"
                   title="Delete row"
@@ -670,7 +753,7 @@ export default function AdminPricingPage() {
         enableColumnFilter: true,
       },
     ],
-    [editingCell, editValue, services, vehicles, locations]
+    [editingCell, editValue, services, vehicles, locations],
   );
 
   const table = useReactTable({
@@ -696,8 +779,12 @@ export default function AdminPricingPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Pricing Management</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">Manage service pricing matrix</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Pricing Management
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Manage service pricing matrix
+          </p>
         </div>
         <div className="flex items-center space-x-2">
           <div className="relative">
@@ -716,7 +803,8 @@ export default function AdminPricingPage() {
                   onClick={() => setShowColumnMenu(false)}
                 />
                 <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20 p-2">
-                  {table.getAllColumns()
+                  {table
+                    .getAllColumns()
                     .filter((column) => column.getCanHide())
                     .map((column) => (
                       <label
@@ -726,7 +814,9 @@ export default function AdminPricingPage() {
                         <input
                           type="checkbox"
                           checked={column.getIsVisible()}
-                          onChange={(e) => column.toggleVisibility(e.target.checked)}
+                          onChange={(e) =>
+                            column.toggleVisibility(e.target.checked)
+                          }
                           className="rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500"
                         />
                         <span className="text-sm text-gray-700 dark:text-gray-300 capitalize">
@@ -765,7 +855,10 @@ export default function AdminPricingPage() {
                         >
                           {header.isPlaceholder
                             ? null
-                            : flexRender(header.column.columnDef.header, header.getContext())}
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
                         </th>
                       ))}
                     </tr>
@@ -774,7 +867,10 @@ export default function AdminPricingPage() {
                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                   {table.getRowModel().rows.length === 0 ? (
                     <tr>
-                      <td colSpan={visibleColumnsCount} className="px-6 py-12 text-center">
+                      <td
+                        colSpan={visibleColumnsCount}
+                        className="px-6 py-12 text-center"
+                      >
                         <DollarSign className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
                         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
                           No pricing entries found
@@ -786,13 +882,19 @@ export default function AdminPricingPage() {
                     </tr>
                   ) : (
                     table.getRowModel().rows.map((row) => (
-                      <tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                      <tr
+                        key={row.id}
+                        className="hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                      >
                         {row.getVisibleCells().map((cell) => (
                           <td
                             key={cell.id}
                             className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white"
                           >
-                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
                           </td>
                         ))}
                       </tr>
@@ -804,7 +906,8 @@ export default function AdminPricingPage() {
             {table.getRowModel().rows.length > 0 && (
               <div className="px-6 py-3 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Showing {table.getRowModel().rows.length} of {pricing.length} pricing entries
+                  Showing {table.getRowModel().rows.length} of {pricing.length}{" "}
+                  pricing entries
                 </p>
               </div>
             )}
@@ -818,7 +921,9 @@ export default function AdminPricingPage() {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create New Pricing</h2>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                  Create New Pricing
+                </h2>
                 <button
                   onClick={() => setShowCreateModal(false)}
                   className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
@@ -834,7 +939,9 @@ export default function AdminPricingPage() {
                 </label>
                 <select
                   value={newPricing.serviceId}
-                  onChange={(e) => setNewPricing({ ...newPricing, serviceId: e.target.value })}
+                  onChange={(e) =>
+                    setNewPricing({ ...newPricing, serviceId: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
                   <option value="">Select service...</option>
@@ -851,7 +958,12 @@ export default function AdminPricingPage() {
                 </label>
                 <select
                   value={newPricing.vehicleTypeId}
-                  onChange={(e) => setNewPricing({ ...newPricing, vehicleTypeId: e.target.value })}
+                  onChange={(e) =>
+                    setNewPricing({
+                      ...newPricing,
+                      vehicleTypeId: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
                   <option value="">Select vehicle...</option>
@@ -868,7 +980,12 @@ export default function AdminPricingPage() {
                 </label>
                 <select
                   value={newPricing.pickupLocationId}
-                  onChange={(e) => setNewPricing({ ...newPricing, pickupLocationId: e.target.value })}
+                  onChange={(e) =>
+                    setNewPricing({
+                      ...newPricing,
+                      pickupLocationId: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
                   <option value="">Select pickup location...</option>
@@ -885,7 +1002,12 @@ export default function AdminPricingPage() {
                 </label>
                 <select
                   value={newPricing.destinationLocationId}
-                  onChange={(e) => setNewPricing({ ...newPricing, destinationLocationId: e.target.value })}
+                  onChange={(e) =>
+                    setNewPricing({
+                      ...newPricing,
+                      destinationLocationId: e.target.value,
+                    })
+                  }
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                 >
                   <option value="">Select destination location...</option>
@@ -905,7 +1027,9 @@ export default function AdminPricingPage() {
                   step="0.01"
                   min="0"
                   value={newPricing.price}
-                  onChange={(e) => setNewPricing({ ...newPricing, price: e.target.value })}
+                  onChange={(e) =>
+                    setNewPricing({ ...newPricing, price: e.target.value })
+                  }
                   placeholder="0.00"
                   className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
                 />

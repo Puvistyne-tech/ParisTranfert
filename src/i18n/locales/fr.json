@@ -119,6 +119,39 @@
         "Visites Historiques et Culturelles",
         "Durée Flexible"
       ]
+    },
+    "paris-city-tour": {
+      "name": "Visite de Paris (4H-8H)",
+      "description": "Découvrez la beauté de Paris avec des visites de la ville personnalisées. Explorez les monuments emblématiques et les joyaux cachés avec un chauffeur ou guide expérimenté, à votre rythme et dans le confort.",
+      "features": [
+        "Guide Professionnel",
+        "Itinéraire Personnalisé",
+        "Accès Prioritaire",
+        "Opportunités Photos",
+        "Conseils Locaux"
+      ]
+    },
+    "personal-security": {
+      "name": "Sécurité Personnelle",
+      "description": "Pour les clients qui nécessitent une protection renforcée, nous offrons des services professionnels de sécurité personnelle avec du personnel formé, garantissant votre sécurité et discrétion pendant tous vos déplacements. (2SPROTEC)",
+      "features": [
+        "Personnel de Sécurité Formé",
+        "Évaluation des Risques",
+        "Protection Discrète",
+        "Protocoles d'Urgence",
+        "Vérifications d'Antécédents"
+      ]
+    },
+    "eventTransport": {
+      "name": "Transport d'Événements",
+      "description": "Services de transport professionnels pour événements, conférences et occasions spéciales",
+      "features": [
+        "Transport d'Événements",
+        "Transfers de Conférences",
+        "Occasions Spéciales",
+        "Transfers de Groupe",
+        "Planification Flexible"
+      ]
     }
   },
   "fleet": {

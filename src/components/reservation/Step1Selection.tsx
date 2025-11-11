@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent } from "@/components/ui/Card";
-import { Car, Baby, Users, UserCheck, AlertCircle } from "lucide-react";
+import { AlertCircle, Baby, Car, UserCheck, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
+import type { Service } from "@/components/models";
 import type { Category } from "@/components/models/categories";
 import type { VehicleType } from "@/components/models/vehicleTypes";
-import type { Service } from "@/components/models";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
 import type { AdditionalServices } from "@/store/reservationStore";
 
 interface Step1SelectionProps {
@@ -44,7 +44,9 @@ export function Step1Selection({
 }: Step1SelectionProps) {
   const t = useTranslations("reservation.step1");
   const [imageError, setImageError] = useState(false);
-  const [vehicleImageErrors, setVehicleImageErrors] = useState<Record<string, boolean>>({});
+  const [vehicleImageErrors, setVehicleImageErrors] = useState<
+    Record<string, boolean>
+  >({});
 
   // Reset image error when vehicle type changes
   useEffect(() => {
@@ -52,9 +54,9 @@ export function Step1Selection({
   }, [selectedVehicleType?.id]);
 
   const handleVehicleImageError = (vehicleId: string) => {
-    setVehicleImageErrors(prev => ({ ...prev, [vehicleId]: true }));
+    setVehicleImageErrors((prev) => ({ ...prev, [vehicleId]: true }));
   };
-  
+
   return (
     <>
       <motion.div
@@ -144,13 +146,18 @@ export function Step1Selection({
                           {selectedVehicleType.description}
                         </p>
                       )}
-                      {(selectedVehicleType.minPassengers || selectedVehicleType.maxPassengers) && (
+                      {(selectedVehicleType.minPassengers ||
+                        selectedVehicleType.maxPassengers) && (
                         <p className="text-blue-600 dark:text-blue-400 text-xs sm:text-sm font-medium mb-1">
-                          {selectedVehicleType.minPassengers || 1}-{selectedVehicleType.maxPassengers || 8} {t("passengers")}
+                          {selectedVehicleType.minPassengers || 1}-
+                          {selectedVehicleType.maxPassengers || 8}{" "}
+                          {t("passengers")}
                         </p>
                       )}
                       <p className="text-blue-600 dark:text-blue-400 text-xs italic hidden sm:block">
-                        {t("youWillReceive", { vehicleType: selectedVehicleType.name.toLowerCase() })}
+                        {t("youWillReceive", {
+                          vehicleType: selectedVehicleType.name.toLowerCase(),
+                        })}
                       </p>
                     </div>
                   </div>
@@ -173,12 +180,15 @@ export function Step1Selection({
                     className="p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all text-left"
                   >
                     <div className="w-full h-32 rounded-lg overflow-hidden mb-3">
-                      {!vehicleImageErrors[vehicleType.id] && vehicleType.image ? (
+                      {!vehicleImageErrors[vehicleType.id] &&
+                      vehicleType.image ? (
                         <img
                           src={vehicleType.image}
                           alt={vehicleType.name}
                           className="w-full h-full object-cover"
-                          onError={() => handleVehicleImageError(vehicleType.id)}
+                          onError={() =>
+                            handleVehicleImageError(vehicleType.id)
+                          }
                         />
                       ) : (
                         <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
@@ -197,13 +207,17 @@ export function Step1Selection({
                         {vehicleType.description}
                       </p>
                     )}
-                    {(vehicleType.minPassengers || vehicleType.maxPassengers) && (
+                    {(vehicleType.minPassengers ||
+                      vehicleType.maxPassengers) && (
                       <p className="text-sm text-gray-700 dark:text-gray-300 font-medium mb-1">
-                        {vehicleType.minPassengers || 1}-{vehicleType.maxPassengers || 8} {t("passengers")}
+                        {vehicleType.minPassengers || 1}-
+                        {vehicleType.maxPassengers || 8} {t("passengers")}
                       </p>
                     )}
                     <p className="text-xs text-gray-500 dark:text-gray-400 italic">
-                      {t("youWillReceive", { vehicleType: vehicleType.name.toLowerCase() })}
+                      {t("youWillReceive", {
+                        vehicleType: vehicleType.name.toLowerCase(),
+                      })}
                     </p>
                   </button>
                 ))}
@@ -243,10 +257,14 @@ export function Step1Selection({
                     </p>
                     <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm text-blue-600 dark:text-blue-400">
                       {selectedService.duration && (
-                        <span>{t("duration")}: {selectedService.duration}</span>
+                        <span>
+                          {t("duration")}: {selectedService.duration}
+                        </span>
                       )}
                       {selectedService.priceRange && (
-                        <span>{t("price")}: {selectedService.priceRange}</span>
+                        <span>
+                          {t("price")}: {selectedService.priceRange}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -262,9 +280,9 @@ export function Step1Selection({
               </div>
             ) : (
               <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4 space-y-8">
-                {categories.map((category) => { 
+                {categories.map((category) => {
                   const categoryServices = services.filter(
-                    (s) => s.categoryId === category.id && s.isAvailable
+                    (s) => s.categoryId === category.id && s.isAvailable,
                   );
                   if (categoryServices.length === 0) return null;
 
@@ -327,95 +345,122 @@ export function Step1Selection({
               </p>
             </div>
 
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <Baby className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">{t("babySeats")}</h3>
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{t("babySeatsDescription")}</p>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onAdditionalServicesUpdate({ 
-                        babySeats: Math.max(0, additionalServices.babySeats - 1) 
-                      })}
-                      disabled={additionalServices.babySeats === 0}
-                    >
-                      -
-                    </Button>
-                    <span className="w-8 text-center font-medium">
-                      {additionalServices.babySeats}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onAdditionalServicesUpdate({ 
-                        babySeats: additionalServices.babySeats + 1 
-                      })}
-                    >
-                      +
-                    </Button>
-                  </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <Baby className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                    {t("babySeats")}
+                  </h3>
                 </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">{t("boosterSeats")}</h3>
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{t("boosterSeatsDescription")}</p>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onAdditionalServicesUpdate({ 
-                        boosters: Math.max(0, additionalServices.boosters - 1) 
-                      })}
-                      disabled={additionalServices.boosters === 0}
-                    >
-                      -
-                    </Button>
-                    <span className="w-8 text-center font-medium">
-                      {additionalServices.boosters}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onAdditionalServicesUpdate({ 
-                        boosters: additionalServices.boosters + 1 
-                      })}
-                    >
-                      +
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <UserCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                    <h3 className="font-semibold text-gray-900 dark:text-gray-100">{t("meetGreet")}</h3>
-                  </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{t("meetGreetDescription")}</p>
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={additionalServices.meetAndGreet}
-                      onChange={(e) => onAdditionalServicesUpdate({
-                        meetAndGreet: e.target.checked 
-                      })}
-                      className="w-5 h-5 text-blue-600 dark:text-blue-400 rounded focus:ring-blue-500"
-                    />
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                      {additionalServices.meetAndGreet ? t("selected") : t("addService")}
-                    </label>
-                  </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {t("babySeatsDescription")}
+                </p>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      onAdditionalServicesUpdate({
+                        babySeats: Math.max(
+                          0,
+                          additionalServices.babySeats - 1,
+                        ),
+                      })
+                    }
+                    disabled={additionalServices.babySeats === 0}
+                  >
+                    -
+                  </Button>
+                  <span className="w-8 text-center font-medium">
+                    {additionalServices.babySeats}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      onAdditionalServicesUpdate({
+                        babySeats: additionalServices.babySeats + 1,
+                      })
+                    }
+                  >
+                    +
+                  </Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
+
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                    {t("boosterSeats")}
+                  </h3>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {t("boosterSeatsDescription")}
+                </p>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      onAdditionalServicesUpdate({
+                        boosters: Math.max(0, additionalServices.boosters - 1),
+                      })
+                    }
+                    disabled={additionalServices.boosters === 0}
+                  >
+                    -
+                  </Button>
+                  <span className="w-8 text-center font-medium">
+                    {additionalServices.boosters}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      onAdditionalServicesUpdate({
+                        boosters: additionalServices.boosters + 1,
+                      })
+                    }
+                  >
+                    +
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <UserCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                    {t("meetGreet")}
+                  </h3>
+                </div>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {t("meetGreetDescription")}
+                </p>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    checked={additionalServices.meetAndGreet}
+                    onChange={(e) =>
+                      onAdditionalServicesUpdate({
+                        meetAndGreet: e.target.checked,
+                      })
+                    }
+                    className="w-5 h-5 text-blue-600 dark:text-blue-400 rounded focus:ring-blue-500"
+                  />
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    {additionalServices.meetAndGreet
+                      ? t("selected")
+                      : t("addService")}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* Validation Errors */}
       {validationErrors.length > 0 && (
@@ -434,7 +479,10 @@ export function Step1Selection({
                   </h3>
                   <ul className="space-y-1">
                     {validationErrors.map((error, index) => (
-                      <li key={index} className="text-red-700 flex items-center">
+                      <li
+                        key={index}
+                        className="text-red-700 flex items-center"
+                      >
                         <span className="w-1.5 h-1.5 bg-red-500 rounded-full mr-2"></span>
                         {error}
                       </li>
@@ -454,15 +502,10 @@ export function Step1Selection({
         transition={{ delay: 0.2 }}
         className="text-center mb-8"
       >
-        <Button
-          size="lg"
-          onClick={onContinue}
-          className="px-8 py-3"
-        >
+        <Button size="lg" onClick={onContinue} className="px-8 py-3">
           {t("continueToTripDetails")}
         </Button>
       </motion.div>
     </>
   );
 }
-

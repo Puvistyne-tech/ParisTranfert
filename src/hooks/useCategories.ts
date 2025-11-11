@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { getCategories } from "@/lib/supabaseService";
 import type { Category } from "@/components/models/categories";
+import { getCategories } from "@/lib/supabaseService";
 
 /**
  * Hook to fetch categories with TanStack Query caching
@@ -16,4 +16,3 @@ export function useCategories() {
     refetchOnWindowFocus: false,
   });
 }
-

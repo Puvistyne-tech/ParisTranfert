@@ -1,15 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { AlertCircle, Eye, EyeOff, Info, Loader2 } from "lucide-react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale } from "next-intl";
-import { signIn, getCurrentUser, isAdmin } from "@/lib/auth";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import { Card, CardContent } from "@/components/ui/Card";
-import { AlertCircle, Loader2, Eye, EyeOff, Info } from "lucide-react";
-import { signInWithGoogle } from "@/lib/auth";
-import Image from "next/image";
+import { Input } from "@/components/ui/Input";
+import { getCurrentUser, isAdmin, signIn, signInWithGoogle } from "@/lib/auth";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -31,18 +30,20 @@ export default function AdminLoginPage() {
         const user = await getCurrentUser();
         if (user) {
           const adminCheck = await isAdmin();
-          
+
           // If user is authenticated and is an admin, redirect to admin dashboard
           if (adminCheck) {
             router.push(`/${locale}/admin`);
             return;
           }
-          
+
           // User is authenticated but doesn't have admin role
           const role = user.user_metadata?.role || user.role;
-          if (!role || role !== 'admin') {
+          if (!role || role !== "admin") {
             setNeedsAdminRole(true);
-            setError("You are signed in, but you don't have admin access. Please contact an administrator to grant you admin privileges.");
+            setError(
+              "You are signed in, but you don't have admin access. Please contact an administrator to grant you admin privileges.",
+            );
           }
         }
         // If no user, just show the login form (no error)
@@ -114,17 +115,17 @@ export default function AdminLoginPage() {
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               Admin Login
             </h1>
-            <p className="text-gray-600">
-              Sign in to access the admin panel
-            </p>
+            <p className="text-gray-600">Sign in to access the admin panel</p>
           </div>
 
           {error && (
-            <div className={`mb-6 p-4 border rounded-lg flex items-start space-x-2 ${
-              needsAdminRole 
-                ? "bg-blue-50 border-blue-200 text-blue-700" 
-                : "bg-red-50 border-red-200 text-red-700"
-            }`}>
+            <div
+              className={`mb-6 p-4 border rounded-lg flex items-start space-x-2 ${
+                needsAdminRole
+                  ? "bg-blue-50 border-blue-200 text-blue-700"
+                  : "bg-red-50 border-red-200 text-red-700"
+              }`}
+            >
               {needsAdminRole ? (
                 <Info className="w-5 h-5 mt-0.5 flex-shrink-0" />
               ) : (
@@ -138,8 +139,21 @@ export default function AdminLoginPage() {
                     <ol className="list-decimal list-inside space-y-1">
                       <li>Go to Supabase Dashboard → Authentication → Users</li>
                       <li>Find your user account</li>
-                      <li>Edit user metadata and add: <code className="bg-blue-100 px-1 rounded">role: &apos;admin&apos;</code></li>
-                      <li>Or use SQL: <code className="bg-blue-100 px-1 rounded">UPDATE auth.users SET raw_user_meta_data = raw_user_meta_data || &apos;{`{"role": "admin"}`}&apos;::jsonb WHERE email = &apos;your-email@example.com&apos;;</code></li>
+                      <li>
+                        Edit user metadata and add:{" "}
+                        <code className="bg-blue-100 px-1 rounded">
+                          role: &apos;admin&apos;
+                        </code>
+                      </li>
+                      <li>
+                        Or use SQL:{" "}
+                        <code className="bg-blue-100 px-1 rounded">
+                          UPDATE auth.users SET raw_user_meta_data =
+                          raw_user_meta_data || &apos;{`{"role": "admin"}`}
+                          &apos;::jsonb WHERE email =
+                          &apos;your-email@example.com&apos;;
+                        </code>
+                      </li>
                     </ol>
                   </div>
                 )}
@@ -222,7 +236,9 @@ export default function AdminLoginPage() {
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                <span className="px-2 bg-white text-gray-500">
+                  Or continue with
+                </span>
               </div>
             </div>
 
@@ -268,4 +284,3 @@ export default function AdminLoginPage() {
     </div>
   );
 }
-

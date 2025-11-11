@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { getLocations } from "@/lib/supabaseService";
 import type { Location } from "@/components/models/locations";
+import { getLocations } from "@/lib/supabaseService";
 
 /**
  * Hook to fetch locations with TanStack Query caching
@@ -16,4 +16,3 @@ export function useLocations() {
     refetchOnWindowFocus: false,
   });
 }
-

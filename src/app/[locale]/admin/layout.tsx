@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { useLocale } from "next-intl";
-import { getCurrentUser, isAdmin } from "@/lib/auth";
-import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { Loader2 } from "lucide-react";
-import type { AdminUser } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
+import { usePathname, useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
+import { useEffect, useState } from "react";
+import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { DarkModeProvider } from "@/components/providers/DarkModeProvider";
+import type { AdminUser } from "@/lib/auth";
+import { getCurrentUser, isAdmin } from "@/lib/auth";
+import { supabase } from "@/lib/supabase";
 
 export default function AdminLayout({
   children,
@@ -23,37 +23,42 @@ export default function AdminLayout({
   const [isAdminUser, setIsAdminUser] = useState(false);
 
   // Skip auth check for login page
-  const isLoginPage = pathname?.includes('/admin/login');
+  const isLoginPage = pathname?.includes("/admin/login");
 
   // Handle OAuth callback - extract tokens from URL hash and clean URL
   useEffect(() => {
     const handleOAuthCallback = async () => {
       // Check if there's a hash in the URL (OAuth tokens)
-      if (typeof window !== 'undefined' && window.location.hash) {
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        
+      if (typeof window !== "undefined" && window.location.hash) {
+        const hashParams = new URLSearchParams(
+          window.location.hash.substring(1),
+        );
+
         // If we have OAuth tokens in the hash, let Supabase handle them
-        if (hashParams.has('access_token') || hashParams.has('error')) {
+        if (hashParams.has("access_token") || hashParams.has("error")) {
           try {
             // Supabase automatically processes the hash when getSession() is called
             // Wait a moment for it to process
-            await new Promise(resolve => setTimeout(resolve, 100));
-            
+            await new Promise((resolve) => setTimeout(resolve, 100));
+
             // Get the session (this will process the hash tokens)
-            const { data: { session }, error } = await supabase.auth.getSession();
-            
+            const { error } = await supabase.auth.getSession();
+
             if (error) {
-              console.error('Error getting session from OAuth callback:', error);
+              console.error(
+                "Error getting session from OAuth callback:",
+                error,
+              );
             }
-            
+
             // Clean up the URL by removing the hash (after Supabase has processed it)
             const cleanUrl = window.location.pathname + window.location.search;
-            window.history.replaceState({}, '', cleanUrl);
-            
+            window.history.replaceState({}, "", cleanUrl);
+
             // Refresh to update auth state throughout the app
             router.refresh();
           } catch (err) {
-            console.error('Error handling OAuth callback:', err);
+            console.error("Error handling OAuth callback:", err);
           }
         }
       }
@@ -90,7 +95,7 @@ export default function AdminLayout({
     };
 
     checkAuth();
-  }, [router, locale, pathname, isLoginPage]);
+  }, [router, locale, isLoginPage]);
 
   // If on login page, render children without auth check
   if (isLoginPage) {
@@ -102,7 +107,9 @@ export default function AdminLayout({
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin text-primary-600 dark:text-primary-400 mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-400">Loading admin panel...</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            Loading admin panel...
+          </p>
         </div>
       </div>
     );
@@ -114,18 +121,18 @@ export default function AdminLayout({
 
   return (
     <DarkModeProvider>
-      <div id="admin-container" className="min-h-screen bg-gray-50 dark:bg-gray-900 flex">
+      <div
+        id="admin-container"
+        className="min-h-screen bg-gray-50 dark:bg-gray-900 flex"
+      >
         {/* Sidebar */}
         <AdminSidebar user={user} />
-        
+
         {/* Main content area - with proper spacing for mobile menu */}
         <div className="flex-1 lg:ml-64 min-h-screen pt-16 lg:pt-0">
-          <div className="p-6 lg:p-8">
-            {children}
-          </div>
+          <div className="p-6 lg:p-8">{children}</div>
         </div>
       </div>
     </DarkModeProvider>
   );
 }
-

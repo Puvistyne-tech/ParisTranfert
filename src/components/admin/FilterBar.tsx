@@ -1,9 +1,9 @@
 "use client";
 
+import { Filter, X } from "lucide-react";
 import { useState } from "react";
-import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
-import { X, Filter } from "lucide-react";
+import { Input } from "@/components/ui/Input";
 
 interface FilterBarProps {
   onFilterChange: (filters: Record<string, any>) => void;
@@ -50,7 +50,7 @@ export function FilterBar({
   };
 
   const hasActiveFilters = Object.values(localFilters).some(
-    (value) => value && value !== ""
+    (value) => value && value !== "",
   );
 
   return (
@@ -58,7 +58,9 @@ export function FilterBar({
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-2">
           <Filter className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-          <h3 className="text-sm font-medium text-gray-900 dark:text-white">Filters</h3>
+          <h3 className="text-sm font-medium text-gray-900 dark:text-white">
+            Filters
+          </h3>
           {hasActiveFilters && (
             <span className="px-2 py-1 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 rounded-full text-xs font-medium">
               Active
@@ -194,4 +196,3 @@ export function FilterBar({
     </div>
   );
 }
-

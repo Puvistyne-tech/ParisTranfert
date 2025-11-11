@@ -20,19 +20,22 @@ interface EmailOptions {
  */
 async function sendEmail(options: EmailOptions): Promise<void> {
   try {
-    const response = await fetch(`${SUPABASE_URL}/functions/v1/send-reservation-email`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+    const response = await fetch(
+      `${SUPABASE_URL}/functions/v1/send-reservation-email`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          to: options.to,
+          subject: options.subject,
+          html: options.html,
+          text: options.text || options.html.replace(/<[^>]*>/g, ""),
+        }),
       },
-      body: JSON.stringify({
-        to: options.to,
-        subject: options.subject,
-        html: options.html,
-        text: options.text || options.html.replace(/<[^>]*>/g, ""),
-      }),
-    });
+    );
 
     if (!response.ok) {
       throw new Error(`Email sending failed: ${response.statusText}`);
@@ -49,7 +52,7 @@ async function sendEmail(options: EmailOptions): Promise<void> {
 export async function sendQuoteEmail(
   reservation: Reservation,
   clientEmail: string,
-  quotePrice?: number
+  quotePrice?: number,
 ): Promise<void> {
   const price = quotePrice || reservation.totalPrice;
   const subject = `Your Quote from Paris Transfer - Reservation ${reservation.id.slice(0, 8)}`;
@@ -111,18 +114,23 @@ export async function sendStatusUpdateEmail(
   reservation: Reservation,
   clientEmail: string,
   status: string,
-  message?: string
+  message?: string,
 ): Promise<void> {
   const statusMessages: Record<string, string> = {
     confirmed: "Your reservation has been confirmed!",
     cancelled: "Your reservation has been cancelled.",
-    completed: "Your reservation has been completed. Thank you for choosing us!",
+    completed:
+      "Your reservation has been completed. Thank you for choosing us!",
     quote_sent: "A quote has been sent for your reservation.",
-    quote_accepted: "Your quote has been accepted and your reservation is now confirmed!",
+    quote_accepted:
+      "Your quote has been accepted and your reservation is now confirmed!",
   };
 
   const subject = `Reservation Update - ${reservation.id.slice(0, 8)}`;
-  const statusMessage = message || statusMessages[status] || "Your reservation status has been updated.";
+  const statusMessage =
+    message ||
+    statusMessages[status] ||
+    "Your reservation status has been updated.";
 
   const html = `
     <!DOCTYPE html>
@@ -168,7 +176,7 @@ export async function sendStatusUpdateEmail(
 export async function sendAdminReplyEmail(
   reservation: Reservation,
   clientEmail: string,
-  adminMessage: string
+  adminMessage: string,
 ): Promise<void> {
   const subject = `Reply to your reservation - ${reservation.id.slice(0, 8)}`;
 
@@ -207,4 +215,3 @@ export async function sendAdminReplyEmail(
     html,
   });
 }
-

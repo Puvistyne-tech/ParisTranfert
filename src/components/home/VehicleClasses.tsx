@@ -1,14 +1,14 @@
-  "use client";
+"use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { ArrowRight, Briefcase, Crown } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { useVehicleTypes } from "@/hooks/useVehicleTypes";
+import type { VehicleType } from "@/components/models/vehicleTypes";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
-import type { VehicleType } from "@/components/models/vehicleTypes";
+import { useVehicleTypes } from "@/hooks/useVehicleTypes";
 import { useReservationStore } from "@/store/reservationStore";
 
 export function VehicleClasses() {
@@ -16,13 +16,13 @@ export function VehicleClasses() {
   const router = useRouter();
   const locale = useLocale();
   const { setSelectedVehicleType } = useReservationStore();
-  
+
   // Use TanStack Query hook for data fetching with automatic caching
   const { data: vehicleTypes = [], isLoading: loading } = useVehicleTypes();
 
   const handleSelectVehicleType = (vehicleTypeId: string) => {
     // Find the vehicle type object and save it to the store
-    const vehicleType = vehicleTypes.find(vt => vt.id === vehicleTypeId);
+    const vehicleType = vehicleTypes.find((vt) => vt.id === vehicleTypeId);
     if (vehicleType) {
       setSelectedVehicleType(vehicleType);
     }
@@ -80,77 +80,81 @@ export function VehicleClasses() {
         </motion.div>
 
         {loading ? (
-          <div className="text-center py-12 text-gray-600 dark:text-gray-400">{t("loadingVehicleTypes")}</div>
+          <div className="text-center py-12 text-gray-600 dark:text-gray-400">
+            {t("loadingVehicleTypes")}
+          </div>
         ) : (
           <>
             {/* Vehicle Types Grid */}
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <div className="grid md:grid-cols-2 gap-8 mb-12">
               {vehicleTypes.map((vehicleType, index) => (
-            <motion.div
-              key={vehicleType.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.2 }}
-              viewport={{ once: true }}
-            >
-              <Card className="group relative overflow-hidden h-full">
-                <CardContent className="p-0">
-                  {/* Background Image */}
-                  <div className="relative h-64">
-                    <Image
-                      src={
-                        vehicleType.image || 
-                        (vehicleType.id === 'car'
-                          ? 'https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80'
-                          : 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80')
-                      }
-                      alt={vehicleType.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
-                    
-                    {/* Vehicle Type Icon */}
-                    <div className="absolute top-6 left-6">
-                      <div className="w-16 h-16 bg-gradient-to-br from-primary-600 to-accent-500 rounded-2xl flex items-center justify-center shadow-lg">
-                        {vehicleType.id === 'car' ? (
-                          <Briefcase className="text-white text-2xl" />
-                        ) : (
-                          <Crown className="text-white text-2xl" />
-                        )}
+                <motion.div
+                  key={vehicleType.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: index * 0.2 }}
+                  viewport={{ once: true }}
+                >
+                  <Card className="group relative overflow-hidden h-full">
+                    <CardContent className="p-0">
+                      {/* Background Image */}
+                      <div className="relative h-64">
+                        <Image
+                          src={
+                            vehicleType.image ||
+                            (vehicleType.id === "car"
+                              ? "https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80"
+                              : "https://images.unsplash.com/photo-1560958089-b8a1929cea89?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80")
+                          }
+                          alt={vehicleType.name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+
+                        {/* Vehicle Type Icon */}
+                        <div className="absolute top-6 left-6">
+                          <div className="w-16 h-16 bg-gradient-to-br from-primary-600 to-accent-500 rounded-2xl flex items-center justify-center shadow-lg">
+                            {vehicleType.id === "car" ? (
+                              <Briefcase className="text-white text-2xl" />
+                            ) : (
+                              <Crown className="text-white text-2xl" />
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="absolute bottom-6 left-6 right-6">
+                          <h3 className="text-3xl font-bold text-white mb-2">
+                            {vehicleType.name}
+                          </h3>
+                          {vehicleType.description && (
+                            <p className="text-white/90 text-lg mb-4">
+                              {vehicleType.description}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Content */}
-                    <div className="absolute bottom-6 left-6 right-6">
-                      <h3 className="text-3xl font-bold text-white mb-2">
-                        {vehicleType.name}
-                      </h3>
-                      {vehicleType.description && (
-                      <p className="text-white/90 text-lg mb-4">
-                          {vehicleType.description}
-                      </p>
-                        )}
-                    </div>
-                  </div>
-
-                  {/* Action Button */}
-                  <div className="p-6 bg-white dark:bg-gray-800">
-                    <Button
-                      variant="primary"
-                      size="lg"
-                      className="w-full btn-premium group-hover:scale-105 transition-transform duration-300"
-                      onClick={() => handleSelectVehicleType(vehicleType.id)}
-                    >
-                      {t("bookNow")}
-                      <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
+                      {/* Action Button */}
+                      <div className="p-6 bg-white dark:bg-gray-800">
+                        <Button
+                          variant="primary"
+                          size="lg"
+                          className="w-full btn-premium group-hover:scale-105 transition-transform duration-300"
+                          onClick={() =>
+                            handleSelectVehicleType(vehicleType.id)
+                          }
+                        >
+                          {t("bookNow")}
+                          <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
           </>
         )}
 

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { X, Star } from "lucide-react";
+import { Star, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
@@ -19,7 +19,13 @@ interface TestimonialModalProps {
   loading?: boolean;
 }
 
-export function TestimonialModal({ isOpen, onClose, onSave, testimonial, loading = false }: TestimonialModalProps) {
+export function TestimonialModal({
+  isOpen,
+  onClose,
+  onSave,
+  testimonial,
+  loading = false,
+}: TestimonialModalProps) {
   const [formData, setFormData] = useState({
     name: "",
     initials: "",
@@ -90,7 +96,9 @@ export function TestimonialModal({ isOpen, onClose, onSave, testimonial, loading
               </label>
               <Input
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 required
                 className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
               />
@@ -101,7 +109,12 @@ export function TestimonialModal({ isOpen, onClose, onSave, testimonial, loading
               </label>
               <Input
                 value={formData.initials}
-                onChange={(e) => setFormData({ ...formData, initials: e.target.value.toUpperCase().slice(0, 2) })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    initials: e.target.value.toUpperCase().slice(0, 2),
+                  })
+                }
                 required
                 maxLength={2}
                 placeholder="e.g., JD"
@@ -143,7 +156,9 @@ export function TestimonialModal({ isOpen, onClose, onSave, testimonial, loading
             </label>
             <textarea
               value={formData.comment}
-              onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, comment: e.target.value })
+              }
               required
               rows={4}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
@@ -156,18 +171,29 @@ export function TestimonialModal({ isOpen, onClose, onSave, testimonial, loading
             </label>
             <Input
               value={formData.gradient}
-              onChange={(e) => setFormData({ ...formData, gradient: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, gradient: e.target.value })
+              }
               placeholder="e.g., from-blue-500 to-purple-600"
               className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
             />
           </div>
 
           <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={loading}
+            >
               Cancel
             </Button>
             <Button type="submit" variant="primary" disabled={loading}>
-              {loading ? "Saving..." : testimonial ? "Update Testimonial" : "Create Testimonial"}
+              {loading
+                ? "Saving..."
+                : testimonial
+                  ? "Update Testimonial"
+                  : "Create Testimonial"}
             </Button>
           </div>
         </form>
@@ -175,4 +201,3 @@ export function TestimonialModal({ isOpen, onClose, onSave, testimonial, loading
     </div>
   );
 }
-

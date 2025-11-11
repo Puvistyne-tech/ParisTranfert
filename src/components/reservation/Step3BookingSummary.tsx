@@ -1,14 +1,17 @@
 "use client";
 
+import { Baby, Car, Image as ImageIcon, UserCheck, Users } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
+import type { Service } from "@/components/models";
+import type { VehicleType } from "@/components/models/vehicleTypes";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
-import { Car, Baby, Users, UserCheck, Image as ImageIcon } from "lucide-react";
-import { useTranslations, useLocale } from "next-intl";
-import { useEffect, useState } from "react";
-import type { VehicleType } from "@/components/models/vehicleTypes";
-import type { Service } from "@/components/models";
+import {
+  getTranslatedServiceName,
+  getTranslatedVehicleDescription,
+} from "@/lib/translations";
 import type { AdditionalServices } from "@/store/reservationStore";
-import { getTranslatedVehicleDescription, getTranslatedServiceName } from "@/lib/translations";
 
 interface Step3BookingSummaryProps {
   selectedVehicleType: VehicleType | null;
@@ -72,32 +75,34 @@ export function Step3BookingSummary({
         <CardContent className="p-6">
           <div className="mb-4">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-            {t("bookingSummary")}
-          </h3>
+              {t("bookingSummary")}
+            </h3>
             <p className="text-sm text-gray-600 dark:text-gray-400">
               Please verify your information before confirming
             </p>
           </div>
-          
+
           {selectedVehicleType && (
             <div className="mb-6">
-              <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-3">{t("vehicleType")}</h4>
+              <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-3">
+                {t("vehicleType")}
+              </h4>
               <div className="flex items-start space-x-4">
                 {/* Vehicle Image */}
                 <div className="relative w-24 h-20 rounded-lg overflow-hidden flex-shrink-0 shadow-md">
                   {!imageError && selectedVehicleType.image ? (
-                    <img 
+                    <img
                       src={selectedVehicleType.image}
                       alt={selectedVehicleType.name}
                       className="w-full h-full object-cover"
                       onError={() => setImageError(true)}
                     />
                   ) : !imageError ? (
-                    <img 
+                    <img
                       src={
-                        selectedVehicleType.id === 'car'
-                          ? 'https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
-                          : 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'
+                        selectedVehicleType.id === "car"
+                          ? "https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
+                          : "https://images.unsplash.com/photo-1560958089-b8a1929cea89?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80"
                       }
                       alt={selectedVehicleType.name}
                       className="w-full h-full object-cover"
@@ -109,7 +114,7 @@ export function Step3BookingSummary({
                     </div>
                   )}
                 </div>
-                
+
                 {/* Vehicle Details */}
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-base text-gray-900 dark:text-gray-100 mb-1">
@@ -117,22 +122,29 @@ export function Step3BookingSummary({
                   </p>
                   {selectedVehicleType.description && (
                     <p className="text-xs text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
-                      {getTranslatedVehicleDescription(selectedVehicleType.id, selectedVehicleType.description, (key: string) => {
-                        try {
-                          return tFleet(key) || undefined;
-                        } catch {
-                          return undefined;
-                        }
-                      })}
+                      {getTranslatedVehicleDescription(
+                        selectedVehicleType.id,
+                        selectedVehicleType.description,
+                        (key: string) => {
+                          try {
+                            return tFleet(key) || undefined;
+                          } catch {
+                            return undefined;
+                          }
+                        },
+                      )}
                     </p>
                   )}
-                  
+
                   {/* Passenger Limit with Icon */}
-                  {(selectedVehicleType.minPassengers || selectedVehicleType.maxPassengers) && (
+                  {(selectedVehicleType.minPassengers ||
+                    selectedVehicleType.maxPassengers) && (
                     <div className="flex items-center space-x-1.5 text-sm text-gray-700 dark:text-gray-300 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded-md w-fit">
                       <Users className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                       <span className="font-medium">
-                        {selectedVehicleType.minPassengers || 1} - {selectedVehicleType.maxPassengers || 8} {t("passengers")}
+                        {selectedVehicleType.minPassengers || 1} -{" "}
+                        {selectedVehicleType.maxPassengers || 8}{" "}
+                        {t("passengers")}
                       </span>
                     </div>
                   )}
@@ -143,38 +155,54 @@ export function Step3BookingSummary({
 
           {selectedService && (
             <div className="mb-6">
-              <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">{t("service")}</h4>
+              <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
+                {t("service")}
+              </h4>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                {getTranslatedServiceName(selectedService.id, selectedService.name, (key: string) => {
-                  try {
-                    return tServices(key) || undefined;
-                  } catch {
-                    return undefined;
-                  }
-                })}
+                {getTranslatedServiceName(
+                  selectedService.id,
+                  selectedService.name,
+                  (key: string) => {
+                    try {
+                      return tServices(key) || undefined;
+                    } catch {
+                      return undefined;
+                    }
+                  },
+                )}
               </p>
               {selectedService.priceRange && (
-                <p className="text-xs text-gray-500 dark:text-gray-400">{selectedService.priceRange}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {selectedService.priceRange}
+                </p>
               )}
             </div>
           )}
 
           {/* Price Breakdown - Only show for airport-transfers */}
-          {selectedService?.id === 'airport-transfers' && (
+          {selectedService?.id === "airport-transfers" && (
             <div className="border-t dark:border-gray-700 pt-4 mb-4">
               {priceLoading ? (
-                <div className="text-sm text-gray-500 dark:text-gray-400">{t("loadingPrice")}</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  {t("loadingPrice")}
+                </div>
               ) : basePrice !== null ? (
                 <>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">{t("basePrice")}</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      {t("basePrice")}
+                    </span>
                     <span className="font-medium text-gray-900 dark:text-gray-100">
                       €{basePrice.toFixed(2)}
                     </span>
                   </div>
                   <div className="flex justify-between items-center text-lg font-bold mt-4 pt-4 border-t dark:border-gray-700">
-                    <span className="text-gray-900 dark:text-gray-100">{t("total")}</span>
-                    <span className="text-gray-900 dark:text-gray-100">€{basePrice.toFixed(2)}</span>
+                    <span className="text-gray-900 dark:text-gray-100">
+                      {t("total")}
+                    </span>
+                    <span className="text-gray-900 dark:text-gray-100">
+                      €{basePrice.toFixed(2)}
+                    </span>
                   </div>
                 </>
               ) : (
@@ -186,36 +214,48 @@ export function Step3BookingSummary({
           )}
 
           {/* Additional Services Info - Only for airport-transfers */}
-          {selectedService?.id === 'airport-transfers' && 
-           (additionalServices.babySeats > 0 || additionalServices.boosters > 0 || additionalServices.meetAndGreet) && (
-            <div className="border-t dark:border-gray-700 pt-4 mb-4">
-              <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">{t("additionalServicesFree")}</h4>
-              {additionalServices.babySeats > 0 && (
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">{t("babySeats")} ({additionalServices.babySeats})</span>
-                  <span className="text-sm text-green-600 dark:text-green-400 font-medium">{t("free")}</span>
-                </div>
-              )}
-              {additionalServices.boosters > 0 && (
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">{t("boosterSeats")} ({additionalServices.boosters})</span>
-                  <span className="text-sm text-green-600 dark:text-green-400 font-medium">{t("free")}</span>
-                </div>
-              )}
-              {additionalServices.meetAndGreet && (
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">{t("meetGreet")}</span>
-                  <span className="text-sm text-green-600 dark:text-green-400 font-medium">{t("free")}</span>
-                </div>
-              )}
-            </div>
-          )}
+          {selectedService?.id === "airport-transfers" &&
+            (additionalServices.babySeats > 0 ||
+              additionalServices.boosters > 0 ||
+              additionalServices.meetAndGreet) && (
+              <div className="border-t dark:border-gray-700 pt-4 mb-4">
+                <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                  {t("additionalServicesFree")}
+                </h4>
+                {additionalServices.babySeats > 0 && (
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      {t("babySeats")} ({additionalServices.babySeats})
+                    </span>
+                    <span className="text-sm text-green-600 dark:text-green-400 font-medium">
+                      {t("free")}
+                    </span>
+                  </div>
+                )}
+                {additionalServices.boosters > 0 && (
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      {t("boosterSeats")} ({additionalServices.boosters})
+                    </span>
+                    <span className="text-sm text-green-600 dark:text-green-400 font-medium">
+                      {t("free")}
+                    </span>
+                  </div>
+                )}
+                {additionalServices.meetAndGreet && (
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm text-gray-600 dark:text-gray-400">
+                      {t("meetGreet")}
+                    </span>
+                    <span className="text-sm text-green-600 dark:text-green-400 font-medium">
+                      {t("free")}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )}
 
-          <Button
-            size="lg"
-            onClick={onSubmit}
-            className="w-full mt-6"
-          >
+          <Button size="lg" onClick={onSubmit} className="w-full mt-6">
             {t("confirmBooking")}
           </Button>
         </CardContent>
@@ -223,4 +263,3 @@ export function Step3BookingSummary({
     </div>
   );
 }
-

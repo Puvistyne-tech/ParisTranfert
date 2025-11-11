@@ -1,10 +1,10 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { PublicDarkModeProvider } from "@/components/providers/DarkModeProvider";
 import { ConditionalNavbar } from "./ConditionalNavbar";
 import { Footer } from "./Footer";
 import { MobileFAB } from "./MobileFAB";
-import { PublicDarkModeProvider } from "@/components/providers/DarkModeProvider";
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -27,4 +27,3 @@ export function LayoutWrapper({ children }: { children: React.ReactNode }) {
     </PublicDarkModeProvider>
   );
 }
-

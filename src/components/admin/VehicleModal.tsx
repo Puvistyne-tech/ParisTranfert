@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
@@ -20,7 +20,13 @@ interface VehicleModalProps {
   loading?: boolean;
 }
 
-export function VehicleModal({ isOpen, onClose, onSave, vehicle, loading = false }: VehicleModalProps) {
+export function VehicleModal({
+  isOpen,
+  onClose,
+  onSave,
+  vehicle,
+  loading = false,
+}: VehicleModalProps) {
   const [formData, setFormData] = useState({
     id: "",
     name: "",
@@ -111,7 +117,9 @@ export function VehicleModal({ isOpen, onClose, onSave, vehicle, loading = false
             </label>
             <Input
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
               required
               className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
             />
@@ -123,7 +131,9 @@ export function VehicleModal({ isOpen, onClose, onSave, vehicle, loading = false
             </label>
             <textarea
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
             />
@@ -136,7 +146,9 @@ export function VehicleModal({ isOpen, onClose, onSave, vehicle, loading = false
             <Input
               type="url"
               value={formData.image}
-              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, image: e.target.value })
+              }
               placeholder="https://example.com/image.jpg"
               className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
             />
@@ -153,7 +165,12 @@ export function VehicleModal({ isOpen, onClose, onSave, vehicle, loading = false
               <Input
                 type="number"
                 value={formData.minPassengers}
-                onChange={(e) => setFormData({ ...formData, minPassengers: parseInt(e.target.value) || 1 })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    minPassengers: parseInt(e.target.value) || 1,
+                  })
+                }
                 required
                 min={1}
                 className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
@@ -166,7 +183,12 @@ export function VehicleModal({ isOpen, onClose, onSave, vehicle, loading = false
               <Input
                 type="number"
                 value={formData.maxPassengers}
-                onChange={(e) => setFormData({ ...formData, maxPassengers: parseInt(e.target.value) || 8 })}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    maxPassengers: parseInt(e.target.value) || 8,
+                  })
+                }
                 required
                 min={1}
                 className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
@@ -175,11 +197,20 @@ export function VehicleModal({ isOpen, onClose, onSave, vehicle, loading = false
           </div>
 
           <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={loading}
+            >
               Cancel
             </Button>
             <Button type="submit" variant="primary" disabled={loading}>
-              {loading ? "Saving..." : vehicle ? "Update Vehicle" : "Create Vehicle"}
+              {loading
+                ? "Saving..."
+                : vehicle
+                  ? "Update Vehicle"
+                  : "Create Vehicle"}
             </Button>
           </div>
         </form>
@@ -187,4 +218,3 @@ export function VehicleModal({ isOpen, onClose, onSave, vehicle, loading = false
     </div>
   );
 }
-

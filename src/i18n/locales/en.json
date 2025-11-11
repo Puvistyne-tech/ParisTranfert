@@ -115,6 +115,39 @@
         "Historical & Cultural Tours",
         "Flexible Duration"
       ]
+    },
+    "paris-city-tour": {
+      "name": "Paris City Tour (4H-8H)",
+      "description": "Discover the beauty of Paris with personalized city tours. Explore iconic landmarks and hidden gems with a knowledgeable driver or tour guide, at your own pace and comfort.",
+      "features": [
+        "Professional guide",
+        "Customized itinerary",
+        "Skip-the-line access",
+        "Photo opportunities",
+        "Local insights"
+      ]
+    },
+    "personal-security": {
+      "name": "Personal Security Service",
+      "description": "For clients who require enhanced protection, we offer professional personal security services with trained personnel, ensuring your safety and discretion during all travels. (2SPROTEC)",
+      "features": [
+        "Trained security personnel",
+        "Risk assessment",
+        "Discreet protection",
+        "Emergency protocols",
+        "Background checks"
+      ]
+    },
+    "eventTransport": {
+      "name": "Event Transport",
+      "description": "Professional transportation services for events, conferences, and special occasions",
+      "features": [
+        "Event Transportation",
+        "Conference Transfers",
+        "Special Occasions",
+        "Group Transfers",
+        "Flexible Scheduling"
+      ]
     }
   },
   "fleet": {

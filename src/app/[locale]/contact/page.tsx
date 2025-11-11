@@ -36,7 +36,11 @@ export default function ContactPage() {
       reset();
     } catch (error) {
       console.error("Failed to send contact message:", error);
-      setSubmitError(error instanceof Error ? error.message : "Failed to send contact message. Please try again.");
+      setSubmitError(
+        error instanceof Error
+          ? error.message
+          : "Failed to send contact message. Please try again.",
+      );
     }
   };
 

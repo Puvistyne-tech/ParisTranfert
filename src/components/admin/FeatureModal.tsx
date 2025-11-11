@@ -1,19 +1,29 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
 interface FeatureModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (feature: { key: string; icon: string; gradient: string }) => Promise<void>;
+  onSave: (feature: {
+    key: string;
+    icon: string;
+    gradient: string;
+  }) => Promise<void>;
   feature?: any | null;
   loading?: boolean;
 }
 
-export function FeatureModal({ isOpen, onClose, onSave, feature, loading = false }: FeatureModalProps) {
+export function FeatureModal({
+  isOpen,
+  onClose,
+  onSave,
+  feature,
+  loading = false,
+}: FeatureModalProps) {
   const [formData, setFormData] = useState({
     key: "",
     icon: "",
@@ -77,7 +87,9 @@ export function FeatureModal({ isOpen, onClose, onSave, feature, loading = false
             </label>
             <Input
               value={formData.key}
-              onChange={(e) => setFormData({ ...formData, key: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, key: e.target.value })
+              }
               required
               disabled={!!feature}
               placeholder="e.g., wifi, luggage, air-conditioning"
@@ -91,7 +103,9 @@ export function FeatureModal({ isOpen, onClose, onSave, feature, loading = false
             </label>
             <Input
               value={formData.icon}
-              onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, icon: e.target.value })
+              }
               required
               placeholder="e.g., Wifi, Luggage, Wind"
               className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
@@ -104,7 +118,9 @@ export function FeatureModal({ isOpen, onClose, onSave, feature, loading = false
             </label>
             <Input
               value={formData.gradient}
-              onChange={(e) => setFormData({ ...formData, gradient: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, gradient: e.target.value })
+              }
               required
               placeholder="e.g., from-blue-500 to-purple-600"
               className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
@@ -112,11 +128,20 @@ export function FeatureModal({ isOpen, onClose, onSave, feature, loading = false
           </div>
 
           <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={loading}
+            >
               Cancel
             </Button>
             <Button type="submit" variant="primary" disabled={loading}>
-              {loading ? "Saving..." : feature ? "Update Feature" : "Create Feature"}
+              {loading
+                ? "Saving..."
+                : feature
+                  ? "Update Feature"
+                  : "Create Feature"}
             </Button>
           </div>
         </form>
@@ -124,4 +149,3 @@ export function FeatureModal({ isOpen, onClose, onSave, feature, loading = false
     </div>
   );
 }
-

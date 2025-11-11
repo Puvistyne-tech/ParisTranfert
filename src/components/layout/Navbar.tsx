@@ -1,17 +1,23 @@
 "use client";
 
-import { Globe, Menu, X, User, LogOut, Settings, Moon, Sun } from "lucide-react";
+import {
+  Globe,
+  LogOut,
+  Menu,
+  Settings,
+  User,
+  X,
+} from "lucide-react";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { Link } from "@/i18n/navigation";
-import { cn } from "@/lib/utils";
-import { getCurrentUser, signOut, isAdmin } from "@/lib/auth";
 import type { AdminUser } from "@/lib/auth";
+import { getCurrentUser, isAdmin, signOut } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
-import { usePublicDarkMode } from "@/components/providers/DarkModeProvider";
+import { cn } from "@/lib/utils";
 
 const languages = [
   { code: "en", name: "English", flag: "🇺🇸" },
@@ -30,7 +36,6 @@ export function Navbar() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [user, setUser] = useState<AdminUser | null>(null);
   const [userIsAdmin, setUserIsAdmin] = useState(false);
-  const { isDark, toggleDarkMode } = usePublicDarkMode();
 
   // Check if we're on a page with light background
   const isLightBackgroundPage =
@@ -73,7 +78,9 @@ export function Navbar() {
     checkAuth();
 
     // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
       checkAuth();
     });
 
@@ -88,20 +95,21 @@ export function Navbar() {
       setIsLanguageMenuOpen(false);
       return;
     }
-    
+
     // Get the current pathname without the locale prefix
     // pathname from usePathname() includes the locale (e.g., /fr/services)
-    const segments = pathname.split('/').filter(Boolean);
-    
+    const segments = pathname.split("/").filter(Boolean);
+
     // Remove the first segment if it's a locale
-    if (segments.length > 0 && ['en', 'fr', 'es'].includes(segments[0])) {
+    if (segments.length > 0 && ["en", "fr", "es"].includes(segments[0])) {
       segments.shift();
     }
-    
+
     // Reconstruct the path with the new locale
-    const pathWithoutLocale = segments.length > 0 ? `/${segments.join('/')}` : '';
+    const pathWithoutLocale =
+      segments.length > 0 ? `/${segments.join("/")}` : "";
     const newPath = `/${newLocale}${pathWithoutLocale}`;
-    
+
     // Persist locale preference for future visits (30 days)
     const maxAgeSeconds = 60 * 60 * 24 * 30;
     document.cookie = `NEXT_LOCALE=${newLocale}; path=/; max-age=${maxAgeSeconds}; SameSite=Lax`;
@@ -155,8 +163,14 @@ export function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 md:h-20 overflow-visible">
             {/* Logo */}
-            <Link href="/" className="flex items-center space-x-2 md:space-x-4 hover:opacity-80 transition-opacity duration-300 relative z-10">
-              <div className="relative h-12 w-12 md:h-20 md:w-20 lg:h-24 lg:w-24" style={{ marginBottom: '0' }}>
+            <Link
+              href="/"
+              className="flex items-center space-x-2 md:space-x-4 hover:opacity-80 transition-opacity duration-300 relative z-10"
+            >
+              <div
+                className="relative h-12 w-12 md:h-20 md:w-20 lg:h-24 lg:w-24"
+                style={{ marginBottom: "0" }}
+              >
                 <Image
                   src="/logo.png"
                   alt="Prestige Shuttle Group"
@@ -168,7 +182,9 @@ export function Navbar() {
               <span
                 className={cn(
                   "text-base md:text-lg lg:text-xl font-bold font-display whitespace-nowrap",
-                  shouldUseDarkText ? "text-gray-900 dark:text-gray-100" : "text-white",
+                  shouldUseDarkText
+                    ? "text-gray-900 dark:text-gray-100"
+                    : "text-white",
                 )}
               >
                 Paris Transfers
@@ -194,24 +210,6 @@ export function Navbar() {
                 </button>
               ))}
 
-              {/* Dark Mode Toggle */}
-              <button
-                type="button"
-                onClick={toggleDarkMode}
-                className={cn(
-                  "flex items-center justify-center w-10 h-10 rounded-lg transition-colors duration-300",
-                  shouldUseDarkText
-                    ? "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
-                    : "text-white hover:bg-white/10",
-                )}
-                aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-              >
-                {isDark ? (
-                  <Sun className="w-5 h-5" />
-                ) : (
-                  <Moon className="w-5 h-5" />
-                )}
-              </button>
 
               {/* Language Switcher */}
               <div className="relative">
@@ -245,7 +243,9 @@ export function Navbar() {
                         )}
                       >
                         <span>{lang.flag}</span>
-                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{lang.name}</span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                          {lang.name}
+                        </span>
                       </button>
                     ))}
                   </div>

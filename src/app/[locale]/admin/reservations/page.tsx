@@ -1,26 +1,31 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import { Calendar, Download, Eye } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useLocale } from "next-intl";
+import { useEffect, useState } from "react";
+import { FilterBar } from "@/components/admin/FilterBar";
+import { ReservationDetailModal } from "@/components/admin/ReservationDetailModal";
+import { StatusBadge } from "@/components/admin/StatusBadge";
+import type {
+  Reservation,
+  ReservationStatus,
+} from "@/components/models/reservations";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
-import { Eye, Download, Calendar } from "lucide-react";
-import { getReservations } from "@/lib/supabaseService";
 import { useServices } from "@/hooks/useServices";
 import { useVehicleTypes } from "@/hooks/useVehicleTypes";
-import type { Reservation, ReservationStatus } from "@/components/models/reservations";
-import { FilterBar } from "@/components/admin/FilterBar";
-import { StatusBadge } from "@/components/admin/StatusBadge";
-import { ReservationDetailModal } from "@/components/admin/ReservationDetailModal";
+import { getReservations } from "@/lib/supabaseService";
 
 export default function AdminReservationsPage() {
+  const router = useRouter();
+  const locale = useLocale();
   const searchParams = useSearchParams();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
-  const [showDetails, setShowDetails] = useState(false);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [selectedReservationId, setSelectedReservationId] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     search: searchParams.get("search") || "",
     status: "",
@@ -34,7 +39,7 @@ export default function AdminReservationsPage() {
   // Use TanStack Query hooks for data fetching with automatic caching
   const { data: servicesData = [] } = useServices();
   const { data: vehiclesData = [] } = useVehicleTypes();
-  
+
   const services = servicesData.map((s) => ({ value: s.id, label: s.name }));
   const vehicles = vehiclesData.map((v) => ({ value: v.id, label: v.name }));
 
@@ -45,7 +50,9 @@ export default function AdminReservationsPage() {
   const fetchReservations = async () => {
     setLoading(true);
     try {
-      const statusFilter = filters.status ? (filters.status as ReservationStatus) : undefined;
+      const statusFilter = filters.status
+        ? (filters.status as ReservationStatus)
+        : undefined;
       const result = await getReservations({
         status: statusFilter,
         limit: pageSize,
@@ -59,12 +66,17 @@ export default function AdminReservationsPage() {
         const searchLower = filters.search.toLowerCase().trim();
         // Check if search is an exact UUID match (reservation ID)
         // UUIDs are typically 36 characters with hyphens: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-        const isUUIDFormat = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(filters.search.trim());
+        const isUUIDFormat =
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+            filters.search.trim(),
+          );
         const isPartialUUID = /^[0-9a-f-]{8,}$/i.test(filters.search.trim());
-        
+
         if (isUUIDFormat) {
           // Exact UUID match - prioritize this result
-          const exactMatch = filtered.find(r => r.id.toLowerCase() === searchLower);
+          const exactMatch = filtered.find(
+            (r) => r.id.toLowerCase() === searchLower,
+          );
           if (exactMatch) {
             filtered = [exactMatch];
           } else {
@@ -73,11 +85,14 @@ export default function AdminReservationsPage() {
           }
         } else if (isPartialUUID) {
           // Partial UUID - prioritize ID matches
-          const idMatches = filtered.filter(r => r.id.toLowerCase().includes(searchLower));
+          const idMatches = filtered.filter((r) =>
+            r.id.toLowerCase().includes(searchLower),
+          );
           const otherMatches = filtered.filter(
-            r => !r.id.toLowerCase().includes(searchLower) &&
-            (r.pickupLocation.toLowerCase().includes(searchLower) ||
-            r.destinationLocation?.toLowerCase().includes(searchLower))
+            (r) =>
+              !r.id.toLowerCase().includes(searchLower) &&
+              (r.pickupLocation.toLowerCase().includes(searchLower) ||
+                r.destinationLocation?.toLowerCase().includes(searchLower)),
           );
           filtered = [...idMatches, ...otherMatches];
         } else {
@@ -86,7 +101,7 @@ export default function AdminReservationsPage() {
             (r) =>
               r.id.toLowerCase().includes(searchLower) ||
               r.pickupLocation.toLowerCase().includes(searchLower) ||
-              r.destinationLocation?.toLowerCase().includes(searchLower)
+              r.destinationLocation?.toLowerCase().includes(searchLower),
           );
         }
       }
@@ -96,7 +111,9 @@ export default function AdminReservationsPage() {
       }
 
       if (filters.vehicleTypeId) {
-        filtered = filtered.filter((r) => r.vehicleTypeId === filters.vehicleTypeId);
+        filtered = filtered.filter(
+          (r) => r.vehicleTypeId === filters.vehicleTypeId,
+        );
       }
 
       if (filters.dateFrom) {
@@ -117,7 +134,8 @@ export default function AdminReservationsPage() {
   };
 
   const statusOptions = [
-    { value: "pending", label: "Pending / Quote Requested" },
+    { value: "quote_requested", label: "Quote Requested" },
+    { value: "pending", label: "Pending" },
     { value: "quote_sent", label: "Quote Sent" },
     { value: "quote_accepted", label: "Quote Accepted" },
     { value: "confirmed", label: "Confirmed" },
@@ -126,21 +144,27 @@ export default function AdminReservationsPage() {
   ];
 
   const handleViewDetails = (reservation: Reservation) => {
-    setSelectedReservation(reservation);
-    setShowDetails(true);
+    setSelectedReservationId(reservation.id);
   };
 
   const handleUpdate = () => {
     fetchReservations();
   };
 
+  // Remove unused imports
+  // ReservationDetailModal is no longer used - navigation goes to unified page
+
   const totalPages = Math.ceil(total / pageSize);
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Reservations & Quotes</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">Manage all reservations and quotes</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Reservations & Quotes
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
+          Manage all reservations and quotes
+        </p>
       </div>
 
       <FilterBar
@@ -157,7 +181,9 @@ export default function AdminReservationsPage() {
       {loading ? (
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 dark:border-primary-400 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading reservations...</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            Loading reservations...
+          </p>
         </div>
       ) : (
         <>
@@ -177,26 +203,39 @@ export default function AdminReservationsPage() {
                         </span>
                         {reservation.createdAt && (
                           <span className="text-xs text-gray-400 dark:text-gray-500">
-                            Created: {new Date(reservation.createdAt).toLocaleString()}
+                            Created:{" "}
+                            {new Date(reservation.createdAt).toLocaleString()}
                           </span>
                         )}
-                        {reservation.updatedAt && reservation.updatedAt !== reservation.createdAt && (
-                          <span className="text-xs text-gray-400 dark:text-gray-500">
-                            Modified: {new Date(reservation.updatedAt).toLocaleString()}
-                          </span>
-                        )}
+                        {reservation.updatedAt &&
+                          reservation.updatedAt !== reservation.createdAt && (
+                            <span className="text-xs text-gray-400 dark:text-gray-500">
+                              Modified:{" "}
+                              {new Date(reservation.updatedAt).toLocaleString()}
+                            </span>
+                          )}
                       </div>
                       <div className="grid md:grid-cols-4 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">Service:</span>{" "}
-                          <span className="font-medium text-gray-900 dark:text-gray-100">{reservation.serviceId}</span>
+                          <span className="text-gray-600 dark:text-gray-400">
+                            Service:
+                          </span>{" "}
+                          <span className="font-medium text-gray-900 dark:text-gray-100">
+                            {reservation.serviceId}
+                          </span>
                         </div>
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">Vehicle:</span>{" "}
-                          <span className="font-medium text-gray-900 dark:text-gray-100">{reservation.vehicleTypeId}</span>
+                          <span className="text-gray-600 dark:text-gray-400">
+                            Vehicle:
+                          </span>{" "}
+                          <span className="font-medium text-gray-900 dark:text-gray-100">
+                            {reservation.vehicleTypeId}
+                          </span>
                         </div>
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">Route:</span>{" "}
+                          <span className="text-gray-600 dark:text-gray-400">
+                            Route:
+                          </span>{" "}
                           <span className="font-medium text-gray-900 dark:text-gray-100">
                             {reservation.pickupLocation}
                             {reservation.destinationLocation
@@ -205,8 +244,12 @@ export default function AdminReservationsPage() {
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">Price:</span>{" "}
-                          <span className="font-semibold text-lg text-gray-900 dark:text-gray-100">€{reservation.totalPrice}</span>
+                          <span className="text-gray-600 dark:text-gray-400">
+                            Price:
+                          </span>{" "}
+                          <span className="font-semibold text-lg text-gray-900 dark:text-gray-100">
+                            €{reservation.totalPrice}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -244,8 +287,8 @@ export default function AdminReservationsPage() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between">
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, total)} of{" "}
-                {total} reservations
+                Showing {(page - 1) * pageSize + 1} to{" "}
+                {Math.min(page * pageSize, total)} of {total} reservations
               </p>
               <div className="flex items-center space-x-2">
                 <Button
@@ -268,18 +311,15 @@ export default function AdminReservationsPage() {
         </>
       )}
 
-      {showDetails && selectedReservation && (
+      {/* Reservation Detail Modal */}
         <ReservationDetailModal
-          reservation={selectedReservation}
-          isOpen={showDetails}
+        reservationId={selectedReservationId}
+        isOpen={!!selectedReservationId}
           onClose={() => {
-            setShowDetails(false);
-            setSelectedReservation(null);
+          setSelectedReservationId(null);
+          fetchReservations(); // Refresh list when modal closes
           }}
-          onUpdate={handleUpdate}
         />
-      )}
     </div>
   );
 }
-

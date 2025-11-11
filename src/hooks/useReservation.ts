@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { getReservationById } from "@/lib/supabaseService";
 import type { Reservation } from "@/components/models/reservations";
+import { getReservationById } from "@/lib/supabaseService";
 
 /**
  * Hook to fetch a single reservation by ID with TanStack Query caching
@@ -22,4 +22,3 @@ export function useReservation(id: string | null | undefined) {
     refetchOnWindowFocus: false,
   });
 }
-

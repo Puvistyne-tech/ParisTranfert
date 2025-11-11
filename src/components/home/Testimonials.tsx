@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-import { getTestimonials } from "@/lib/supabaseService";
 import { Card, CardContent } from "@/components/ui/Card";
+import { getTestimonials } from "@/lib/supabaseService";
 
 export function Testimonials() {
   const t = useTranslations("testimonials");
@@ -31,7 +31,9 @@ export function Testimonials() {
     return (
       <section className="py-20 bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center text-gray-600 dark:text-gray-400">{tCommon("loading")}</div>
+          <div className="text-center text-gray-600 dark:text-gray-400">
+            {tCommon("loading")}
+          </div>
         </div>
       </section>
     );

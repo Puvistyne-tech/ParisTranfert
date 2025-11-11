@@ -12,11 +12,13 @@ export function ConditionalNavbar() {
     "/confirmation",
     "/booking",
     "/admin", // Exclude all admin pages
-    "/dashboard"
+    "/dashboard",
   ];
 
   // Check if current page should have navbar
-  const shouldShowNavbar = !noNavbarPages.some(page => pathname.includes(page));
+  const shouldShowNavbar = !noNavbarPages.some((page) =>
+    pathname.includes(page),
+  );
 
   if (!shouldShowNavbar) {
     return null;

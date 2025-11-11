@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { getVehicleTypes } from "@/lib/supabaseService";
 import type { VehicleType } from "@/components/models/vehicleTypes";
+import { getVehicleTypes } from "@/lib/supabaseService";
 
 /**
  * Hook to fetch vehicle types with TanStack Query caching
@@ -16,4 +16,3 @@ export function useVehicleTypes() {
     refetchOnWindowFocus: false,
   });
 }
-

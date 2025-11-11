@@ -1,21 +1,34 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/Button";
-import { Card, CardContent } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { Select } from "@/components/ui/Select";
-import { AddressAutocomplete } from "@/components/ui/AddressAutocomplete";
-import { ArrowLeft, Calendar, Clock, Users, User, Phone, Mail, MapPin, Plane, FileText, AlertCircle, TestTube } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowLeft,
+  Calendar,
+  Clock,
+  FileText,
+  Mail,
+  MapPin,
+  Phone,
+  Plane,
+  TestTube,
+  User,
+  Users,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
+import { useEffect, useMemo, useState } from "react";
 import type { Service } from "@/components/models";
 import type { Location } from "@/components/models/locations";
 import type { ServiceField } from "@/components/models/serviceFields";
 import type { VehicleType } from "@/components/models/vehicleTypes";
-import { useServiceFields } from "@/hooks/useServiceFields";
+import { AddressAutocomplete } from "@/components/ui/AddressAutocomplete";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
 import { useLocationsByService } from "@/hooks/useLocationsByService";
+import { useServiceFields } from "@/hooks/useServiceFields";
 import { cn } from "@/lib/utils";
-import { useState, useEffect, useMemo } from "react";
 
 interface Step2TripDetailsProps {
   selectedService: Service | null;
@@ -57,30 +70,32 @@ export function Step2TripDetails({
   isFormValid,
 }: Step2TripDetailsProps) {
   const t = useTranslations("reservation.step2");
-  
+
   // Use TanStack Query hooks for data fetching with automatic caching
-  const { data: allServiceFields = [], isLoading: loadingFields } = useServiceFields(selectedService?.id);
+  const { data: allServiceFields = [], isLoading: loadingFields } =
+    useServiceFields(selectedService?.id);
   // Filter out passenger_count if it exists
-  const serviceFields = useMemo(() => 
-    allServiceFields.filter(field => field.fieldKey !== 'passenger_count'),
-    [allServiceFields]
+  const serviceFields = useMemo(
+    () =>
+      allServiceFields.filter((field) => field.fieldKey !== "passenger_count"),
+    [allServiceFields],
   );
-  
+
   // Check if service has location_select fields
-  const hasLocationSelect = useMemo(() => 
-    serviceFields.some(field => field.fieldType === 'location_select'),
-    [serviceFields]
+  const hasLocationSelect = useMemo(
+    () => serviceFields.some((field) => field.fieldType === "location_select"),
+    [serviceFields],
   );
-  
+
   // Load service locations only if needed
   const { data: serviceLocations = [] } = useLocationsByService(
-    hasLocationSelect ? selectedService?.id : null
+    hasLocationSelect ? selectedService?.id : null,
   );
 
   // Initialize passengers to 1 if not set
   useEffect(() => {
     if (!formData.passengers) {
-      onFormFieldChange('passengers', '1');
+      onFormFieldChange("passengers", "1");
     }
   }, []); // Only run once on mount
 
@@ -89,12 +104,17 @@ export function Step2TripDetails({
     onFormFieldChange(field, value);
     // Clear related errors when user types
     if (validationErrors.length > 0) {
-      const remainingErrors = validationErrors.filter(error => {
-        if (field === 'firstName' || field === 'lastName' || field === 'email' || field === 'phone') {
-          return !error.includes('contact information');
+      const remainingErrors = validationErrors.filter((error) => {
+        if (
+          field === "firstName" ||
+          field === "lastName" ||
+          field === "email" ||
+          field === "phone"
+        ) {
+          return !error.includes("contact information");
         }
-        if (field === 'date' || field === 'time' || field === 'passengers') {
-          return !error.includes('trip details');
+        if (field === "date" || field === "time" || field === "passengers") {
+          return !error.includes("trip details");
         }
         return true;
       });
@@ -106,23 +126,28 @@ export function Step2TripDetails({
 
   const handleServiceFieldChange = (fieldKey: string, value: any) => {
     onServiceFieldChange(fieldKey, value);
-    
+
     // Map location fields to formData
-    const field = serviceFields.find(f => f.fieldKey === fieldKey);
+    const field = serviceFields.find((f) => f.fieldKey === fieldKey);
     if (field) {
       if (field.isPickup) {
-        onFormFieldChange('pickup', value);
+        onFormFieldChange("pickup", value);
       }
       if (field.isDestination) {
-        onFormFieldChange('destination', value);
+        onFormFieldChange("destination", value);
       }
     }
-    
+
     // Clear related errors when user changes service field
     if (validationErrors.length > 0) {
-      const remainingErrors = validationErrors.filter(error => {
-        if (error.includes('pickup') && fieldKey === 'pickup_location') return false;
-        if (error.includes('destination') && fieldKey === 'destination_location') return false;
+      const remainingErrors = validationErrors.filter((error) => {
+        if (error.includes("pickup") && fieldKey === "pickup_location")
+          return false;
+        if (
+          error.includes("destination") &&
+          fieldKey === "destination_location"
+        )
+          return false;
         // Check if error matches this field's label
         if (field && error.includes(field.label)) return false;
         return true;
@@ -138,44 +163,44 @@ export function Step2TripDetails({
     if (!selectedService || serviceFields.length === 0) {
       return;
     }
-    
+
     // Apply default values and map to formData
-    serviceFields.forEach(field => {
+    serviceFields.forEach((field) => {
       if (field.defaultValue) {
         // Set default value in serviceSubData if not already set
         const currentValue = serviceSubData[field.fieldKey];
-        if (!currentValue || currentValue === '') {
+        if (!currentValue || currentValue === "") {
           onServiceFieldChange(field.fieldKey, field.defaultValue);
         }
       }
-      
+
       // Map location fields to formData (use current value or default)
-      const locationValue = serviceSubData[field.fieldKey] || field.defaultValue || '';
+      const locationValue =
+        serviceSubData[field.fieldKey] || field.defaultValue || "";
       if (field.isPickup && locationValue) {
-        onFormFieldChange('pickup', locationValue);
+        onFormFieldChange("pickup", locationValue);
       }
       if (field.isDestination && locationValue) {
-        onFormFieldChange('destination', locationValue);
+        onFormFieldChange("destination", locationValue);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedService, serviceFields]);
-  
+
   // Map service field values to formData.pickup/location and formData.destination
   useEffect(() => {
-    serviceFields.forEach(field => {
+    serviceFields.forEach((field) => {
       const value = serviceSubData[field.fieldKey];
       if (value) {
         if (field.isPickup) {
-          onFormFieldChange('pickup', value);
+          onFormFieldChange("pickup", value);
         }
         if (field.isDestination) {
-          onFormFieldChange('destination', value);
+          onFormFieldChange("destination", value);
         }
       }
     });
   }, [serviceSubData, serviceFields]);
-
 
   // Get error fields for highlighting - use prop if available, otherwise parse from errors
   // Use useMemo to ensure it updates when props change
@@ -183,33 +208,67 @@ export function Step2TripDetails({
     if (errorFieldsProp && errorFieldsProp.size > 0) {
       return errorFieldsProp;
     }
-    
+
     // Fallback: parse error messages to find field names
     const fields = new Set<string>();
     if (validationErrors.length > 0) {
-      validationErrors.forEach(error => {
+      validationErrors.forEach((error) => {
         // Check for common field names (case-insensitive)
         const errorLower = error.toLowerCase();
-        if (errorLower.includes("first name") || errorLower.includes("prénom") || errorLower.includes("nombre")) fields.add('firstName');
-        if (errorLower.includes("last name") || errorLower.includes("nom") || errorLower.includes("apellido")) fields.add('lastName');
-        if (errorLower.includes("email") || errorLower.includes("courriel")) fields.add('email');
-        if (errorLower.includes("phone") || errorLower.includes("téléphone") || errorLower.includes("teléfono")) fields.add('phone');
-        if (errorLower.includes("date") || errorLower.includes("fecha")) fields.add('date');
-        if (errorLower.includes("time") || errorLower.includes("heure") || errorLower.includes("hora")) fields.add('time');
-        if (errorLower.includes("passenger") || errorLower.includes("passager") || errorLower.includes("pasajero")) fields.add('passengers');
-        if (errorLower.includes("pickup") || errorLower.includes("prise en charge") || errorLower.includes("recogida")) {
-          fields.add('pickup');
-          const pickupField = serviceFields.find(f => f.isPickup);
+        if (
+          errorLower.includes("first name") ||
+          errorLower.includes("prénom") ||
+          errorLower.includes("nombre")
+        )
+          fields.add("firstName");
+        if (
+          errorLower.includes("last name") ||
+          errorLower.includes("nom") ||
+          errorLower.includes("apellido")
+        )
+          fields.add("lastName");
+        if (errorLower.includes("email") || errorLower.includes("courriel"))
+          fields.add("email");
+        if (
+          errorLower.includes("phone") ||
+          errorLower.includes("téléphone") ||
+          errorLower.includes("teléfono")
+        )
+          fields.add("phone");
+        if (errorLower.includes("date") || errorLower.includes("fecha"))
+          fields.add("date");
+        if (
+          errorLower.includes("time") ||
+          errorLower.includes("heure") ||
+          errorLower.includes("hora")
+        )
+          fields.add("time");
+        if (
+          errorLower.includes("passenger") ||
+          errorLower.includes("passager") ||
+          errorLower.includes("pasajero")
+        )
+          fields.add("passengers");
+        if (
+          errorLower.includes("pickup") ||
+          errorLower.includes("prise en charge") ||
+          errorLower.includes("recogida")
+        ) {
+          fields.add("pickup");
+          const pickupField = serviceFields.find((f) => f.isPickup);
           if (pickupField) fields.add(pickupField.fieldKey);
         }
-        if (errorLower.includes("destination") || errorLower.includes("destino")) {
-          fields.add('destination');
-          const destField = serviceFields.find(f => f.isDestination);
+        if (
+          errorLower.includes("destination") ||
+          errorLower.includes("destino")
+        ) {
+          fields.add("destination");
+          const destField = serviceFields.find((f) => f.isDestination);
           if (destField) fields.add(destField.fieldKey);
         }
-        
+
         // Try to match service field names
-        serviceFields.forEach(field => {
+        serviceFields.forEach((field) => {
           if (error.includes(field.label)) {
             fields.add(field.fieldKey);
           }
@@ -221,39 +280,43 @@ export function Step2TripDetails({
 
   const renderServiceField = (field: ServiceField) => {
     const Icon = fieldIcons[field.fieldKey] || FileText;
-    const value = serviceSubData[field.fieldKey] || field.defaultValue || '';
+    const value = serviceSubData[field.fieldKey] || field.defaultValue || "";
     const hasError = errorFields.has(field.fieldKey);
     // If field has a default value and it's set, make it read-only
-    const isReadOnly = Boolean(field.defaultValue && value === field.defaultValue);
+    const isReadOnly = Boolean(
+      field.defaultValue && value === field.defaultValue,
+    );
 
     // Common props for Input and Select components
     const commonInputProps = {
       value: value,
-      onChange: (e: any) => handleServiceFieldChange(field.fieldKey, e.target.value),
+      onChange: (e: any) =>
+        handleServiceFieldChange(field.fieldKey, e.target.value),
       className: cn(
         "w-full",
-        hasError ? 'border-red-500 dark:border-red-500 border-2' : '',
-        isReadOnly ? 'bg-gray-100 dark:bg-gray-700 cursor-not-allowed' : ''
+        hasError ? "border-red-500 dark:border-red-500 border-2" : "",
+        isReadOnly ? "bg-gray-100 dark:bg-gray-700 cursor-not-allowed" : "",
       ),
       ...(isReadOnly && { disabled: true, readOnly: true }),
     };
-    
+
     // Common props for textarea (different styling)
     const commonTextareaProps = {
       value: value,
-      onChange: (e: any) => handleServiceFieldChange(field.fieldKey, e.target.value),
+      onChange: (e: any) =>
+        handleServiceFieldChange(field.fieldKey, e.target.value),
       className: cn(
         "w-full px-4 py-3 rounded-lg border-2 transition-all duration-300",
-        hasError 
-          ? "border-red-500 dark:border-red-500 focus:border-red-500 dark:focus:border-red-500 focus:outline-none" 
+        hasError
+          ? "border-red-500 dark:border-red-500 focus:border-red-500 dark:focus:border-red-500 focus:outline-none"
           : "border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:outline-none hover:border-gray-300 dark:hover:border-gray-500",
-        isReadOnly && "bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
+        isReadOnly && "bg-gray-100 dark:bg-gray-700 cursor-not-allowed",
       ),
       ...(isReadOnly && { disabled: true, readOnly: true }),
     };
 
     switch (field.fieldType) {
-      case 'number':
+      case "number":
         return (
           <Input
             {...commonInputProps}
@@ -263,14 +326,20 @@ export function Step2TripDetails({
             placeholder={`Enter ${field.label.toLowerCase()}`}
           />
         );
-      case 'select':
-        const selectOptions = field.options?.map(opt => ({ value: opt, label: opt })) || [];
+      case "select": {
+        const selectOptions =
+          field.options?.map((opt) => ({ value: opt, label: opt })) || [];
         // Only use value if it exists in options, otherwise use empty string to show placeholder
-        const selectValue = value && selectOptions.some(opt => opt.value === value) ? value : '';
+        const selectValue =
+          value && selectOptions.some((opt) => opt.value === value)
+            ? value
+            : "";
         return (
           <Select
             value={selectValue}
-            onChange={(e: any) => handleServiceFieldChange(field.fieldKey, e.target.value)}
+            onChange={(e: any) =>
+              handleServiceFieldChange(field.fieldKey, e.target.value)
+            }
             options={selectOptions}
             placeholder={`Select ${field.label.toLowerCase()}`}
             error={hasError ? t("fieldRequired") : undefined}
@@ -278,7 +347,8 @@ export function Step2TripDetails({
             readOnly={isReadOnly}
           />
         );
-      case 'textarea':
+      }
+      case "textarea":
         return (
           <textarea
             {...commonTextareaProps}
@@ -286,43 +356,44 @@ export function Step2TripDetails({
             placeholder={`Enter ${field.label.toLowerCase()}`}
           />
         );
-      case 'date':
-        return (
-          <Input
-            {...commonInputProps}
-            type="date"
-          />
-        );
-      case 'time':
-        return (
-          <Input
-            {...commonInputProps}
-            type="time"
-          />
-        );
-      case 'location_select':
+      case "date":
+        return <Input {...commonInputProps} type="date" />;
+      case "time":
+        return <Input {...commonInputProps} type="time" />;
+      case "location_select": {
         // Filter out the selected location from the opposite field
         // If this is pickup_location, exclude the selected destination_location
         // If this is destination_location, exclude the selected pickup_location
-        const filteredLocations = serviceLocations.filter(loc => {
-          if (field.fieldKey === 'pickup_location' && field.isPickup) {
+        const filteredLocations = serviceLocations.filter((loc) => {
+          if (field.fieldKey === "pickup_location" && field.isPickup) {
             // For pickup, exclude the selected destination
             return loc.id !== serviceSubData.destination_location;
           }
-          if (field.fieldKey === 'destination_location' && field.isDestination) {
+          if (
+            field.fieldKey === "destination_location" &&
+            field.isDestination
+          ) {
             // For destination, exclude the selected pickup
             return loc.id !== serviceSubData.pickup_location;
           }
           return true; // No filtering needed for other cases
         });
-        
-        const locationOptions = filteredLocations.map(loc => ({ value: loc.id, label: loc.name }));
+
+        const locationOptions = filteredLocations.map((loc) => ({
+          value: loc.id,
+          label: loc.name,
+        }));
         // Only use value if it exists in options, otherwise use empty string to show placeholder
-        const locationValue = value && locationOptions.some(opt => opt.value === value) ? value : '';
+        const locationValue =
+          value && locationOptions.some((opt) => opt.value === value)
+            ? value
+            : "";
         return (
           <Select
             value={locationValue}
-            onChange={(e: any) => handleServiceFieldChange(field.fieldKey, e.target.value)}
+            onChange={(e: any) =>
+              handleServiceFieldChange(field.fieldKey, e.target.value)
+            }
             options={locationOptions}
             placeholder={`Select ${field.label.toLowerCase()}`}
             error={hasError ? t("fieldRequired") : undefined}
@@ -330,7 +401,8 @@ export function Step2TripDetails({
             readOnly={isReadOnly}
           />
         );
-      case 'address_autocomplete':
+      }
+      case "address_autocomplete":
         // If field has default value and it's set, show as read-only text input
         if (isReadOnly) {
           return (
@@ -340,7 +412,7 @@ export function Step2TripDetails({
               disabled
               className={cn(
                 "w-full bg-gray-100 dark:bg-gray-700 cursor-not-allowed",
-                hasError && 'border-red-500 dark:border-red-500 border-2'
+                hasError && "border-red-500 dark:border-red-500 border-2",
               )}
               placeholder={field.label}
             />
@@ -349,9 +421,13 @@ export function Step2TripDetails({
         return (
           <AddressAutocomplete
             value={value}
-            onChange={(newValue) => handleServiceFieldChange(field.fieldKey, newValue)}
+            onChange={(newValue) =>
+              handleServiceFieldChange(field.fieldKey, newValue)
+            }
             placeholder={`Enter ${field.label.toLowerCase()}`}
-            className={hasError ? 'border-red-500 dark:border-red-500 border-2' : ''}
+            className={
+              hasError ? "border-red-500 dark:border-red-500 border-2" : ""
+            }
             field={field}
           />
         );
@@ -366,12 +442,8 @@ export function Step2TripDetails({
     }
   };
 
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       <Card>
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-6">
@@ -380,33 +452,33 @@ export function Step2TripDetails({
             </h2>
             <div className="flex items-center space-x-2">
               {/* DEBUG BUTTON - Only visible in development */}
-              {process.env.NODE_ENV === 'development' && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  // Autofill basic trip info
-                  const tomorrow = new Date();
-                  tomorrow.setDate(tomorrow.getDate() + 1);
-                  const dateStr = tomorrow.toISOString().split('T')[0];
-                  const timeStr = '10:00';
-                  
-                  onFormFieldChange('date', dateStr);
-                  onFormFieldChange('time', timeStr);
-                  onFormFieldChange('passengers', '2');
-                  
-                  // Autofill contact info
-                  onFormFieldChange('firstName', 'John');
-                  onFormFieldChange('lastName', 'Doe');
-                  onFormFieldChange('email', 'puvistien@gmail.com');
-                  onFormFieldChange('phone', '+33123456789');
-                }}
-                className="flex items-center space-x-2 bg-yellow-100 hover:bg-yellow-200 border-yellow-400 text-yellow-800 text-xs"
+              {process.env.NODE_ENV === "development" && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    // Autofill basic trip info
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    const dateStr = tomorrow.toISOString().split("T")[0];
+                    const timeStr = "10:00";
+
+                    onFormFieldChange("date", dateStr);
+                    onFormFieldChange("time", timeStr);
+                    onFormFieldChange("passengers", "2");
+
+                    // Autofill contact info
+                    onFormFieldChange("firstName", "John");
+                    onFormFieldChange("lastName", "Doe");
+                    onFormFieldChange("email", "puvistien@gmail.com");
+                    onFormFieldChange("phone", "+33123456789");
+                  }}
+                  className="flex items-center space-x-2 bg-yellow-100 hover:bg-yellow-200 border-yellow-400 text-yellow-800 text-xs"
                   title="DEBUG: Autofill form - Only visible in development"
-              >
-                <TestTube className="w-4 h-4" />
-                <span>DEBUG: Fill</span>
-              </Button>
+                >
+                  <TestTube className="w-4 h-4" />
+                  <span>DEBUG: Fill</span>
+                </Button>
               )}
               <Button
                 variant="outline"
@@ -433,12 +505,12 @@ export function Step2TripDetails({
                 </label>
                 <Input
                   type="date"
-                  value={formData.date || ''}
-                  onChange={(e) => onFormFieldChange('date', e.target.value)}
-                  className={`w-full ${errorFields.has('date') ? 'border-red-500 dark:border-red-500 border-2' : ''}`}
+                  value={formData.date || ""}
+                  onChange={(e) => onFormFieldChange("date", e.target.value)}
+                  className={`w-full ${errorFields.has("date") ? "border-red-500 dark:border-red-500 border-2" : ""}`}
                 />
               </div>
-              
+
               <div className="w-full">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Clock className="w-4 h-4 inline mr-2" />
@@ -446,29 +518,34 @@ export function Step2TripDetails({
                 </label>
                 <Input
                   type="time"
-                  value={formData.time || ''}
-                  onChange={(e) => handleFieldChange('time', e.target.value)}
-                  className={`w-full ${errorFields.has('time') ? 'border-red-500 dark:border-red-500 border-2' : ''}`}
+                  value={formData.time || ""}
+                  onChange={(e) => handleFieldChange("time", e.target.value)}
+                  className={`w-full ${errorFields.has("time") ? "border-red-500 dark:border-red-500 border-2" : ""}`}
                 />
               </div>
-              
+
               <div className="w-full md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Users className="w-4 h-4 inline mr-2" />
                   {t("numberOfPassengers")}
                 </label>
                 <Select
-                  value={formData.passengers?.toString() || '1'}
+                  value={formData.passengers?.toString() || "1"}
                   onChange={(e) => {
-                    handleFieldChange('passengers', e.target.value);
+                    handleFieldChange("passengers", e.target.value);
                   }}
-                  options={Array.from({ 
-                    length: selectedVehicleType ? (selectedVehicleType.maxPassengers || 8) : 8 
-                  }, (_, i) => ({
-                    value: (i + 1).toString(),
-                    label: `${i + 1} ${i === 0 ? t("passenger") : t("passengers")}`
-                  }))}
-                  className={`w-full ${errorFields.has('passengers') ? 'border-red-500 dark:border-red-500 border-2' : ''}`}
+                  options={Array.from(
+                    {
+                      length: selectedVehicleType
+                        ? selectedVehicleType.maxPassengers || 8
+                        : 8,
+                    },
+                    (_, i) => ({
+                      value: (i + 1).toString(),
+                      label: `${i + 1} ${i === 0 ? t("passenger") : t("passengers")}`,
+                    }),
+                  )}
+                  className={`w-full ${errorFields.has("passengers") ? "border-red-500 dark:border-red-500 border-2" : ""}`}
                 />
               </div>
             </div>
@@ -477,34 +554,42 @@ export function Step2TripDetails({
           {/* Service-Specific Fields */}
           {loadingFields ? (
             <div className="mb-8">
-              <div className="text-sm text-gray-500 dark:text-gray-400">{t("loadingServiceFields")}</div>
-            </div>
-          ) : serviceFields.length > 0 && (
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                {t("serviceDetails")}
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                {t("pleaseProvideInfo", { serviceName: selectedService?.name || "" })}
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                {serviceFields.map((field) => {
-                  const Icon = fieldIcons[field.fieldKey] || FileText;
-                  return (
-                    <div key={field.id} className="space-y-2 w-full">
-                      <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                        <Icon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                        <span>
-                          {field.label}
-                          {field.required && <span className="text-red-500 ml-1">*</span>}
-                        </span>
-                      </label>
-                      {renderServiceField(field)}
-                    </div>
-                  );
-                })}
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                {t("loadingServiceFields")}
               </div>
             </div>
+          ) : (
+            serviceFields.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                  {t("serviceDetails")}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                  {t("pleaseProvideInfo", {
+                    serviceName: selectedService?.name || "",
+                  })}
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                  {serviceFields.map((field) => {
+                    const Icon = fieldIcons[field.fieldKey] || FileText;
+                    return (
+                      <div key={field.id} className="space-y-2 w-full">
+                        <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                          <Icon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                          <span>
+                            {field.label}
+                            {field.required && (
+                              <span className="text-red-500 ml-1">*</span>
+                            )}
+                          </span>
+                        </label>
+                        {renderServiceField(field)}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )
           )}
 
           {/* Contact Information */}
@@ -521,12 +606,14 @@ export function Step2TripDetails({
                 <Input
                   type="text"
                   placeholder={t("enterFirstName")}
-                  value={formData.firstName || ''}
-                  onChange={(e) => onFormFieldChange('firstName', e.target.value)}
-                  className={`w-full ${errorFields.has('firstName') ? 'border-red-500 dark:border-red-500 border-2' : ''}`}
+                  value={formData.firstName || ""}
+                  onChange={(e) =>
+                    onFormFieldChange("firstName", e.target.value)
+                  }
+                  className={`w-full ${errorFields.has("firstName") ? "border-red-500 dark:border-red-500 border-2" : ""}`}
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <User className="w-4 h-4 inline mr-2" />
@@ -535,12 +622,14 @@ export function Step2TripDetails({
                 <Input
                   type="text"
                   placeholder={t("enterLastName")}
-                  value={formData.lastName || ''}
-                  onChange={(e) => handleFieldChange('lastName', e.target.value)}
-                  className={`w-full ${errorFields.has('lastName') ? 'border-red-500 dark:border-red-500 border-2' : ''}`}
+                  value={formData.lastName || ""}
+                  onChange={(e) =>
+                    handleFieldChange("lastName", e.target.value)
+                  }
+                  className={`w-full ${errorFields.has("lastName") ? "border-red-500 dark:border-red-500 border-2" : ""}`}
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Mail className="w-4 h-4 inline mr-2" />
@@ -549,12 +638,12 @@ export function Step2TripDetails({
                 <Input
                   type="email"
                   placeholder={t("enterEmailAddress")}
-                  value={formData.email || ''}
-                  onChange={(e) => handleFieldChange('email', e.target.value)}
-                  className={`w-full ${errorFields.has('email') ? 'border-red-500 dark:border-red-500 border-2' : ''}`}
+                  value={formData.email || ""}
+                  onChange={(e) => handleFieldChange("email", e.target.value)}
+                  className={`w-full ${errorFields.has("email") ? "border-red-500 dark:border-red-500 border-2" : ""}`}
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Phone className="w-4 h-4 inline mr-2" />
@@ -563,9 +652,9 @@ export function Step2TripDetails({
                 <Input
                   type="tel"
                   placeholder={t("enterPhoneNumber")}
-                  value={formData.phone || ''}
-                  onChange={(e) => handleFieldChange('phone', e.target.value)}
-                  className={`w-full ${errorFields.has('phone') ? 'border-red-500 dark:border-red-500 border-2' : ''}`}
+                  value={formData.phone || ""}
+                  onChange={(e) => handleFieldChange("phone", e.target.value)}
+                  className={`w-full ${errorFields.has("phone") ? "border-red-500 dark:border-red-500 border-2" : ""}`}
                 />
               </div>
             </div>
@@ -580,8 +669,8 @@ export function Step2TripDetails({
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent"
               rows={4}
               placeholder={t("specialRequestsPlaceholderText")}
-              value={formData.notes || ''}
-              onChange={(e) => onFormFieldChange('notes', e.target.value)}
+              value={formData.notes || ""}
+              onChange={(e) => onFormFieldChange("notes", e.target.value)}
             />
           </div>
 
@@ -615,4 +704,3 @@ export function Step2TripDetails({
     </motion.div>
   );
 }
-

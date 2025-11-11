@@ -31,7 +31,8 @@ export function ConfirmDialog({
 
   const variantStyles = {
     danger: "bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800",
-    warning: "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800",
+    warning:
+      "bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800",
     default: "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700",
   };
 
@@ -59,13 +60,11 @@ export function ConfirmDialog({
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 {title}
               </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">{message}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                {message}
+              </p>
               <div className="flex items-center justify-end space-x-3">
-                <Button
-                  variant="outline"
-                  onClick={onClose}
-                  disabled={loading}
-                >
+                <Button variant="outline" onClick={onClose} disabled={loading}>
                   {cancelText}
                 </Button>
                 <Button
@@ -83,4 +82,3 @@ export function ConfirmDialog({
     </div>
   );
 }
-

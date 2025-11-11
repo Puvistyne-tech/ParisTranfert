@@ -2,56 +2,59 @@
 "use client";
 
 import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  BookOpen,
+  Calendar,
+  Crown,
+  Globe,
+  Heart,
+  MapPin,
+  Plane,
+  Shield,
+  Star,
+  UserCheck,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
-import { ArrowRight } from "lucide-react";
-import {
-  Plane,
-  Crown,
-  Star,
-  Globe,
-  Shield,
-  MapPin,
-  UserCheck,
-  Heart,
-  Calendar,
-  BookOpen,
-} from "lucide-react";
 
 import { useCategories } from "@/hooks/useCategories";
 import { useServices } from "@/hooks/useServices";
-import type { Category } from "../models/categories";
 import type { Service } from "../models";
+import type { Category } from "../models/categories";
 
 export function BriefServices() {
   const t = useTranslations("home.briefServices");
   const tServices = useTranslations("services");
   const router = useRouter();
   const locale = useLocale();
-  
+
   // Use TanStack Query hooks for data fetching with automatic caching
-  const { data: categories = [], isLoading: categoriesLoading } = useCategories();
+  const { data: categories = [], isLoading: categoriesLoading } =
+    useCategories();
   const { data: services = [], isLoading: servicesLoading } = useServices();
   const loading = categoriesLoading || servicesLoading;
 
   const iconMap: { [key: string]: any } = {
-    'Plane': Plane,
-    'Crown': Crown,
-    'Star': Star,
-    'Globe': Globe,
-    'Shield': Shield,
-    'MapPin': MapPin,
-    'UserCheck': UserCheck,
-    'Heart': Heart,
-    'Calendar': Calendar,
-    'BookOpen': BookOpen,
+    Plane: Plane,
+    Crown: Crown,
+    Star: Star,
+    Globe: Globe,
+    Shield: Shield,
+    MapPin: MapPin,
+    UserCheck: UserCheck,
+    Heart: Heart,
+    Calendar: Calendar,
+    BookOpen: BookOpen,
   };
 
-
   return (
-    <section id="services" className="py-20 bg-gradient-to-br from-sky-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-blue-900/20 dark:to-gray-800 relative overflow-hidden">
+    <section
+      id="services"
+      className="py-20 bg-gradient-to-br from-sky-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-blue-900/20 dark:to-gray-800 relative overflow-hidden"
+    >
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
@@ -108,74 +111,92 @@ export function BriefServices() {
         </motion.div>
 
         {loading ? (
-          <div className="text-center py-12 text-gray-600 dark:text-gray-400">{t("loadingServices")}</div>
+          <div className="text-center py-12 text-gray-600 dark:text-gray-400">
+            {t("loadingServices")}
+          </div>
         ) : (
           <>
-        {/* Services by Category */}
-            {categories.slice(0, 2).map((category: Category, categoryIndex: number) => {
-          const categoryServices = services.filter((service: Service) => service.categoryId === category.id);
-          const displayServices = categoryServices.slice(0, 2); // Show max 2 services per category
-          
-          if (displayServices.length === 0) return null;
+            {/* Services by Category */}
+            {categories
+              .slice(0, 2)
+              .map((category: Category, categoryIndex: number) => {
+                const categoryServices = services.filter(
+                  (service: Service) => service.categoryId === category.id,
+                );
+                const displayServices = categoryServices.slice(0, 2); // Show max 2 services per category
 
-          return (
-            <motion.div
-              key={category.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: categoryIndex * 0.2 }}
-              viewport={{ once: true }}
-              className="mb-12"
-            >
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                  {category.name}
-                </h3>
-                <p className="text-gray-600 dark:text-gray-400">
-                  {category.description}
-                </p>
-              </div>
+                if (displayServices.length === 0) return null;
 
-              <div className="grid md:grid-cols-2 gap-8">
-                {displayServices.map((service: Service, serviceIndex: number) => {
-                  const iconName = typeof service.icon === 'string' ? service.icon : service.icon;
-                  const Icon = iconMap[iconName] || Star;
+                return (
+                  <motion.div
+                    key={category.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: categoryIndex * 0.2 }}
+                    viewport={{ once: true }}
+                    className="mb-12"
+                  >
+                    <div className="text-center mb-8">
+                      <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                        {category.name}
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        {category.description}
+                      </p>
+                    </div>
 
-                  return (
-                    <motion.div
-                      key={service.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6, delay: serviceIndex * 0.1 }}
-                      viewport={{ once: true }}
-                    >
-                      <Card className="service-card p-6 card-hover h-full group cursor-pointer"
-                            onClick={() => router.push(`/${locale}/services`)}>
-                        <CardContent className="text-center h-full flex flex-col">
-                          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-all duration-300">
-                            <Icon className="text-white text-xl" />
-                          </div>
-                          <h4 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">
-                            {service.name}
-                          </h4>
-                          <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm leading-relaxed flex-1">
-                            {service.shortDescription}
-                          </p>
-                          <div className="text-lg font-bold text-primary-600 dark:text-primary-400 mb-3">
-                            {service.priceRange}
-                          </div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                            {t("learnMore")}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </motion.div>
-          );
-        })}
+                    <div className="grid md:grid-cols-2 gap-8">
+                      {displayServices.map(
+                        (service: Service, serviceIndex: number) => {
+                          const iconName =
+                            typeof service.icon === "string"
+                              ? service.icon
+                              : service.icon;
+                          const Icon = iconMap[iconName] || Star;
+
+                          return (
+                            <motion.div
+                              key={service.id}
+                              initial={{ opacity: 0, y: 20 }}
+                              whileInView={{ opacity: 1, y: 0 }}
+                              transition={{
+                                duration: 0.6,
+                                delay: serviceIndex * 0.1,
+                              }}
+                              viewport={{ once: true }}
+                            >
+                              <Card
+                                className="service-card p-6 card-hover h-full group cursor-pointer"
+                                onClick={() =>
+                                  router.push(`/${locale}/services`)
+                                }
+                              >
+                                <CardContent className="text-center h-full flex flex-col">
+                                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-all duration-300">
+                                    <Icon className="text-white text-xl" />
+                                  </div>
+                                  <h4 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">
+                                    {service.name}
+                                  </h4>
+                                  <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm leading-relaxed flex-1">
+                                    {service.shortDescription}
+                                  </p>
+                                  <div className="text-lg font-bold text-primary-600 dark:text-primary-400 mb-3">
+                                    {service.priceRange}
+                                  </div>
+                                  <div className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                                    {t("learnMore")}
+                                  </div>
+                                </CardContent>
+                              </Card>
+                            </motion.div>
+                          );
+                        },
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
           </>
         )}
 

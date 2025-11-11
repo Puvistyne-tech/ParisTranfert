@@ -87,7 +87,9 @@ export default function AboutPage() {
                   <div className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                     {stat.value}
                   </div>
-                  <div className="text-gray-600 dark:text-gray-400">{t(stat.labelKey)}</div>
+                  <div className="text-gray-600 dark:text-gray-400">
+                    {t(stat.labelKey)}
+                  </div>
                 </motion.div>
               );
             })}
@@ -108,15 +110,9 @@ export default function AboutPage() {
                 {t("ourStory.title")}
               </h2>
               <div className="space-y-4 text-gray-600 dark:text-gray-400 leading-relaxed">
-                <p>
-                  {t("ourStory.paragraph1")}
-                </p>
-                <p>
-                  {t("ourStory.paragraph2")}
-                </p>
-                <p>
-                  {t("ourStory.paragraph3")}
-                </p>
+                <p>{t("ourStory.paragraph1")}</p>
+                <p>{t("ourStory.paragraph2")}</p>
+                <p>{t("ourStory.paragraph3")}</p>
               </div>
             </motion.div>
 
@@ -127,7 +123,9 @@ export default function AboutPage() {
               transition={{ duration: 0.8, delay: 0.2 }}
             >
               <div className="bg-gradient-to-br from-primary-600 to-accent-500 rounded-2xl p-8 text-white">
-                <h3 className="text-2xl font-bold mb-4">{t("whyChooseUs.title")}</h3>
+                <h3 className="text-2xl font-bold mb-4">
+                  {t("whyChooseUs.title")}
+                </h3>
                 <ul className="space-y-3">
                   <li className="flex items-center">
                     <div className="w-2 h-2 bg-white rounded-full mr-3"></div>
@@ -193,7 +191,9 @@ export default function AboutPage() {
                       <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">
                         {t(value.titleKey)}
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-400">{t(value.descriptionKey)}</p>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        {t(value.descriptionKey)}
+                      </p>
                     </CardContent>
                   </Card>
                 </motion.div>

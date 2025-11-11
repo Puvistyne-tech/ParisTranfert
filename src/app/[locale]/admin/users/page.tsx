@@ -1,23 +1,31 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
-import { Button } from "@/components/ui/Button";
-import { Search, User, Mail, Phone, Calendar, Eye } from "lucide-react";
-import { getClients, getClientReservations } from "@/lib/supabaseService";
+import { Calendar, Eye, Mail, Phone, Search, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
+import { useEffect, useState } from "react";
+import { ReservationDetailModal } from "@/components/admin/ReservationDetailModal";
+import { StatusBadge, type StatusType } from "@/components/admin/StatusBadge";
 import type { Client } from "@/components/models/clients";
 import type { Reservation } from "@/components/models/reservations";
-import { StatusBadge } from "@/components/admin/StatusBadge";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import { getClientReservations, getClients } from "@/lib/supabaseService";
 
 export default function AdminUsersPage() {
+  const router = useRouter();
+  const locale = useLocale();
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [clientReservations, setClientReservations] = useState<Reservation[]>([]);
+  const [clientReservations, setClientReservations] = useState<Reservation[]>(
+    [],
+  );
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [selectedReservationId, setSelectedReservationId] = useState<string | null>(null);
   const pageSize = 20;
 
   useEffect(() => {
@@ -56,8 +64,12 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Users & Clients</h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">Manage all registered clients</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Users & Clients
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
+          Manage all registered clients
+        </p>
       </div>
 
       {/* Search */}
@@ -91,7 +103,10 @@ export default function AdminUsersPage() {
         <>
           <div className="grid gap-4">
             {clients.map((client) => (
-              <Card key={client.id} className="dark:bg-gray-800 dark:border-gray-700">
+              <Card
+                key={client.id}
+                className="dark:bg-gray-800 dark:border-gray-700"
+              >
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
@@ -133,7 +148,8 @@ export default function AdminUsersPage() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between">
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, total)} of {total} clients
+                Showing {(page - 1) * pageSize + 1} to{" "}
+                {Math.min(page * pageSize, total)} of {total} clients
               </p>
               <div className="flex items-center space-x-2">
                 <Button
@@ -165,44 +181,66 @@ export default function AdminUsersPage() {
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                   {selectedClient.firstName} {selectedClient.lastName}
                 </h2>
-                <Button variant="outline" onClick={() => setSelectedClient(null)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setSelectedClient(null)}
+                >
                   Close
                 </Button>
               </div>
 
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Email</label>
-                  <p className="text-gray-900 dark:text-white">{selectedClient.email}</p>
+                  <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Email
+                  </div>
+                  <p className="text-gray-900 dark:text-white">
+                    {selectedClient.email}
+                  </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Phone</label>
-                  <p className="text-gray-900 dark:text-white">{selectedClient.phone}</p>
+                  <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Phone
+                  </div>
+                  <p className="text-gray-900 dark:text-white">
+                    {selectedClient.phone}
+                  </p>
                 </div>
               </div>
 
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Reservations</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                  Reservations
+                </h3>
                 {clientReservations.length === 0 ? (
-                  <p className="text-gray-500 dark:text-gray-400">No reservations found</p>
+                  <p className="text-gray-500 dark:text-gray-400">
+                    No reservations found
+                  </p>
                 ) : (
                   <div className="space-y-2">
                     {clientReservations.map((reservation) => (
                       <div
                         key={reservation.id}
-                        className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg flex items-center justify-between"
+                        className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                        onClick={() => setSelectedReservationId(reservation.id)}
                       >
                         <div>
                           <p className="font-medium text-gray-900 dark:text-white">
                             {reservation.date} at {reservation.time}
                           </p>
                           <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {reservation.pickupLocation} → {reservation.destinationLocation || "N/A"}
+                            {reservation.pickupLocation} →{" "}
+                            {reservation.destinationLocation || "N/A"}
                           </p>
                         </div>
                         <div className="flex items-center space-x-4">
-                          <StatusBadge status={reservation.status as any} />
-                          <span className="font-semibold text-gray-900 dark:text-white">€{reservation.totalPrice}</span>
+                          <StatusBadge
+                            status={reservation.status as StatusType}
+                          />
+                          <span className="font-semibold text-gray-900 dark:text-white">
+                            €{reservation.totalPrice}
+                          </span>
+                          <Eye className="w-4 h-4 text-gray-400" />
                         </div>
                       </div>
                     ))}
@@ -213,7 +251,19 @@ export default function AdminUsersPage() {
           </div>
         </div>
       )}
+
+      {/* Reservation Detail Modal */}
+      <ReservationDetailModal
+        reservationId={selectedReservationId}
+        isOpen={!!selectedReservationId}
+        onClose={() => {
+          setSelectedReservationId(null);
+          // Refresh client reservations if a client is selected
+          if (selectedClient) {
+            handleViewClient(selectedClient);
+          }
+        }}
+      />
     </div>
   );
 }
-

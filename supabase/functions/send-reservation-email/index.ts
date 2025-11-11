@@ -61,7 +61,7 @@
 // // Email template functions (adapted for Deno)
 // function generateAdminNotificationEmail(reservation: any): { subject: string; html: string; text: string } {
 //   const subject = `New Reservation: ${reservation.reservationId || reservation.id}`;
-  
+
 //   const html = `
 //     <!DOCTYPE html>
 //     <html>
@@ -86,7 +86,7 @@
 //           <h1>New Reservation Received</h1>
 //           <p>Reservation ID: ${reservation.reservationId || reservation.id}</p>
 //         </div>
-        
+
 //         <div class="content">
 //           <div class="section">
 //             <h2>Customer Information</h2>
@@ -94,7 +94,7 @@
 //             <p><span class="label">Email:</span><span class="value">${reservation.customerEmail}</span></p>
 //             <p><span class="label">Phone:</span><span class="value">${reservation.customerPhone}</span></p>
 //           </div>
-          
+
 //           <div class="section">
 //             <h2>Trip Details</h2>
 //             <p><span class="label">Date:</span><span class="value">${reservation.pickupDate}</span></p>
@@ -103,33 +103,33 @@
 //             ${reservation.destinationLocation ? `<p><span class="label">To:</span><span class="value">${reservation.destinationLocation}</span></p>` : ''}
 //             <p><span class="label">Passengers:</span><span class="value">${reservation.passengers}</span></p>
 //           </div>
-          
+
 //           <div class="section">
 //             <h2>Vehicle & Service</h2>
 //             <p><span class="label">Vehicle Type:</span><span class="value">${reservation.vehicleTypeName || 'N/A'}</span></p>
 //             <p><span class="label">Service:</span><span class="value">${reservation.serviceName}</span></p>
 //             <p><span class="label">Total Price:</span><span class="value">€${reservation.totalPrice}</span></p>
 //           </div>
-          
+
 //           <div class="section">
 //             <h2>Additional Services</h2>
 //             <p><span class="label">Baby Seats:</span><span class="value">${reservation.babySeats || 0}</span></p>
 //             <p><span class="label">Booster Seats:</span><span class="value">${reservation.boosterSeats || 0}</span></p>
 //             <p><span class="label">Meet & Greet:</span><span class="value">${reservation.meetAndGreet ? 'Yes' : 'No'}</span></p>
 //           </div>
-          
+
 //           ${reservation.notes ? `
 //           <div class="section">
 //             <h2>Special Requests</h2>
 //             <p>${reservation.notes}</p>
 //           </div>
 //           ` : ''}
-          
+
 //           <div style="text-align: center; margin-top: 30px;">
 //             <a href="${APP_URL}/admin/reservations" class="button">View in Admin Panel</a>
 //           </div>
 //         </div>
-        
+
 //         <div class="footer">
 //           <p>This email was sent automatically from Paris Transfer reservation system.</p>
 //         </div>
@@ -137,7 +137,7 @@
 //     </body>
 //     </html>
 //   `;
-  
+
 //   const text = `
 // New Reservation: ${reservation.reservationId || reservation.id}
 
@@ -167,7 +167,7 @@
 
 // Please log into the admin panel to approve or reject this reservation.
 //   `.trim();
-  
+
 //   return { subject, html, text };
 // }
 
@@ -176,12 +176,12 @@
 //   const isPending = status === 'pending' || status === 'quote_requested';
 //   const isQuoteSent = status === 'quote_sent';
 //   const isCancelled = status === 'cancelled';
-  
+
 //   let subject = '';
 //   let headerColor = '#2563eb';
 //   let statusMessage = '';
 //   let statusDescription = '';
-  
+
 //   if (status === 'quote_requested') {
 //     subject = `Quote Request Received: ${reservation.reservationId || reservation.id}`;
 //     headerColor = '#2563eb';
@@ -213,7 +213,7 @@
 //     statusMessage = '❌ Your reservation has been cancelled';
 //     statusDescription = 'We apologize, but your reservation has been cancelled. Please contact us for alternative options.';
 //   }
-  
+
 //   const html = `
 //     <!DOCTYPE html>
 //     <html>
@@ -239,13 +239,13 @@
 //           <h1>${status === 'quote_requested' ? 'Quote Request Received' : status === 'quote_sent' ? 'Your Quote' : status === 'quote_accepted' ? 'Quote Accepted' : isPending ? 'Reservation Received' : isConfirmed ? 'Reservation Confirmed' : 'Reservation Cancelled'}</h1>
 //           <p>Reservation ID: ${reservation.reservationId || reservation.id}</p>
 //         </div>
-        
+
 //         <div class="content">
 //           <div class="status-message">
 //             <h2>${statusMessage}</h2>
 //             <p>${statusDescription}</p>
 //           </div>
-          
+
 //           <div class="section">
 //             <h2>Trip Details</h2>
 //             <p><span class="label">Date:</span><span class="value">${reservation.pickupDate}</span></p>
@@ -254,14 +254,14 @@
 //             ${reservation.destinationLocation ? `<p><span class="label">To:</span><span class="value">${reservation.destinationLocation}</span></p>` : ''}
 //             <p><span class="label">Passengers:</span><span class="value">${reservation.passengers}</span></p>
 //           </div>
-          
+
 //           <div class="section">
 //             <h2>Vehicle & Service</h2>
 //             <p><span class="label">Vehicle Type:</span><span class="value">${reservation.vehicleTypeName || 'N/A'}</span></p>
 //             <p><span class="label">Service:</span><span class="value">${reservation.serviceName}</span></p>
 //             <p><span class="label">Total Price:</span><span class="value">€${reservation.totalPrice}</span></p>
 //           </div>
-          
+
 //           ${(isConfirmed || status === 'quote_accepted') ? `
 //           <div class="section">
 //             <h2>Important Information</h2>
@@ -273,13 +273,13 @@
 //             </ul>
 //           </div>
 //           ` : ''}
-          
+
 //           <div style="text-align: center; margin-top: 30px;">
 //             <a href="mailto:info@paristransfer.com" class="button">Contact Us</a>
 //             ${(isConfirmed || status === 'quote_accepted') ? `<a href="${APP_URL}/confirmation?download=${reservation.reservationId || reservation.id}" class="button">Download PDF</a>` : ''}
 //           </div>
 //         </div>
-        
+
 //         <div class="footer">
 //           <p>Thank you for choosing Paris Transfer!</p>
 //           <p>Email: info@paristransfer.com | Phone: +33 1 23 45 67 89</p>
@@ -288,7 +288,7 @@
 //     </body>
 //     </html>
 //   `;
-  
+
 //   const text = `${subject}
 
 // ${statusMessage}
@@ -318,7 +318,7 @@
 
 // Thank you for choosing Paris Transfer!
 //   `.trim();
-  
+
 //   return { subject, html, text };
 // }
 
@@ -417,7 +417,7 @@
 //   try {
 //     // Parse webhook payload
 //     const payload: WebhookPayload = await req.json();
-    
+
 //     console.log('Received webhook:', JSON.stringify(payload, null, 2));
 
 //     // Only process INSERT and UPDATE operations
@@ -456,9 +456,9 @@
 //           adminEmail.text
 //         );
 
-//         return new Response(JSON.stringify({ 
-//           success: true, 
-//           message: 'Emails sent: customer pending confirmation + admin notification' 
+//         return new Response(JSON.stringify({
+//           success: true,
+//           message: 'Emails sent: customer pending confirmation + admin notification'
 //         }), {
 //           headers: { 'Content-Type': 'application/json' },
 //         });
@@ -485,9 +485,9 @@
 //           customerEmail.text
 //         );
 
-//         return new Response(JSON.stringify({ 
-//           success: true, 
-//           message: 'Email sent: customer confirmation' 
+//         return new Response(JSON.stringify({
+//           success: true,
+//           message: 'Email sent: customer confirmation'
 //         }), {
 //           headers: { 'Content-Type': 'application/json' },
 //         });
@@ -501,9 +501,9 @@
 //           customerEmail.text
 //         );
 
-//         return new Response(JSON.stringify({ 
-//           success: true, 
-//           message: 'Email sent: customer cancellation notice' 
+//         return new Response(JSON.stringify({
+//           success: true,
+//           message: 'Email sent: customer cancellation notice'
 //         }), {
 //           headers: { 'Content-Type': 'application/json' },
 //         });
@@ -517,11 +517,11 @@
 //   } catch (error) {
 //     console.error('Error processing webhook:', error);
 //     return new Response(
-//       JSON.stringify({ 
-//         error: 'Internal server error', 
-//         message: error instanceof Error ? error.message : 'Unknown error' 
+//       JSON.stringify({
+//         error: 'Internal server error',
+//         message: error instanceof Error ? error.message : 'Unknown error'
 //       }),
-//       { 
+//       {
 //         status: 500,
 //         headers: { 'Content-Type': 'application/json' },
 //       }

@@ -5,17 +5,18 @@
 
 // Map database service IDs to translation keys
 const serviceIdToTranslationKey: Record<string, string> = {
-  'airport-transfers': 'airportTransfer',
-  'disneyland-paris': 'disneyland',
-  'private-tours': 'privateTour',
-  'wedding-transfers': 'weddingTransfer',
-  'business-transfers': 'businessTransfer',
-  'custom-transfers': 'customTransfer',
-  'international': 'international',
-  'transport-international': 'international',
-  'greeter-service': 'greeterService',
-  'service-vip': 'serviceVip',
-  'tour-guide': 'tourGuide',
+  "airport-transfers": "airportTransfer",
+  "disneyland-paris": "disneyland",
+  "private-tours": "privateTour",
+  "wedding-transfers": "weddingTransfer",
+  "business-transfers": "businessTransfer",
+  "custom-transfers": "customTransfer",
+  international: "international",
+  "transport-international": "international",
+  "greeter-service": "greeterService",
+  "service-vip": "serviceVip",
+  "tour-guide": "tourGuide",
+  "event-transport": "eventTransport",
 };
 
 /**
@@ -23,7 +24,11 @@ const serviceIdToTranslationKey: Record<string, string> = {
  * Falls back to original name if translation not found
  * Note: The `t` function should already be scoped to the "services" namespace
  */
-export function getTranslatedServiceName(serviceId: string, serviceName: string, t: (key: string) => string | undefined): string {
+export function getTranslatedServiceName(
+  serviceId: string,
+  serviceName: string,
+  t: (key: string) => string | undefined,
+): string {
   const translationKey = serviceIdToTranslationKey[serviceId] || serviceId;
   // Don't add "services." prefix since t is already scoped to services namespace
   const fullKey = `${translationKey}.name`;
@@ -47,10 +52,10 @@ export function getTranslatedServiceName(serviceId: string, serviceName: string,
 export function getTranslatedVehicleDescription(
   vehicleId: string,
   description: string,
-  t: (key: string) => string | undefined
+  t: (key: string) => string | undefined,
 ): string {
   if (!description) return description;
-  
+
   // Don't add "fleet." prefix since t is already scoped to fleet namespace
   const translationKey = `${vehicleId}.description`;
   try {
@@ -64,4 +69,3 @@ export function getTranslatedVehicleDescription(
     return description;
   }
 }
-

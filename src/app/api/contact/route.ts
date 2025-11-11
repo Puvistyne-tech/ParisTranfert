@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     const validatedData = contactSchema.parse(body);
 
     // Note: The schema doesn't have a contact_messages table.
-    // For now, we'll create a client record with a unique client_id to identify it as a contact form submission.
+    // For now, we'll create a client record to store contact form submissions.
     // Consider adding a contact_messages table to the schema if you need to store contact messages separately.
     const { data, error } = await supabase
       .from("clients")
@@ -20,8 +20,6 @@ export async function POST(request: NextRequest) {
         last_name: validatedData.lastName,
         email: validatedData.email,
         phone: validatedData.phone || "",
-        // Use client_id to identify contact form submissions (prefixed with 'contact_')
-        client_id: `contact_${Date.now()}`,
       })
       .select()
       .single();

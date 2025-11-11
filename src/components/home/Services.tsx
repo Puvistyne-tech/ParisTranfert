@@ -3,46 +3,47 @@
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  CheckCircle,
-  Plane,
-  Crown,
-  Star,
-  Globe,
-  Shield,
-  MapPin,
-  UserCheck,
-  Heart,
-  Calendar,
   BookOpen,
+  Calendar,
+  CheckCircle,
+  Crown,
+  Globe,
+  Heart,
+  MapPin,
+  Plane,
+  Shield,
+  Star,
+  UserCheck,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { useServices } from "@/hooks/useServices";
+import type { Service } from "@/components/models/services";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
-import type { Service } from "@/components/models/services";
-
+import { useServices } from "@/hooks/useServices";
 
 export function Services() {
   const t = useTranslations("services");
   const router = useRouter();
   const locale = useLocale();
-  
+
   // Use TanStack Query hook for data fetching with automatic caching
   const { data: services = [], isLoading: loading } = useServices();
-  
+
   const tCommon = useTranslations("common");
-  
+
   if (loading) {
     return (
       <section id="services" className="py-20 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center text-gray-600 dark:text-gray-400">{tCommon("loading")}</div>
+          <div className="text-center text-gray-600 dark:text-gray-400">
+            {tCommon("loading")}
+          </div>
         </div>
       </section>
     );
   }
-  
+
   return (
     <section id="services" className="py-20 bg-white dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -66,26 +67,28 @@ export function Services() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((service: Service, index: number) => {
             const iconMap: { [key: string]: any } = {
-              'Plane': Plane,
-              'Crown': Crown,
-              'Star': Star,
-              'Globe': Globe,
-              'Shield': Shield,
-              'MapPin': MapPin,
-              'UserCheck': UserCheck,
-              'Heart': Heart,
-              'Calendar': Calendar,
-              'BookOpen': BookOpen,
+              Plane: Plane,
+              Crown: Crown,
+              Star: Star,
+              Globe: Globe,
+              Shield: Shield,
+              MapPin: MapPin,
+              UserCheck: UserCheck,
+              Heart: Heart,
+              Calendar: Calendar,
+              BookOpen: BookOpen,
             };
-            const iconName = typeof service.icon === 'string' ? service.icon : service.icon;
+            const iconName =
+              typeof service.icon === "string" ? service.icon : service.icon;
             const Icon = iconMap[iconName] || Plane;
-            
+
             // Handle features as JSONB (could be array or object)
-            const features = Array.isArray(service.features) 
-              ? service.features 
-              : typeof service.features === 'object' && service.features !== null
-              ? Object.values(service.features)
-              : [];
+            const features = Array.isArray(service.features)
+              ? service.features
+              : typeof service.features === "object" &&
+                  service.features !== null
+                ? Object.values(service.features)
+                : [];
 
             return (
               <motion.div
@@ -110,15 +113,17 @@ export function Services() {
                     </p>
 
                     <div className="space-y-2 text-left mb-6">
-                      {features.slice(0, 3).map((feature: any, featureIndex: number) => (
-                        <div
-                          key={featureIndex}
-                          className="flex items-center text-sm text-gray-500 dark:text-gray-400"
-                        >
-                          <CheckCircle className="text-green-500 dark:text-green-400 mr-2 w-4 h-4" />
-                          <span>{feature}</span>
-                        </div>
-                      ))}
+                      {features
+                        .slice(0, 3)
+                        .map((feature: any, featureIndex: number) => (
+                          <div
+                            key={featureIndex}
+                            className="flex items-center text-sm text-gray-500 dark:text-gray-400"
+                          >
+                            <CheckCircle className="text-green-500 dark:text-green-400 mr-2 w-4 h-4" />
+                            <span>{feature}</span>
+                          </div>
+                        ))}
                     </div>
 
                     <div className="flex justify-between items-center mt-auto">

@@ -1,33 +1,33 @@
+import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
-import { QueryProvider } from "@/components/providers/QueryProvider";
 import { LayoutWrapper } from "@/components/layout/LayoutWrapper";
-import { notFound } from "next/navigation";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 import { routing } from "@/i18n/routing";
 
 export default async function LocaleLayout({
-    children,
-    params,
+  children,
+  params,
 }: {
-    children: React.ReactNode;
-    params: Promise<{ locale: string }>;
+  children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }) {
-    // Ensure that the incoming `locale` is valid
-    const { locale } = await params;
-    if (!hasLocale(routing.locales, locale)) {
-        notFound();
-    }
+  // Ensure that the incoming `locale` is valid
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
 
-    // Enable static rendering
-    setRequestLocale(locale);
+  // Enable static rendering
+  setRequestLocale(locale);
 
-    const messages = await getMessages();
+  const messages = await getMessages();
 
-    return (
-        <NextIntlClientProvider messages={messages}>
-            <QueryProvider>
-                <LayoutWrapper>{children}</LayoutWrapper>
-            </QueryProvider>
-        </NextIntlClientProvider>
-    );
+  return (
+    <NextIntlClientProvider messages={messages}>
+      <QueryProvider>
+        <LayoutWrapper>{children}</LayoutWrapper>
+      </QueryProvider>
+    </NextIntlClientProvider>
+  );
 }

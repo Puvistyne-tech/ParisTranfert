@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { MapPin, Loader2 } from "lucide-react";
+import { Loader2, MapPin } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import type { ServiceField } from "@/components/models/serviceFields";
 import { Input } from "@/components/ui/Input";
 import { cn } from "@/lib/utils";
-import type { ServiceField } from "@/components/models/serviceFields";
 
 interface AddressSuggestion {
   display_name: string;
@@ -24,7 +24,7 @@ interface AddressAutocompleteProps {
 // Debounce function to limit API calls
 function debounce<T extends (...args: any[]) => any>(
   func: T,
-  wait: number
+  wait: number,
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout | null = null;
   return function executedFunction(...args: Parameters<T>) {
@@ -65,27 +65,30 @@ export function AddressAutocomplete({
       // Rate limit: 1 request per second - we use debounce to respect this
       // For international destinations, don't restrict to France
       // Check if this is an international destination field (contains "Pays", "Country", "international", or service is "international")
-      const labelLower = field?.label?.toLowerCase() || '';
-      const isInternational = field?.fieldKey === 'destination_location' && 
-                             (labelLower.includes('pays') || 
-                              labelLower.includes('country') || 
-                              labelLower.includes('international') ||
-                              labelLower.includes('(pays/ville/adresse)'));
-      
-      let url = `https://nominatim.openstreetmap.org/search?` +
+      const labelLower = field?.label?.toLowerCase() || "";
+      const isInternational =
+        field?.fieldKey === "destination_location" &&
+        (labelLower.includes("pays") ||
+          labelLower.includes("country") ||
+          labelLower.includes("international") ||
+          labelLower.includes("(pays/ville/adresse)"));
+
+      let url =
+        `https://nominatim.openstreetmap.org/search?` +
         `format=json&` +
         `q=${encodeURIComponent(query)}&` +
         `limit=5&` +
         `addressdetails=1&` +
         `accept-language=en,fr`;
-      
+
       // Only restrict to France for pickup locations (not international destinations)
       if (!isInternational) {
-        url += `&countrycodes=fr` + // Focus on France
-               `&bounded=1&` +
-               `viewbox=2.0,48.5,2.7,49.0`; // Rough bounding box for Paris region
+        url +=
+          `&countrycodes=fr` + // Focus on France
+          `&bounded=1&` +
+          `viewbox=2.0,48.5,2.7,49.0`; // Rough bounding box for Paris region
       }
-      
+
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -106,7 +109,7 @@ export function AddressAutocomplete({
   const debouncedFetchSuggestions = useRef(
     debounce((query: string) => {
       fetchSuggestions(query);
-    }, 1000)
+    }, 1000),
   ).current;
 
   // Handle input change
@@ -143,7 +146,7 @@ export function AddressAutocomplete({
       case "ArrowDown":
         e.preventDefault();
         setSelectedIndex((prev) =>
-          prev < suggestions.length - 1 ? prev + 1 : prev
+          prev < suggestions.length - 1 ? prev + 1 : prev,
         );
         break;
       case "ArrowUp":
@@ -235,4 +238,3 @@ export function AddressAutocomplete({
     </div>
   );
 }
-

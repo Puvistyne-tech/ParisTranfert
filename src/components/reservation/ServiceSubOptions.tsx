@@ -7,14 +7,14 @@
 // import { Service } from "@/components/models";
 // import { getLocationsByService } from "@/lib/supabaseService";
 // import type { Location } from "@/components/models/locations";
-// import { 
-//   Plane, 
-//   Calendar, 
-//   MapPin, 
-//   Users, 
-//   Shield, 
-//   FileText, 
-//   Globe, 
+// import {
+//   Plane,
+//   Calendar,
+//   MapPin,
+//   Users,
+//   Shield,
+//   FileText,
+//   Globe,
 //   Clock,
 //   Heart,
 //   Star,
@@ -59,7 +59,7 @@
 //   useEffect(() => {
 //     async function loadLocations() {
 //       if (!service.serviceFields) return;
-      
+
 //       const fields = service.serviceFields as unknown as Record<string, ServiceField>;
 //       const hasLocationSelect = Object.values(fields).some(
 //         (field) => field.type === 'location_select'
@@ -83,14 +83,14 @@
 //   const handleInputChange = (fieldKey: string, value: any) => {
 //     const newData = { ...formData, [fieldKey]: value };
 //     setFormData(newData);
-    
+
 //     // Clear error for this field
 //     if (errors[fieldKey]) {
 //       const newErrors = { ...errors };
 //       delete newErrors[fieldKey];
 //       setErrors(newErrors);
 //     }
-    
+
 //     onDataChange(newData);
 //   };
 
@@ -135,7 +135,7 @@
 //           value: loc.id,
 //           label: loc.name
 //         }));
-        
+
 //         // Filter by pickup/destination if specified
 //         let filteredLocations = locationOptions;
 //         if (field.is_pickup) {
@@ -145,7 +145,7 @@
 //           // For destination, show all locations that can be destinations
 //           filteredLocations = locationOptions;
 //         }
-        
+
 //         return (
 //           <div>
 //             <Select
@@ -156,7 +156,7 @@
 //             {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
 //           </div>
 //         );
-        
+
 //       case 'number':
 //         return (
 //           <div>
@@ -169,7 +169,7 @@
 //             {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
 //           </div>
 //         );
-        
+
 //       case 'select':
 //         const selectOptions = (field.options || []).map(opt => ({
 //           value: opt,
@@ -184,7 +184,7 @@
 //             {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
 //           </div>
 //         );
-        
+
 //       case 'textarea':
 //         return (
 //           <div>
@@ -198,7 +198,7 @@
 //             {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
 //           </div>
 //         );
-        
+
 //       case 'date':
 //         return (
 //           <div>
@@ -209,7 +209,7 @@
 //             {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
 //           </div>
 //         );
-        
+
 //       case 'time':
 //         return (
 //           <div>
@@ -220,7 +220,7 @@
 //             {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
 //           </div>
 //         );
-        
+
 //       default:
 //         return (
 //           <div>
@@ -236,10 +236,10 @@
 //   };
 
 //   // Use serviceFields if available, otherwise fall back to requirements
-//   const serviceFields = service.serviceFields 
+//   const serviceFields = service.serviceFields
 //     ? (service.serviceFields as unknown as Record<string, ServiceField>)
 //     : undefined;
-  
+
 //   if (!serviceFields || Object.keys(serviceFields).length === 0) {
 //     return null;
 //   }

@@ -1,31 +1,37 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Plus, Edit, Trash2, Car } from "lucide-react";
-import { getVehicleTypes, createVehicleType, updateVehicleType, deleteVehicleType } from "@/lib/supabaseService";
-import type { VehicleType } from "@/components/models/vehicleTypes";
+import { Car, Edit, Plus, Trash2 } from "lucide-react";
+import Image from "next/image";
+import { useCallback, useEffect, useState } from "react";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { VehicleModal } from "@/components/admin/VehicleModal";
-import Image from "next/image";
+import type { VehicleType } from "@/components/models/vehicleTypes";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
+import {
+  createVehicleType,
+  deleteVehicleType,
+  getVehicleTypes,
+  updateVehicleType,
+} from "@/lib/supabaseService";
 
 export default function AdminVehiclesPage() {
   const [vehicles, setVehicles] = useState<VehicleType[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedVehicle, setSelectedVehicle] = useState<VehicleType | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; vehicleId: string | null }>({
+  const [selectedVehicle, setSelectedVehicle] = useState<VehicleType | null>(
+    null,
+  );
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean;
+    vehicleId: string | null;
+  }>({
     isOpen: false,
     vehicleId: null,
   });
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    fetchVehicles();
-  }, []);
-
-  const fetchVehicles = async () => {
+  const fetchVehicles = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getVehicleTypes();
@@ -35,7 +41,7 @@ export default function AdminVehiclesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const handleCreate = () => {
     setSelectedVehicle(null);
@@ -47,7 +53,18 @@ export default function AdminVehiclesPage() {
     setIsModalOpen(true);
   };
 
-  const handleSave = async (vehicleData: any) => {
+  useEffect(() => {
+    fetchVehicles();
+  }, [fetchVehicles]);
+
+  const handleSave = async (vehicleData: {
+    id: string;
+    name: string;
+    description?: string;
+    image?: string;
+    minPassengers?: number;
+    maxPassengers?: number;
+  }) => {
     setSaving(true);
     try {
       if (selectedVehicle) {
@@ -68,7 +85,7 @@ export default function AdminVehiclesPage() {
 
   const handleDelete = async () => {
     if (!deleteConfirm.vehicleId) return;
-    
+
     try {
       await deleteVehicleType(deleteConfirm.vehicleId);
       await fetchVehicles();
@@ -83,8 +100,12 @@ export default function AdminVehiclesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Vehicle Types Management</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">Manage vehicle types and passenger limits</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Vehicle Types Management
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Manage vehicle types and passenger limits
+          </p>
         </div>
         <Button variant="primary" onClick={handleCreate}>
           <Plus className="w-4 h-4 mr-2" />
@@ -95,12 +116,17 @@ export default function AdminVehiclesPage() {
       {loading ? (
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 dark:border-primary-400 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading vehicles...</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            Loading vehicles...
+          </p>
         </div>
       ) : (
         <div className="grid gap-4">
           {vehicles.map((vehicle) => (
-            <Card key={vehicle.id} className="dark:bg-gray-800 dark:border-gray-700">
+            <Card
+              key={vehicle.id}
+              className="dark:bg-gray-800 dark:border-gray-700"
+            >
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
@@ -119,25 +145,39 @@ export default function AdminVehiclesPage() {
                       </div>
                     )}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{vehicle.name}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{vehicle.description}</p>
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {vehicle.name}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        {vehicle.description}
+                      </p>
                       <div className="flex items-center space-x-4 mt-2">
                         <span className="text-sm text-gray-600 dark:text-gray-400">
-                          Passengers: {vehicle.minPassengers || 1} - {vehicle.maxPassengers || 8}
+                          Passengers: {vehicle.minPassengers || 1} -{" "}
+                          {vehicle.maxPassengers || 8}
                         </span>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEdit(vehicle)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEdit(vehicle)}
+                    >
                       <Edit className="w-4 h-4 mr-1" />
                       Edit
                     </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
-                      onClick={() => setDeleteConfirm({ isOpen: true, vehicleId: vehicle.id })}
+                      onClick={() =>
+                        setDeleteConfirm({
+                          isOpen: true,
+                          vehicleId: vehicle.id,
+                        })
+                      }
                     >
                       <Trash2 className="w-4 h-4 mr-1" />
                       Delete
@@ -153,8 +193,12 @@ export default function AdminVehiclesPage() {
       {vehicles.length === 0 && !loading && (
         <div className="text-center py-12">
           <Car className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No vehicles found</h3>
-          <p className="text-gray-600 dark:text-gray-400">Get started by creating a new vehicle type</p>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            No vehicles found
+          </h3>
+          <p className="text-gray-600 dark:text-gray-400">
+            Get started by creating a new vehicle type
+          </p>
         </div>
       )}
 
@@ -182,4 +226,3 @@ export default function AdminVehiclesPage() {
     </div>
   );
 }
-

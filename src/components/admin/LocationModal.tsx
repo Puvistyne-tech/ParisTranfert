@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
@@ -17,7 +17,13 @@ interface LocationModalProps {
   loading?: boolean;
 }
 
-export function LocationModal({ isOpen, onClose, onSave, location, loading = false }: LocationModalProps) {
+export function LocationModal({
+  isOpen,
+  onClose,
+  onSave,
+  location,
+  loading = false,
+}: LocationModalProps) {
   const [formData, setFormData] = useState({
     id: "",
     name: "",
@@ -95,7 +101,9 @@ export function LocationModal({ isOpen, onClose, onSave, location, loading = fal
             </label>
             <Input
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
               required
               className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
             />
@@ -107,7 +115,9 @@ export function LocationModal({ isOpen, onClose, onSave, location, loading = fal
             </label>
             <select
               value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, type: e.target.value })
+              }
               required
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
             >
@@ -118,11 +128,20 @@ export function LocationModal({ isOpen, onClose, onSave, location, loading = fal
           </div>
 
           <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={loading}
+            >
               Cancel
             </Button>
             <Button type="submit" variant="primary" disabled={loading}>
-              {loading ? "Saving..." : location ? "Update Location" : "Create Location"}
+              {loading
+                ? "Saving..."
+                : location
+                  ? "Update Location"
+                  : "Create Location"}
             </Button>
           </div>
         </form>
@@ -130,4 +149,3 @@ export function LocationModal({ isOpen, onClose, onSave, location, loading = fal
     </div>
   );
 }
-

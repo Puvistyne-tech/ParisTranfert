@@ -93,7 +93,7 @@
 //                         className="object-cover"
 //                       />
 //                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                      
+
 //                       {/* Stylish Name Overlay */}
 //                       <div className="absolute bottom-2 left-2 right-2">
 //                         <div
@@ -102,7 +102,7 @@
 //                           {vehicle.name}
 //                         </div>
 //                       </div>
-                      
+
 //                       {/* Electric/Hybrid Indicator on Image */}
 //                       {vehicle.isElectric && (
 //                         <div className="absolute top-3 right-3 bg-green-500 text-white p-2 rounded-full shadow-lg">

@@ -16,7 +16,8 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
         "bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white",
       elevated:
         "bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 text-gray-900 dark:text-white",
-      outlined: "bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white",
+      outlined:
+        "bg-white dark:bg-gray-800 rounded-2xl border-2 border-gray-200 dark:border-gray-700 text-gray-900 dark:text-white",
     };
 
     return (

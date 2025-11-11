@@ -7,7 +7,9 @@ type DarkModeContextType = {
   toggleDarkMode: () => void;
 };
 
-const DarkModeContext = createContext<DarkModeContextType | undefined>(undefined);
+const DarkModeContext = createContext<DarkModeContextType | undefined>(
+  undefined,
+);
 
 // Admin Dark Mode Provider - scoped to admin pages only
 export function DarkModeProvider({ children }: { children: React.ReactNode }) {
@@ -37,7 +39,9 @@ export function DarkModeProvider({ children }: { children: React.ReactNode }) {
       }
     } else {
       // Default to system preference
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const prefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)",
+      ).matches;
       setIsDark(prefersDark);
       const adminContainer = document.getElementById("admin-container");
       if (adminContainer) {
@@ -57,7 +61,7 @@ export function DarkModeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!mounted) return;
-    
+
     // Apply dark mode class to admin container only
     const adminContainer = document.getElementById("admin-container");
     if (adminContainer) {
@@ -115,7 +119,11 @@ export function useDarkMode() {
 }
 
 // Public Dark Mode Provider - for home and reservation pages
-export function PublicDarkModeProvider({ children }: { children: React.ReactNode }) {
+export function PublicDarkModeProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -142,7 +150,9 @@ export function PublicDarkModeProvider({ children }: { children: React.ReactNode
       }
     } else {
       // Default to system preference
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const prefersDark = window.matchMedia(
+        "(prefers-color-scheme: dark)",
+      ).matches;
       setIsDark(prefersDark);
       const publicContainer = document.getElementById("public-container");
       if (publicContainer) {
@@ -162,7 +172,7 @@ export function PublicDarkModeProvider({ children }: { children: React.ReactNode
 
   useEffect(() => {
     if (!mounted) return;
-    
+
     // Apply dark mode class to public container only
     const publicContainer = document.getElementById("public-container");
     if (publicContainer) {
@@ -211,13 +221,16 @@ export function PublicDarkModeProvider({ children }: { children: React.ReactNode
   );
 }
 
-const PublicDarkModeContext = createContext<DarkModeContextType | undefined>(undefined);
+const PublicDarkModeContext = createContext<DarkModeContextType | undefined>(
+  undefined,
+);
 
 export function usePublicDarkMode() {
   const context = useContext(PublicDarkModeContext);
   if (context === undefined) {
-    throw new Error("usePublicDarkMode must be used within a PublicDarkModeProvider");
+    throw new Error(
+      "usePublicDarkMode must be used within a PublicDarkModeProvider",
+    );
   }
   return context;
 }
-

@@ -1,8 +1,8 @@
-import { supabase } from './supabase';
-import type { User } from '@supabase/supabase-js';
+import type { User } from "@supabase/supabase-js";
+import { supabase } from "./supabase";
 
 export interface AdminUser extends User {
-  role?: 'admin';
+  role?: "admin";
 }
 
 /**
@@ -26,10 +26,14 @@ export async function signIn(email: string, password: string) {
  */
 export async function signInWithGoogle(redirectTo?: string) {
   // Get the redirect URL - use provided one or default to /admin
-  const redirectUrl = redirectTo || (typeof window !== 'undefined' ? `${window.location.origin}/admin` : '/admin');
-  
+  const redirectUrl =
+    redirectTo ||
+    (typeof window !== "undefined"
+      ? `${window.location.origin}/admin`
+      : "/admin");
+
   const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
+    provider: "google",
     options: {
       redirectTo: redirectUrl,
     },
@@ -57,13 +61,16 @@ export async function signOut() {
  */
 export async function getSession() {
   try {
-    const { data: { session }, error } = await supabase.auth.getSession();
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
     if (error) {
       return null;
     }
     return session;
   } catch (error) {
-    console.error('Error getting session:', error);
+    console.error("Error getting session:", error);
     return null;
   }
 }
@@ -73,23 +80,26 @@ export async function getSession() {
  */
 export async function getCurrentUser(): Promise<AdminUser | null> {
   try {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+
     // If there's an error (like no session), return null instead of throwing
     if (error || !user) {
       return null;
     }
 
     // Get user role from metadata
-    const role = user.user_metadata?.role as 'admin' | undefined;
-    
+    const role = user.user_metadata?.role as "admin" | undefined;
+
     return {
       ...user,
       role,
     } as AdminUser;
   } catch (error) {
     // Handle any unexpected errors gracefully
-    console.error('Error getting current user:', error);
+    console.error("Error getting current user:", error);
     return null;
   }
 }
@@ -112,9 +122,9 @@ export async function isAuthenticated(): Promise<boolean> {
 export async function isAdmin(): Promise<boolean> {
   const user = await getCurrentUser();
   if (!user) return false;
-  
+
   const role = user.user_metadata?.role || user.role;
-  return role === 'admin';
+  return role === "admin";
 }
 
 /**
@@ -123,7 +133,7 @@ export async function isAdmin(): Promise<boolean> {
 export async function requireAuth(): Promise<AdminUser> {
   const user = await getCurrentUser();
   if (!user) {
-    throw new Error('Authentication required');
+    throw new Error("Authentication required");
   }
   return user;
 }
@@ -135,9 +145,7 @@ export async function requireAdmin(): Promise<AdminUser> {
   const user = await requireAuth();
   const isAdminUser = await isAdmin();
   if (!isAdminUser) {
-    throw new Error('Admin access required');
+    throw new Error("Admin access required");
   }
   return user;
 }
-
-

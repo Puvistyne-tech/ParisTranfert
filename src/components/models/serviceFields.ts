@@ -1,4 +1,12 @@
-export type ServiceFieldType = 'text' | 'number' | 'select' | 'textarea' | 'date' | 'time' | 'location_select' | 'address_autocomplete';
+export type ServiceFieldType =
+  | "text"
+  | "number"
+  | "select"
+  | "textarea"
+  | "date"
+  | "time"
+  | "location_select"
+  | "address_autocomplete";
 
 export interface ServiceField {
   id: string;
@@ -15,4 +23,3 @@ export interface ServiceField {
   defaultValue?: string; // Pre-filled value (e.g., "Paris" for Paris Tour destination)
   fieldOrder: number; // Order of display
 }
-

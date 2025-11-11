@@ -1,15 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Plus, Edit, Trash2, Search, Package, Filter } from "lucide-react";
-import { getAllServices, getCategories, createService, updateService, deleteService } from "@/lib/supabaseService";
-import type { Service } from "@/components/models/services";
-import type { Category } from "@/components/models/categories";
+import { Edit, Filter, Package, Plus, Search, Trash2 } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { ServiceModal } from "@/components/admin/ServiceModal";
+import type { Category } from "@/components/models/categories";
+import type { Service } from "@/components/models/services";
+import { Button } from "@/components/ui/Button";
+import { Card, CardContent } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
+import {
+  createService,
+  deleteService,
+  getAllServices,
+  getCategories,
+  updateService,
+} from "@/lib/supabaseService";
 
 export default function AdminServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
@@ -21,17 +27,16 @@ export default function AdminServicesPage() {
   const [popularFilter, setPopularFilter] = useState<string>("all"); // "all", "popular", "not-popular"
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; serviceId: string | null }>({
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean;
+    serviceId: string | null;
+  }>({
     isOpen: false,
     serviceId: null,
   });
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [servicesData, categoriesData] = await Promise.all([
@@ -45,22 +50,26 @@ export default function AdminServicesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const filteredServices = services.filter((service) => {
-    const matchesSearch = !search || 
+    const matchesSearch =
+      !search ||
       service.name.toLowerCase().includes(search.toLowerCase()) ||
       service.description?.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory = !selectedCategory || service.categoryId === selectedCategory;
-    const matchesAvailability = 
+    const matchesCategory =
+      !selectedCategory || service.categoryId === selectedCategory;
+    const matchesAvailability =
       availabilityFilter === "all" ||
       (availabilityFilter === "available" && service.isAvailable) ||
       (availabilityFilter === "unavailable" && !service.isAvailable);
-    const matchesPopular = 
+    const matchesPopular =
       popularFilter === "all" ||
       (popularFilter === "popular" && service.isPopular) ||
       (popularFilter === "not-popular" && !service.isPopular);
-    return matchesSearch && matchesCategory && matchesAvailability && matchesPopular;
+    return (
+      matchesSearch && matchesCategory && matchesAvailability && matchesPopular
+    );
   });
 
   const handleCreate = () => {
@@ -73,13 +82,45 @@ export default function AdminServicesPage() {
     setIsModalOpen(true);
   };
 
-  const handleSave = async (serviceData: any) => {
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleSave = async (
+    serviceData: Partial<Service> & {
+      id: string;
+      key: string;
+      name: string;
+      categoryId: string;
+    },
+  ) => {
     setSaving(true);
     try {
+      // Convert Service type to what the API expects
+      const apiData = {
+        id: serviceData.id,
+        key: serviceData.key,
+        name: serviceData.name,
+        description: serviceData.description,
+        shortDescription: serviceData.shortDescription,
+        icon: serviceData.icon,
+        image: serviceData.image,
+        duration: serviceData.duration,
+        priceRange: serviceData.priceRange,
+        features: Array.isArray(serviceData.features)
+          ? serviceData.features
+          : serviceData.features
+            ? [serviceData.features]
+            : [],
+        languages: serviceData.languages,
+        isPopular: serviceData.isPopular ?? false,
+        isAvailable: serviceData.isAvailable ?? true,
+        categoryId: serviceData.categoryId,
+      };
       if (selectedService) {
-        await updateService(selectedService.id, serviceData);
+        await updateService(selectedService.id, apiData);
       } else {
-        await createService(serviceData);
+        await createService(apiData);
       }
       await fetchData();
       setIsModalOpen(false);
@@ -94,7 +135,7 @@ export default function AdminServicesPage() {
 
   const handleDelete = async () => {
     if (!deleteConfirm.serviceId) return;
-    
+
     try {
       await deleteService(deleteConfirm.serviceId);
       await fetchData();
@@ -109,8 +150,12 @@ export default function AdminServicesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Services Management</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">Manage all services</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            Services Management
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-2">
+            Manage all services
+          </p>
         </div>
         <Button variant="primary" onClick={handleCreate}>
           <Plus className="w-4 h-4 mr-2" />
@@ -123,14 +168,22 @@ export default function AdminServicesPage() {
         <CardContent className="p-4">
           <div className="flex items-center space-x-2 mb-4">
             <Filter className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Filters</h3>
+            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              Filters
+            </h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Search</label>
+              <label
+                htmlFor="search-input"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
+                Search
+              </label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                 <Input
+                  id="search-input"
                   type="text"
                   placeholder="Search services..."
                   value={search}
@@ -140,8 +193,14 @@ export default function AdminServicesPage() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
+              <label
+                htmlFor="category-select"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
+                Category
+              </label>
               <select
+                id="category-select"
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
@@ -155,8 +214,14 @@ export default function AdminServicesPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Availability</label>
+              <label
+                htmlFor="availability-select"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
+                Availability
+              </label>
               <select
+                id="availability-select"
                 value={availabilityFilter}
                 onChange={(e) => setAvailabilityFilter(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
@@ -167,8 +232,14 @@ export default function AdminServicesPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Popular Status</label>
+              <label
+                htmlFor="popular-select"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
+                Popular Status
+              </label>
               <select
+                id="popular-select"
                 value={popularFilter}
                 onChange={(e) => setPopularFilter(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
@@ -179,7 +250,10 @@ export default function AdminServicesPage() {
               </select>
             </div>
           </div>
-          {(search || selectedCategory || availabilityFilter !== "all" || popularFilter !== "all") && (
+          {(search ||
+            selectedCategory ||
+            availabilityFilter !== "all" ||
+            popularFilter !== "all") && (
             <div className="mt-4 flex items-center space-x-2">
               <Button
                 variant="outline"
@@ -206,12 +280,17 @@ export default function AdminServicesPage() {
       {loading ? (
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 dark:border-primary-400 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading services...</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            Loading services...
+          </p>
         </div>
       ) : (
         <div className="grid gap-4">
           {filteredServices.map((service) => (
-            <Card key={service.id} className="dark:bg-gray-800 dark:border-gray-700">
+            <Card
+              key={service.id}
+              className="dark:bg-gray-800 dark:border-gray-700"
+            >
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
@@ -220,14 +299,20 @@ export default function AdminServicesPage() {
                         <Package className="w-6 h-6 text-primary-600 dark:text-primary-400" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{service.name}</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{service.description}</p>
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                          {service.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                          {service.description}
+                        </p>
                         <div className="flex items-center space-x-4 mt-2">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            service.isAvailable 
-                              ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400" 
-                              : "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
-                          }`}>
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              service.isAvailable
+                                ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
+                                : "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
+                            }`}
+                          >
                             {service.isAvailable ? "Available" : "Unavailable"}
                           </span>
                           {service.isPopular && (
@@ -240,15 +325,24 @@ export default function AdminServicesPage() {
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEdit(service)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEdit(service)}
+                    >
                       <Edit className="w-4 h-4 mr-1" />
                       Edit
                     </Button>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
-                      onClick={() => setDeleteConfirm({ isOpen: true, serviceId: service.id })}
+                      onClick={() =>
+                        setDeleteConfirm({
+                          isOpen: true,
+                          serviceId: service.id,
+                        })
+                      }
                     >
                       <Trash2 className="w-4 h-4 mr-1" />
                       Delete
@@ -264,10 +358,15 @@ export default function AdminServicesPage() {
       {filteredServices.length === 0 && !loading && (
         <div className="text-center py-12">
           <Package className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No services found</h3>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+            No services found
+          </h3>
           <p className="text-gray-600 dark:text-gray-400">
-            {search || selectedCategory || availabilityFilter !== "all" || popularFilter !== "all" 
-              ? "Try adjusting your filters" 
+            {search ||
+            selectedCategory ||
+            availabilityFilter !== "all" ||
+            popularFilter !== "all"
+              ? "Try adjusting your filters"
               : "Get started by creating a new service"}
           </p>
         </div>
@@ -298,4 +397,3 @@ export default function AdminServicesPage() {
     </div>
   );
 }
-

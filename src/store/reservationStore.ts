@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { ReservationFormData } from "@/lib/validations";
-import type { VehicleType } from "@/components/models/vehicleTypes";
 import type { Service } from "@/components/models/services";
+import type { VehicleType } from "@/components/models/vehicleTypes";
+import type { ReservationFormData } from "@/lib/validations";
 
 export interface AdditionalServices {
   babySeats: number;
@@ -13,32 +13,32 @@ export interface AdditionalServices {
 interface ReservationState {
   // Reservation ID - local tracking only (not sent to server)
   reservationId: string | null;
-  
+
   // Final reservation ID from server after successful submission
   submittedReservationId: string | null;
-  
+
   // Whether reservation is completed (prevents going back to sections)
   isCompleted: boolean;
-  
+
   // Whether reservation submission is in progress
   isSubmitting: boolean;
-  
+
   // Hash of reservation data to track submission attempts
   submissionAttemptHash: string | null;
-  
+
   // Current step in the reservation process
   currentStep: number;
-  
+
   // Form data for booking details
   formData: Partial<ReservationFormData>;
-  
+
   // Selected items (stored as full objects, not just IDs)
   selectedService: Service | null;
   selectedVehicleType: VehicleType | null;
-  
+
   // Additional services
   additionalServices: AdditionalServices;
-  
+
   // Service-specific sub-options data
   serviceSubData: Record<string, any>;
 
@@ -76,7 +76,7 @@ export const useReservationStore = create<ReservationState>()(
       additionalServices: {
         babySeats: 0,
         boosters: 0,
-        meetAndGreet: false
+        meetAndGreet: false,
       },
       serviceSubData: {},
 
@@ -107,7 +107,8 @@ export const useReservationStore = create<ReservationState>()(
         }
       },
 
-      setSelectedVehicleType: (vehicleType) => set({ selectedVehicleType: vehicleType }),
+      setSelectedVehicleType: (vehicleType) =>
+        set({ selectedVehicleType: vehicleType }),
 
       updateAdditionalServices: (services) =>
         set((state) => ({
@@ -143,7 +144,7 @@ export const useReservationStore = create<ReservationState>()(
           additionalServices: {
             babySeats: 0,
             boosters: 0,
-            meetAndGreet: false
+            meetAndGreet: false,
           },
           serviceSubData: {},
         }),
@@ -157,7 +158,7 @@ export const useReservationStore = create<ReservationState>()(
           additionalServices: {
             babySeats: 0,
             boosters: 0,
-            meetAndGreet: false
+            meetAndGreet: false,
           },
           isCompleted: false,
           isSubmitting: false,
@@ -167,7 +168,7 @@ export const useReservationStore = create<ReservationState>()(
 
       printData: () => {
         const state = get();
-        console.log('Reservation Data:', {
+        console.log("Reservation Data:", {
           currentStep: state.currentStep,
           selectedService: state.selectedService,
           selectedVehicleType: state.selectedVehicleType,

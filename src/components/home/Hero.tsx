@@ -1,34 +1,32 @@
-
-
 //hero
 "use client";
 
 import { motion } from "framer-motion";
 import {
+  AlertCircle,
   Calendar,
+  Car,
   ChevronDown,
   Clock,
   Clock as ClockIcon,
   MapPin,
   Shield,
-  Star,
-  AlertCircle,
-  X,
   Sparkles,
-  Car,
+  Star,
+  X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { useState, useEffect, useRef } from "react";
-import { useServices } from "@/hooks/useServices";
-import { useVehicleTypes } from "@/hooks/useVehicleTypes";
-import { useLocationsByService } from "@/hooks/useLocationsByService";
-import { Select } from "@/components/ui/Select";
+import { useEffect, useRef, useState } from "react";
 import type { Location } from "@/components/models/locations";
 import type { Service } from "@/components/models/services";
 import type { VehicleType } from "@/components/models/vehicleTypes";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Select } from "@/components/ui/Select";
+import { useLocationsByService } from "@/hooks/useLocationsByService";
+import { useServices } from "@/hooks/useServices";
+import { useVehicleTypes } from "@/hooks/useVehicleTypes";
 import { useReservationStore } from "@/store/reservationStore";
 
 export function Hero() {
@@ -36,51 +34,68 @@ export function Hero() {
   const router = useRouter();
   const locale = useLocale();
   const [showPendingNotification, setShowPendingNotification] = useState(false);
-  const [pendingReservationId, setPendingReservationId] = useState<string | null>(null);
-  const [dismissedReservations, setDismissedReservations] = useState<Set<string>>(new Set());
-  
+  const [pendingReservationId, setPendingReservationId] = useState<
+    string | null
+  >(null);
+  const [dismissedReservations, setDismissedReservations] = useState<
+    Set<string>
+  >(new Set());
+
   // Quick booking form state
   const [airportLocations, setAirportLocations] = useState<Location[]>([]);
   const [airportService, setAirportService] = useState<Service | null>(null);
-  const [carVehicleType, setCarVehicleType] = useState<VehicleType | null>(null);
-  const prevLocationsRef = useRef<string>('');
+  const [carVehicleType, setCarVehicleType] = useState<VehicleType | null>(
+    null,
+  );
+  const prevLocationsRef = useRef<string>("");
   const [quickBookingData, setQuickBookingData] = useState({
     pickup: "",
     destination: "",
     date: "",
     time: "",
   });
-  
-  const { setSelectedService, setSelectedVehicleType, updateFormData, updateServiceSubData, setCurrentStep } = useReservationStore();
+
+  const {
+    setSelectedService,
+    setSelectedVehicleType,
+    updateFormData,
+    updateServiceSubData,
+    setCurrentStep,
+  } = useReservationStore();
 
   const handleQuickBooking = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!airportService || !carVehicleType || !quickBookingData.pickup || !quickBookingData.destination) {
+
+    if (
+      !airportService ||
+      !carVehicleType ||
+      !quickBookingData.pickup ||
+      !quickBookingData.destination
+    ) {
       alert(t("pleaseFillAllFields"));
       return;
     }
-    
+
     // Set selected service and vehicle type
     setSelectedService(airportService);
     setSelectedVehicleType(carVehicleType);
-    
+
     // Prefill form data
     updateFormData({
       date: quickBookingData.date,
       time: quickBookingData.time,
       passengers: 1, // Default
     });
-    
+
     // Prefill service sub data with locations
     updateServiceSubData({
       pickup_location: quickBookingData.pickup,
       destination_location: quickBookingData.destination,
     });
-    
+
     // Set to step 2 (trip details)
     setCurrentStep(2);
-    
+
     // Navigate to reservation page
     router.push(`/${locale}/reservation`);
   };
@@ -88,100 +103,116 @@ export function Hero() {
   // Check for pending reservations on mount and on storage changes
   const checkPendingReservations = () => {
     // Load dismissed reservations from localStorage
-    const dismissedData = localStorage.getItem('dismissed-reservations');
-    const dismissed = dismissedData ? new Set<string>(JSON.parse(dismissedData)) : new Set<string>();
+    const dismissedData = localStorage.getItem("dismissed-reservations");
+    const dismissed = dismissedData
+      ? new Set<string>(JSON.parse(dismissedData))
+      : new Set<string>();
     setDismissedReservations(dismissed);
-    
+
     // Check all localStorage keys that start with "reservation-"
     const keys = Object.keys(localStorage);
-    const reservationKeys = keys.filter(key => key.startsWith('reservation-'));
-    
+    const reservationKeys = keys.filter((key) =>
+      key.startsWith("reservation-"),
+    );
+
     let foundPending = false;
     let validPendingId: string | null = null;
-    
+
     for (const key of reservationKeys) {
       try {
         const savedData = localStorage.getItem(key);
         if (!savedData) {
           continue;
         }
-        
+
         const state = JSON.parse(savedData);
-        
+
         // Validate state structure
-        if (typeof state !== 'object' || state === null) {
+        if (typeof state !== "object" || state === null) {
           continue;
         }
-        
+
         // Check if reservation is completed - if so, skip it
         if (state.isCompleted === true) {
           continue;
         }
-        
+
         // Check if reservation is recent (within 7 days)
         // If no timestamp, assume it's old and skip it
-        if (!state.timestamp || typeof state.timestamp !== 'number') {
+        if (!state.timestamp || typeof state.timestamp !== "number") {
           continue;
         }
-        
-        const daysSinceSave = (Date.now() - state.timestamp) / (1000 * 60 * 60 * 24);
+
+        const daysSinceSave =
+          (Date.now() - state.timestamp) / (1000 * 60 * 60 * 24);
         if (daysSinceSave >= 7) {
           // Reservation is too old, skip it
           continue;
         }
-        
+
         // Check if this reservation was dismissed
-        const reservationId = key.replace('reservation-', '');
+        const reservationId = key.replace("reservation-", "");
         if (dismissed.has(reservationId)) {
           continue;
         }
-        
+
         // Check if there's meaningful reservation data (not just empty state)
-        const hasService = state.selectedService && Object.keys(state.selectedService).length > 0;
-        const hasVehicleType = state.selectedVehicleType && Object.keys(state.selectedVehicleType).length > 0;
-        const hasAdditionalServices = state.additionalServices && (
-          (state.additionalServices.babySeats > 0) || 
-          (state.additionalServices.boosters > 0) || 
-          (state.additionalServices.meetAndGreet === true)
-        );
-        const hasFormData = state.formData && Object.keys(state.formData).length > 0;
-        
+        const hasService =
+          state.selectedService &&
+          Object.keys(state.selectedService).length > 0;
+        const hasVehicleType =
+          state.selectedVehicleType &&
+          Object.keys(state.selectedVehicleType).length > 0;
+        const hasAdditionalServices =
+          state.additionalServices &&
+          (state.additionalServices.babySeats > 0 ||
+            state.additionalServices.boosters > 0 ||
+            state.additionalServices.meetAndGreet === true);
+        const hasFormData =
+          state.formData && Object.keys(state.formData).length > 0;
+
         // Only show if there's actual meaningful data (at least one of these)
-        if (hasService || hasVehicleType || hasAdditionalServices || hasFormData) {
+        if (
+          hasService ||
+          hasVehicleType ||
+          hasAdditionalServices ||
+          hasFormData
+        ) {
           // Found a valid pending reservation that hasn't been dismissed
           validPendingId = reservationId;
           foundPending = true;
           break;
         }
-      } catch (error) {
-        // Skip invalid entries - they might be corrupted
-        continue;
-      }
+      } catch (error) {}
     }
-    
+
     // Also check the Zustand persisted store (only if no specific reservation found)
     if (!foundPending) {
       try {
-        const persistedStore = localStorage.getItem('reservation-store');
+        const persistedStore = localStorage.getItem("reservation-store");
         if (persistedStore) {
           const storeData = JSON.parse(persistedStore);
           if (storeData?.state) {
             const state = storeData.state;
-            
+
             // Skip if this reservation ID was dismissed
             if (state.reservationId && dismissed.has(state.reservationId)) {
               foundPending = false;
             } else if (!state.isCompleted) {
               // Check if there's meaningful pending reservation data in the store
               // Must have at least a service OR vehicle type OR additional services
-              const hasService = state.selectedService && Object.keys(state.selectedService).length > 0;
-              const hasVehicleType = state.selectedVehicleType && Object.keys(state.selectedVehicleType).length > 0;
-              const hasAdditionalServices = state.additionalServices && (
-                (state.additionalServices.babySeats > 0) || 
-                (state.additionalServices.boosters > 0) || 
-                (state.additionalServices.meetAndGreet === true)
-              );
-              
+              const hasService =
+                state.selectedService &&
+                Object.keys(state.selectedService).length > 0;
+              const hasVehicleType =
+                state.selectedVehicleType &&
+                Object.keys(state.selectedVehicleType).length > 0;
+              const hasAdditionalServices =
+                state.additionalServices &&
+                (state.additionalServices.babySeats > 0 ||
+                  state.additionalServices.boosters > 0 ||
+                  state.additionalServices.meetAndGreet === true);
+
               // Only show if there's actual meaningful data
               if (hasService || hasVehicleType || hasAdditionalServices) {
                 foundPending = true;
@@ -193,7 +224,7 @@ export function Hero() {
         // Ignore errors in persisted store check
       }
     }
-    
+
     // Update state - only show if we found a valid pending reservation that hasn't been dismissed
     if (foundPending && validPendingId) {
       setPendingReservationId(validPendingId);
@@ -210,10 +241,10 @@ export function Hero() {
   useEffect(() => {
     // Initial check - start with false to ensure clean state
     setShowPendingNotification(false);
-    
+
     // Clean up old dismissed reservations (older than 7 days) to prevent list from growing
     try {
-      const dismissedData = localStorage.getItem('dismissed-reservations');
+      const dismissedData = localStorage.getItem("dismissed-reservations");
       if (dismissedData) {
         const dismissed = JSON.parse(dismissedData);
         // For now, just keep the list - we'll clean it when checking reservations
@@ -222,68 +253,83 @@ export function Hero() {
     } catch (error) {
       // Ignore
     }
-    
+
     checkPendingReservations();
-    
+
     // Listen for storage changes (when reservation is deleted/completed in other tabs)
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key?.startsWith('reservation-') || e.key === 'reservation-store' || e.key === 'dismissed-reservations') {
+      if (
+        e.key?.startsWith("reservation-") ||
+        e.key === "reservation-store" ||
+        e.key === "dismissed-reservations"
+      ) {
         checkPendingReservations();
       }
     };
-    
+
     // Listen for custom storage events (for same-tab changes)
     const handleCustomStorageChange = () => {
       checkPendingReservations();
     };
-    
-    window.addEventListener('storage', handleStorageChange);
-    window.addEventListener('reservation-storage-change', handleCustomStorageChange);
-    
+
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener(
+      "reservation-storage-change",
+      handleCustomStorageChange,
+    );
+
     // Check periodically but less frequently (every 5 seconds instead of 2)
     const interval = setInterval(() => {
       checkPendingReservations();
     }, 5000);
-    
+
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('reservation-storage-change', handleCustomStorageChange);
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener(
+        "reservation-storage-change",
+        handleCustomStorageChange,
+      );
       clearInterval(interval);
     };
   }, []);
-  
+
   // Use TanStack Query hooks for data fetching with automatic caching
   const { data: services = [] } = useServices();
   const { data: vehicleTypes = [] } = useVehicleTypes();
-  const { data: airportLocationsData = [] } = useLocationsByService('airport-transfers');
-  
+  const { data: airportLocationsData = [] } =
+    useLocationsByService("airport-transfers");
+
   // Find airport transfers service and car vehicle type
   useEffect(() => {
     // Only initialize once or when data actually changes
     if (services.length === 0 || vehicleTypes.length === 0) return;
-    
-    const airportServiceData = services.find(s => s.id === 'airport-transfers');
+
+    const airportServiceData = services.find(
+      (s) => s.id === "airport-transfers",
+    );
     if (airportServiceData) {
-      setAirportService(prev => {
+      setAirportService((prev) => {
         if (!prev || prev.id !== airportServiceData.id) {
           return airportServiceData;
         }
         return prev;
       });
     }
-    
+
     if (airportLocationsData.length > 0) {
       // Compare by serializing IDs to avoid reference equality issues
-      const newIds = JSON.stringify(airportLocationsData.map(l => l.id).sort());
+      const newIds = JSON.stringify(
+        airportLocationsData.map((l) => l.id).sort(),
+      );
       if (prevLocationsRef.current !== newIds) {
         prevLocationsRef.current = newIds;
         setAirportLocations(airportLocationsData);
       }
     }
-    
-    const carType = vehicleTypes.find(vt => vt.id === 'car');
+
+    const carType = vehicleTypes.find((vt) => vt.id === "car");
     if (carType) {
-      setCarVehicleType(prev => {
+      setCarVehicleType((prev) => {
         if (!prev || prev.id !== carType.id) {
           return carType;
         }
@@ -298,17 +344,19 @@ export function Hero() {
 
   const handleDismissNotification = () => {
     // Load current dismissed list
-    const dismissedData = localStorage.getItem('dismissed-reservations');
-    const dismissed = dismissedData ? new Set<string>(JSON.parse(dismissedData)) : new Set<string>();
-    
+    const dismissedData = localStorage.getItem("dismissed-reservations");
+    const dismissed = dismissedData
+      ? new Set<string>(JSON.parse(dismissedData))
+      : new Set<string>();
+
     // Mark this reservation as dismissed
     if (pendingReservationId) {
       dismissed.add(pendingReservationId);
     }
-    
+
     // Also mark the Zustand persisted store reservation as dismissed if it exists
     try {
-      const persistedStore = localStorage.getItem('reservation-store');
+      const persistedStore = localStorage.getItem("reservation-store");
       if (persistedStore) {
         const storeData = JSON.parse(persistedStore);
         if (storeData?.state?.reservationId) {
@@ -318,25 +366,30 @@ export function Hero() {
     } catch (error) {
       // Ignore errors
     }
-    
+
     // Save dismissed list
-    localStorage.setItem('dismissed-reservations', JSON.stringify(Array.from(dismissed)));
+    localStorage.setItem(
+      "dismissed-reservations",
+      JSON.stringify(Array.from(dismissed)),
+    );
     setDismissedReservations(dismissed);
-    
+
     // Clear all pending reservations from localStorage
     const keys = Object.keys(localStorage);
-    const reservationKeys = keys.filter(key => key.startsWith('reservation-'));
-    reservationKeys.forEach(key => {
+    const reservationKeys = keys.filter((key) =>
+      key.startsWith("reservation-"),
+    );
+    reservationKeys.forEach((key) => {
       localStorage.removeItem(key);
     });
-    
+
     // Clear the persisted store
-    localStorage.removeItem('reservation-store');
-    
+    localStorage.removeItem("reservation-store");
+
     // Hide the notification immediately
     setShowPendingNotification(false);
     setPendingReservationId(null);
-    
+
     // Trigger a re-check to ensure state is updated
     setTimeout(() => {
       checkPendingReservations();
@@ -392,7 +445,7 @@ export function Hero() {
             delay: 2,
           }}
         />
-        
+
         {/* Animated Car 1 - Moving left to right (Top) */}
         <motion.div
           className="absolute top-[12%] z-0"
@@ -454,10 +507,38 @@ export function Hero() {
                     ease: "linear",
                   }}
                 >
-                  <line x1="0" y1="0" x2="0" y2="-2" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
-                  <line x1="0" y1="0" x2="0" y2="2" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
-                  <line x1="0" y1="0" x2="-2" y2="0" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
-                  <line x1="0" y1="0" x2="2" y2="0" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="-2"
+                    stroke="rgba(255,255,255,0.4)"
+                    strokeWidth="1"
+                  />
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="2"
+                    stroke="rgba(255,255,255,0.4)"
+                    strokeWidth="1"
+                  />
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="-2"
+                    y2="0"
+                    stroke="rgba(255,255,255,0.4)"
+                    strokeWidth="1"
+                  />
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="2"
+                    y2="0"
+                    stroke="rgba(255,255,255,0.4)"
+                    strokeWidth="1"
+                  />
                 </motion.g>
               </g>
               {/* Wheel 2 */}
@@ -471,10 +552,38 @@ export function Hero() {
                     ease: "linear",
                   }}
                 >
-                  <line x1="0" y1="0" x2="0" y2="-2" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
-                  <line x1="0" y1="0" x2="0" y2="2" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
-                  <line x1="0" y1="0" x2="-2" y2="0" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
-                  <line x1="0" y1="0" x2="2" y2="0" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="-2"
+                    stroke="rgba(255,255,255,0.4)"
+                    strokeWidth="1"
+                  />
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="2"
+                    stroke="rgba(255,255,255,0.4)"
+                    strokeWidth="1"
+                  />
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="-2"
+                    y2="0"
+                    stroke="rgba(255,255,255,0.4)"
+                    strokeWidth="1"
+                  />
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="2"
+                    y2="0"
+                    stroke="rgba(255,255,255,0.4)"
+                    strokeWidth="1"
+                  />
                 </motion.g>
               </g>
             </svg>
@@ -575,10 +684,38 @@ export function Hero() {
                     ease: "linear",
                   }}
                 >
-                  <line x1="0" y1="0" x2="0" y2="-2" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-                  <line x1="0" y1="0" x2="0" y2="2" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-                  <line x1="0" y1="0" x2="-2" y2="0" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-                  <line x1="0" y1="0" x2="2" y2="0" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="-2"
+                    stroke="rgba(255,255,255,0.3)"
+                    strokeWidth="1"
+                  />
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="2"
+                    stroke="rgba(255,255,255,0.3)"
+                    strokeWidth="1"
+                  />
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="-2"
+                    y2="0"
+                    stroke="rgba(255,255,255,0.3)"
+                    strokeWidth="1"
+                  />
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="2"
+                    y2="0"
+                    stroke="rgba(255,255,255,0.3)"
+                    strokeWidth="1"
+                  />
                 </motion.g>
               </g>
               {/* Wheel 2 */}
@@ -592,10 +729,38 @@ export function Hero() {
                     ease: "linear",
                   }}
                 >
-                  <line x1="0" y1="0" x2="0" y2="-2" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-                  <line x1="0" y1="0" x2="0" y2="2" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-                  <line x1="0" y1="0" x2="-2" y2="0" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
-                  <line x1="0" y1="0" x2="2" y2="0" stroke="rgba(255,255,255,0.3)" strokeWidth="1" />
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="-2"
+                    stroke="rgba(255,255,255,0.3)"
+                    strokeWidth="1"
+                  />
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="2"
+                    stroke="rgba(255,255,255,0.3)"
+                    strokeWidth="1"
+                  />
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="-2"
+                    y2="0"
+                    stroke="rgba(255,255,255,0.3)"
+                    strokeWidth="1"
+                  />
+                  <line
+                    x1="0"
+                    y1="0"
+                    x2="2"
+                    y2="0"
+                    stroke="rgba(255,255,255,0.3)"
+                    strokeWidth="1"
+                  />
                 </motion.g>
               </g>
             </svg>
@@ -712,7 +877,7 @@ export function Hero() {
             }}
           />
         ))}
-        
+
         {/* Floating particles */}
         {[...Array(6)].map((_, i) => (
           <motion.div
@@ -751,11 +916,12 @@ export function Hero() {
                 ease: "linear",
               }}
               style={{
-                backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)",
+                backgroundImage:
+                  "radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)",
                 backgroundSize: "20px 20px",
               }}
             />
-            
+
             <div className="relative flex items-center gap-1.5 sm:gap-2 min-w-0">
               <div className="flex-shrink-0">
                 <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
@@ -793,7 +959,10 @@ export function Hero() {
           {/* Left Content */}
           <div className="text-white">
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold font-display mb-6 leading-tight">
-              Premium <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">Paris</span>
+              Premium{" "}
+              <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
+                Paris
+              </span>
               <br />
               Transfers
             </h1>
@@ -867,7 +1036,12 @@ export function Hero() {
                       </label>
                       <Select
                         value={quickBookingData.pickup}
-                        onChange={(e) => setQuickBookingData({ ...quickBookingData, pickup: e.target.value })}
+                        onChange={(e) =>
+                          setQuickBookingData({
+                            ...quickBookingData,
+                            pickup: e.target.value,
+                          })
+                        }
                         placeholder={t("selectPickupLocation")}
                         options={airportLocations.map((location) => ({
                           value: location.id,
@@ -881,10 +1055,15 @@ export function Hero() {
                       </label>
                       <Select
                         value={quickBookingData.destination}
-                        onChange={(e) => setQuickBookingData({ ...quickBookingData, destination: e.target.value })}
+                        onChange={(e) =>
+                          setQuickBookingData({
+                            ...quickBookingData,
+                            destination: e.target.value,
+                          })
+                        }
                         placeholder={t("selectDestination")}
                         options={airportLocations
-                          .filter(loc => loc.id !== quickBookingData.pickup)
+                          .filter((loc) => loc.id !== quickBookingData.pickup)
                           .map((location) => ({
                             value: location.id,
                             label: location.name,
@@ -900,7 +1079,12 @@ export function Hero() {
                       <Input
                         type="date"
                         value={quickBookingData.date}
-                        onChange={(e) => setQuickBookingData({ ...quickBookingData, date: e.target.value })}
+                        onChange={(e) =>
+                          setQuickBookingData({
+                            ...quickBookingData,
+                            date: e.target.value,
+                          })
+                        }
                         className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800"
                       />
                     </div>
@@ -911,7 +1095,12 @@ export function Hero() {
                       <Input
                         type="time"
                         value={quickBookingData.time}
-                        onChange={(e) => setQuickBookingData({ ...quickBookingData, time: e.target.value })}
+                        onChange={(e) =>
+                          setQuickBookingData({
+                            ...quickBookingData,
+                            time: e.target.value,
+                          })
+                        }
                         className="w-full p-3 rounded-lg bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800"
                       />
                     </div>
@@ -938,7 +1127,9 @@ export function Hero() {
                   <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                     500+
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">{t("happyClients")}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    {t("happyClients")}
+                  </div>
                 </div>
               </motion.div>
 
@@ -951,7 +1142,9 @@ export function Hero() {
                   <div className="text-2xl font-bold text-success-600 dark:text-success-400">
                     24/7
                   </div>
-                  <div className="text-sm text-gray-600 dark:text-gray-400">{t("service24")}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    {t("service24")}
+                  </div>
                 </div>
               </motion.div>
             </div>

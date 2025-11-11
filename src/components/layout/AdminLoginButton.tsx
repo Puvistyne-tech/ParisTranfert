@@ -1,8 +1,8 @@
 "use client";
 
-import { useRouter, usePathname } from "next/navigation";
-import { useLocale } from "next-intl";
 import { Lock } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 
 export function AdminLoginButton() {
   const router = useRouter();
@@ -10,8 +10,8 @@ export function AdminLoginButton() {
   const pathname = usePathname();
 
   // Hide on admin pages and login page
-  const isAdminPage = pathname?.includes('/admin');
-  
+  const isAdminPage = pathname?.includes("/admin");
+
   if (isAdminPage) {
     return null;
   }
@@ -28,4 +28,3 @@ export function AdminLoginButton() {
     </button>
   );
 }
-

@@ -1,33 +1,33 @@
 "use client";
 
 import { motion } from "framer-motion";
+import {
+  ArrowLeft,
+  ArrowRight,
+  BookOpen,
+  Calendar,
+  Crown,
+  Globe,
+  Heart,
+  Loader2,
+  MapPin,
+  Plane,
+  Save,
+  Shield,
+  Star,
+  Trash2,
+  UserCheck,
+} from "lucide-react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
+import { useEffect, useMemo, useState } from "react";
+import { ServiceIcon } from "@/components/models/services";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { useCategories } from "@/hooks/useCategories";
 import { useServices } from "@/hooks/useServices";
-import { ServiceIcon } from "@/components/models/services";
 import { useReservationStore } from "@/store/reservationStore";
-import {
-  Plane,
-  Crown,
-  Star,
-  Globe,
-  Shield,
-  MapPin,
-  UserCheck,
-  Heart,
-  Calendar,
-  BookOpen,
-  ArrowRight,
-  Loader2,
-  ArrowLeft,
-  Save,
-  Trash2,
-} from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useState, useEffect, useMemo } from "react";
 
 export default function ServicesPage() {
   const t = useTranslations("servicesPage");
@@ -36,33 +36,41 @@ export default function ServicesPage() {
   const router = useRouter();
   const { setSelectedService } = useReservationStore();
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
-  
+
   // Use TanStack Query hooks for data fetching with automatic caching
-  const { data: categories = [], isLoading: categoriesLoading } = useCategories();
+  const { data: categories = [], isLoading: categoriesLoading } =
+    useCategories();
   const { data: services = [], isLoading: servicesLoading } = useServices();
-  
+
   const isLoading = categoriesLoading || servicesLoading;
 
   // Memoize the icon map to prevent recreation on every render
-  const iconMap = useMemo(() => ({
-    [ServiceIcon.PLANE]: Plane,
-    [ServiceIcon.CROWN]: Crown,
-    [ServiceIcon.STAR]: Star,
-    [ServiceIcon.GLOBE]: Globe,
-    [ServiceIcon.SHIELD]: Shield,
-    [ServiceIcon.MAPPIN]: MapPin,
-    [ServiceIcon.USERCHECK]: UserCheck,
-    [ServiceIcon.HEART]: Heart,
-    [ServiceIcon.CALENDAR]: Calendar,
-    [ServiceIcon.BOOKOPEN]: BookOpen,
-  }), []);
+  const iconMap = useMemo(
+    () => ({
+      [ServiceIcon.PLANE]: Plane,
+      [ServiceIcon.CROWN]: Crown,
+      [ServiceIcon.STAR]: Star,
+      [ServiceIcon.GLOBE]: Globe,
+      [ServiceIcon.SHIELD]: Shield,
+      [ServiceIcon.MAPPIN]: MapPin,
+      [ServiceIcon.USERCHECK]: UserCheck,
+      [ServiceIcon.HEART]: Heart,
+      [ServiceIcon.CALENDAR]: Calendar,
+      [ServiceIcon.BOOKOPEN]: BookOpen,
+    }),
+    [],
+  );
 
   // Memoize filtered services by category to prevent recalculation
   const servicesByCategory = useMemo(() => {
-    return categories.map(category => ({
-      ...category,
-      services: services.filter(service => service.categoryId === category.id)
-    })).filter(category => category.services.length > 0);
+    return categories
+      .map((category) => ({
+        ...category,
+        services: services.filter(
+          (service) => service.categoryId === category.id,
+        ),
+      }))
+      .filter((category) => category.services.length > 0);
   }, [categories, services]);
 
   const handleBookService = (service: any) => {
@@ -74,7 +82,7 @@ export default function ServicesPage() {
   const handleBackToHome = () => {
     // Check if there's a service in the store
     const { selectedService: storeService } = useReservationStore.getState();
-    
+
     if (storeService) {
       // Show confirmation dialog
       setShowExitConfirmation(true);
@@ -108,8 +116,12 @@ export default function ServicesPage() {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin text-blue-600 dark:text-blue-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">{t("loadingServices")}</h2>
-          <p className="text-gray-600 dark:text-gray-400">{t("preparingServices")}</p>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+            {t("loadingServices")}
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            {t("preparingServices")}
+          </p>
         </div>
       </div>
     );
@@ -165,8 +177,12 @@ export default function ServicesPage() {
 
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {category.services.map((service, serviceIndex) => {
-                  const iconName = typeof service.icon === 'string' ? service.icon : service.icon;
-                  const Icon = (iconMap as Record<string, any>)[iconName] || Star;
+                  const iconName =
+                    typeof service.icon === "string"
+                      ? service.icon
+                      : service.icon;
+                  const Icon =
+                    (iconMap as Record<string, any>)[iconName] || Star;
 
                   return (
                     <motion.div
@@ -176,7 +192,7 @@ export default function ServicesPage() {
                       transition={{ duration: 0.3 }}
                       viewport={{ once: true, margin: "-100px" }}
                     >
-                      <Card 
+                      <Card
                         className="p-0 shadow-lg card-hover h-full flex flex-col group cursor-pointer hover:shadow-xl transition-all duration-300 relative overflow-hidden"
                         onClick={() => handleBookService(service)}
                       >
@@ -202,7 +218,7 @@ export default function ServicesPage() {
                                   <div className="absolute bottom-8 left-8 w-4 h-4 bg-white/25 rounded-full"></div>
                                   <div className="absolute bottom-4 right-4 w-10 h-10 bg-white/15 rounded-full"></div>
                                 </div>
-                                
+
                                 {/* Large beautiful icon */}
                                 <div className="relative z-10">
                                   <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4 shadow-2xl">
@@ -212,13 +228,13 @@ export default function ServicesPage() {
                                     {service.name}
                                   </div>
                                 </div>
-                                
+
                                 {/* Gradient overlay */}
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                               </div>
                             )}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                            
+
                             {/* Popular Badge */}
                             {service.isPopular && (
                               <div className="absolute top-2 right-2 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium shadow-lg">
@@ -249,7 +265,7 @@ export default function ServicesPage() {
                               {t("bookNow")}
                             </Button>
                           </div>
-                          
+
                           {/* Mobile Book Button - Always visible on mobile */}
                           <div className="md:hidden absolute bottom-4 left-4 right-4 z-20">
                             <Button
@@ -271,23 +287,31 @@ export default function ServicesPage() {
                             <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">
                               {service.name}
                             </h3>
-                            
+
                             <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 flex-1">
                               {service.shortDescription}
                             </p>
 
                             {/* Features */}
                             <div className="space-y-1 text-left mb-3">
-                              {Array.isArray(service.features) 
-                                ? service.features.slice(0, 3).map((feature: any, featureIndex: number) => (
-                                <div
-                                  key={featureIndex}
-                                  className="flex items-center text-xs text-gray-500 dark:text-gray-400"
-                                >
-                                  <span className="w-1.5 h-1.5 bg-green-500 dark:bg-green-400 rounded-full mr-2"></span>
-                                      <span>{typeof feature === 'string' ? feature : JSON.stringify(feature)}</span>
-                                </div>
-                                  ))
+                              {Array.isArray(service.features)
+                                ? service.features
+                                    .slice(0, 3)
+                                    .map(
+                                      (feature: any, featureIndex: number) => (
+                                        <div
+                                          key={featureIndex}
+                                          className="flex items-center text-xs text-gray-500 dark:text-gray-400"
+                                        >
+                                          <span className="w-1.5 h-1.5 bg-green-500 dark:bg-green-400 rounded-full mr-2"></span>
+                                          <span>
+                                            {typeof feature === "string"
+                                              ? feature
+                                              : JSON.stringify(feature)}
+                                          </span>
+                                        </div>
+                                      ),
+                                    )
                                 : null}
                             </div>
 
@@ -335,10 +359,15 @@ export default function ServicesPage() {
 
             {/* Current Selection Summary */}
             <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
-              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">{t("currentSelection")}</h4>
+              <h4 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                {t("currentSelection")}
+              </h4>
               <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                 <Calendar className="w-4 h-4 mr-2 text-green-600 dark:text-green-400" />
-                <span>{t("service")}: {useReservationStore.getState().selectedService?.name}</span>
+                <span>
+                  {t("service")}:{" "}
+                  {useReservationStore.getState().selectedService?.name}
+                </span>
               </div>
             </div>
 

@@ -1,12 +1,12 @@
 export enum ReservationStatus {
-  PENDING = 'pending', // Also used for quote_requested
-  QUOTE_SENT = 'quote_sent',
-  QUOTE_ACCEPTED = 'quote_accepted',
-  CONFIRMED = 'confirmed',
-  COMPLETED = 'completed',
-  CANCELLED = 'cancelled'
+  QUOTE_REQUESTED = "quote_requested",
+  PENDING = "pending",
+  QUOTE_SENT = "quote_sent",
+  QUOTE_ACCEPTED = "quote_accepted",
+  CONFIRMED = "confirmed",
+  COMPLETED = "completed",
+  CANCELLED = "cancelled",
 }
-
 
 export interface Reservation {
   id: string;
