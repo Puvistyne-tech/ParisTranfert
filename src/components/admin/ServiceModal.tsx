@@ -287,22 +287,22 @@ export function ServiceModal({
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Icon
-            </label>
-            <Input
-              value={formData.icon}
-              onChange={(e) =>
-                setFormData({ ...formData, icon: e.target.value })
-              }
-              placeholder="Icon name or URL"
-              className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Icon
+              </label>
+              <Input
+                value={formData.icon}
+                onChange={(e) =>
+                  setFormData({ ...formData, icon: e.target.value })
+                }
+                placeholder="Icon name or URL"
+                className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Service Image
             </label>
             <div className="space-y-3">
@@ -349,7 +349,7 @@ export function ServiceModal({
                     onChange={handleFileSelect}
                     disabled={uploading || loading}
                   />
-                </label>
+              </label>
               </div>
 
               {/* Upload Error */}
@@ -379,7 +379,7 @@ export function ServiceModal({
                     setImagePreview(e.target.value);
                   } else {
                     setImagePreview(null);
-                  }
+                }
                 }}
                 placeholder="https://example.com/image.jpg"
                 className="dark:bg-gray-700 dark:text-white dark:border-gray-600"
@@ -463,10 +463,10 @@ export function ServiceModal({
               {uploading
                 ? "Uploading..."
                 : loading
-                  ? "Saving..."
-                  : service
-                    ? "Update Service"
-                    : "Create Service"}
+                ? "Saving..."
+                : service
+                  ? "Update Service"
+                  : "Create Service"}
             </Button>
           </div>
         </form>
