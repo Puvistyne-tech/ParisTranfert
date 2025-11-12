@@ -22,6 +22,7 @@ import {
   getClientById, 
   getServiceById,
   getVehicleTypeById,
+  getLocationById,
 } from "./supabaseService";
 import { generateReservationPDFBuffer, type ReservationPDFData } from "./pdfUtils";
 
@@ -64,6 +65,26 @@ async function generateReservationPDF(reservationId: string): Promise<Buffer> {
   const data = await getCompleteReservationData(reservationId);
   const { reservation, client, service, vehicleType } = data;
 
+  // Convert location IDs to full names if needed
+  let pickupLocationName = reservation.pickupLocation;
+  let destinationLocationName = reservation.destinationLocation || null;
+  
+  // Check if pickup location is an ID (short string like 'paris', 'cdg', 'orly')
+  if (pickupLocationName && pickupLocationName.length < 20 && /^[a-z0-9_-]+$/.test(pickupLocationName.toLowerCase())) {
+    const location = await getLocationById(pickupLocationName);
+    if (location) {
+      pickupLocationName = location.name;
+    }
+  }
+  
+  // Check if destination location is an ID
+  if (destinationLocationName && destinationLocationName.length < 20 && /^[a-z0-9_-]+$/.test(destinationLocationName.toLowerCase())) {
+    const location = await getLocationById(destinationLocationName);
+    if (location) {
+      destinationLocationName = location.name;
+    }
+  }
+
   // Prepare PDF data
   const pdfData: ReservationPDFData = {
     reservationId: reservation.id,
@@ -76,8 +97,8 @@ async function generateReservationPDF(reservationId: string): Promise<Buffer> {
     serviceDescription: service.description || "",
     pickupDate: reservation.date,
     pickupTime: reservation.time,
-    pickupLocation: reservation.pickupLocation,
-    destinationLocation: reservation.destinationLocation || null,
+    pickupLocation: pickupLocationName,
+    destinationLocation: destinationLocationName,
     passengers: reservation.passengers,
     babySeats: reservation.babySeats,
     boosterSeats: reservation.boosterSeats,
@@ -86,6 +107,7 @@ async function generateReservationPDF(reservationId: string): Promise<Buffer> {
     notes: reservation.notes,
     status: reservation.status,
     createdAt: reservation.createdAt || new Date().toISOString(),
+    serviceSubData: reservation.serviceSubData || undefined,
   };
 
   // Generate PDF buffer directly
@@ -117,6 +139,7 @@ export async function sendReservationStatusEmail(
     serviceName: service.name,
     vehicleTypeName: vehicleType.name,
     status: reservation.status,
+    serviceSubData: reservation.serviceSubData || undefined,
   };
 
   // Generate email template based on status
@@ -225,6 +248,7 @@ export async function sendAdminNotificationEmail(
     vehicleTypeName: vehicleType.name,
     status: reservation.status,
     notes: reservation.notes,
+    serviceSubData: reservation.serviceSubData || undefined,
   };
 
   const emailTemplate = generateAdminNotificationEmail(reservationData);
@@ -270,6 +294,7 @@ export async function sendQuoteEmail(
     serviceName: service.name,
     vehicleTypeName: vehicleType.name,
     status: reservation.status,
+    serviceSubData: reservation.serviceSubData || undefined,
   };
 
   const emailTemplate = generateQuoteSentEmail(reservationData, customerName, quotePrice, locale);
@@ -329,6 +354,7 @@ export async function sendAdminQuoteAcceptedNotification(
     vehicleTypeName: vehicleType.name,
     status: reservation.status,
     notes: reservation.notes,
+    serviceSubData: reservation.serviceSubData || undefined,
   };
 
   const emailTemplate = generateAdminQuoteAcceptedEmail(reservationData);
@@ -376,6 +402,7 @@ export async function sendAdminQuoteDeclinedNotification(
     vehicleTypeName: vehicleType.name,
     status: reservation.status,
     notes: reservation.notes,
+    serviceSubData: reservation.serviceSubData || undefined,
   };
 
   const emailTemplate = generateAdminQuoteDeclinedEmail(reservationData);

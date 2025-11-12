@@ -11,6 +11,7 @@ import type { Reservation } from "@/components/models/reservations";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { MobileActionButtons } from "@/components/admin/MobileActionButtons";
 import { getClientReservations, getClients } from "@/lib/supabaseService";
 
 export default function AdminUsersPage() {
@@ -62,11 +63,8 @@ export default function AdminUsersPage() {
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Users & Clients
-        </h1>
         <p className="text-gray-600 dark:text-gray-400 mt-2">
           Manage all registered clients
         </p>
@@ -74,7 +72,7 @@ export default function AdminUsersPage() {
 
       {/* Search */}
       <Card className="dark:bg-gray-800 dark:border-gray-700">
-        <CardContent className="p-4">
+        <CardContent className="p-3">
           <div className="flex items-center space-x-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
@@ -107,37 +105,36 @@ export default function AdminUsersPage() {
                 key={client.id}
                 className="dark:bg-gray-800 dark:border-gray-700"
               >
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-4">
-                        <div className="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
-                          <User className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start space-x-3 sm:space-x-4">
+                        <div className="p-2 sm:p-3 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex-shrink-0">
+                          <User className="w-5 h-5 sm:w-6 sm:h-6 text-primary-600 dark:text-primary-400" />
                         </div>
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                             {client.firstName} {client.lastName}
                           </h3>
-                          <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 gap-2 sm:gap-0 mt-2 text-sm text-gray-600 dark:text-gray-400">
                             <div className="flex items-center space-x-1">
-                              <Mail className="w-4 h-4" />
-                              <span>{client.email}</span>
+                              <Mail className="w-4 h-4 flex-shrink-0" />
+                              <span className="truncate">{client.email}</span>
                             </div>
                             <div className="flex items-center space-x-1">
-                              <Phone className="w-4 h-4" />
+                              <Phone className="w-4 h-4 flex-shrink-0" />
                               <span>{client.phone}</span>
                             </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <Button
-                      variant="outline"
-                      onClick={() => handleViewClient(client)}
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      View Details
-                    </Button>
+                    <div className="flex items-center justify-end sm:justify-start">
+                      <MobileActionButtons
+                        onView={() => handleViewClient(client)}
+                        viewLabel="View Details"
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -146,16 +143,17 @@ export default function AdminUsersPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left">
                 Showing {(page - 1) * pageSize + 1} to{" "}
                 {Math.min(page * pageSize, total)} of {total} clients
               </p>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
+                  size="sm"
                 >
                   Previous
                 </Button>
@@ -163,6 +161,7 @@ export default function AdminUsersPage() {
                   variant="outline"
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
+                  size="sm"
                 >
                   Next
                 </Button>

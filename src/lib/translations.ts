@@ -69,3 +69,45 @@ export function getTranslatedVehicleDescription(
     return description;
   }
 }
+
+/**
+ * Map common service field labels to translation keys
+ */
+const fieldLabelToTranslationKey: Record<string, string> = {
+  "Lieu de prise en charge": "pickupAddress",
+  "Nom de l'hôtel (si applicable)": "hotelName",
+  "Heure de retour": "returnTime",
+  "Date de retour": "returnDate",
+  "Destination": "destination",
+  "Pickup Location (hidden)": "pickupLocationHidden",
+  "Destination (hidden)": "destinationHidden",
+};
+
+/**
+ * Get translated service field label
+ * Falls back to original label if translation not found
+ * Note: The `t` function should be scoped to the "reservation.step2" namespace
+ */
+export function getTranslatedFieldLabel(
+  label: string,
+  t: (key: string) => string | undefined,
+): string {
+  if (!label) return label;
+
+  const translationKey = fieldLabelToTranslationKey[label];
+  if (!translationKey) {
+    // If no mapping found, return original label
+    return label;
+  }
+
+  try {
+    const translated = t(`serviceFields.${translationKey}`);
+    // If translation returns undefined or the key itself, it means translation doesn't exist
+    if (!translated || translated === `serviceFields.${translationKey}`) {
+      return label;
+    }
+    return translated;
+  } catch {
+    return label;
+  }
+}

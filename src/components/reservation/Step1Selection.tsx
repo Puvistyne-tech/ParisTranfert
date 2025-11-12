@@ -1,12 +1,30 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { AlertCircle, Baby, Car, UserCheck, Users } from "lucide-react";
+import {
+  AlertCircle,
+  Baby,
+  Car,
+  UserCheck,
+  Users,
+  Plane,
+  Heart,
+  Crown,
+  Globe,
+  Shield,
+  MapPin,
+  Calendar,
+  BookOpen,
+  Star,
+  Image as ImageIcon,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Service } from "@/components/models";
 import type { Category } from "@/components/models/categories";
 import type { VehicleType } from "@/components/models/vehicleTypes";
+import { ServiceIcon } from "@/components/models/services";
+import { CategoryId } from "@/components/models/categories";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import type { AdditionalServices } from "@/store/reservationStore";
@@ -47,6 +65,61 @@ export function Step1Selection({
   const [vehicleImageErrors, setVehicleImageErrors] = useState<
     Record<string, boolean>
   >({});
+  const [serviceImageErrors, setServiceImageErrors] = useState<
+    Record<string, boolean>
+  >({});
+
+  // Map category IDs to icons
+  const categoryIconMap = useMemo(
+    () => ({
+      [CategoryId.TRANSPORT_AIRPORT]: Plane,
+      [CategoryId.TRANSPORT_INTERNATIONAL]: Plane,
+      [CategoryId.SPECIAL_DISNEYLAND]: Heart,
+      [CategoryId.LUXURY_VIP]: Crown,
+      [CategoryId.TOUR_PARIS]: Globe,
+      [CategoryId.TOUR_GUIDE]: MapPin,
+      [CategoryId.SECURITY_PERSONAL]: Shield,
+      [CategoryId.SPECIAL_GREETER]: UserCheck,
+      [CategoryId.SPECIAL_EVENT]: Calendar,
+    }),
+    [],
+  );
+
+  // Map service icons to components
+  const serviceIconMap = useMemo(
+    () => ({
+      [ServiceIcon.PLANE]: Plane,
+      [ServiceIcon.CROWN]: Crown,
+      [ServiceIcon.STAR]: Star,
+      [ServiceIcon.GLOBE]: Globe,
+      [ServiceIcon.SHIELD]: Shield,
+      [ServiceIcon.MAPPIN]: MapPin,
+      [ServiceIcon.USERCHECK]: UserCheck,
+      [ServiceIcon.HEART]: Heart,
+      [ServiceIcon.CALENDAR]: Calendar,
+      [ServiceIcon.BOOKOPEN]: BookOpen,
+    }),
+    [],
+  );
+
+  // Get category icon for a service
+  const getCategoryIcon = (service: Service) => {
+    const category = categories.find((c) => c.id === service.categoryId);
+    if (category) {
+      const IconComponent = categoryIconMap[category.id as CategoryId];
+      if (IconComponent) return IconComponent;
+    }
+    // Fallback to service icon if category icon not found
+    const ServiceIconComponent =
+      serviceIconMap[service.icon as ServiceIcon] || Globe;
+    return ServiceIconComponent;
+  };
+
+  // Filter available services
+  const availableServices = useMemo(
+    () => services.filter((s) => s.isAvailable),
+    [services],
+  );
 
   // Reset image error when vehicle type changes
   useEffect(() => {
@@ -279,46 +352,64 @@ export function Step1Selection({
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4 space-y-8">
-                {categories.map((category) => {
-                  const categoryServices = services.filter(
-                    (s) => s.categoryId === category.id && s.isAvailable,
-                  );
-                  if (categoryServices.length === 0) return null;
-
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                {availableServices.map((service) => {
+                  const CategoryIcon = getCategoryIcon(service);
+                  const hasImageError = serviceImageErrors[service.id];
                   return (
-                    <div key={category.id} className="space-y-4">
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                        {category.name}
-                      </h3>
-                      {/* Services in uniform width grid for this category */}
-                      <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4">
-                        {categoryServices.map((service) => (
-                          <button
-                            key={service.id}
-                            onClick={() => onServiceSelect(service)}
-                            className="p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all text-left relative h-full flex flex-col"
-                          >
-                            {service.isPopular && (
-                              <span className="absolute top-2 right-2 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 px-1.5 py-0.5 rounded text-xs font-medium">
-                                {t("popular")}
-                              </span>
-                            )}
-                            <h4 className="font-semibold text-gray-900 dark:text-gray-100 text-base mb-2 pr-8">
-                              {service.name}
-                            </h4>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2 flex-grow">
-                              {service.shortDescription}
-                            </p>
-                            {service.priceRange && (
-                              <div className="text-sm text-blue-600 dark:text-blue-400 font-medium">
-                                {service.priceRange}
-                              </div>
-                            )}
-                          </button>
-                        ))}
+                    <button
+                      key={service.id}
+                      onClick={() => onServiceSelect(service)}
+                      className="group relative p-0 border-2 border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-lg transition-all duration-300 text-left bg-white dark:bg-gray-800 flex flex-col h-full"
+                    >
+                      {/* Service Image */}
+                      <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600">
+                        {!hasImageError && service.image ? (
+                          <img
+                            src={service.image}
+                            alt={service.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            onError={() =>
+                              setServiceImageErrors((prev) => ({
+                                ...prev,
+                                [service.id]: true,
+                              }))
+                            }
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <ImageIcon className="w-16 h-16 text-white/50" />
+                          </div>
+                        )}
+                        {/* Category Icon Badge */}
+                        <div className="absolute top-3 left-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg p-2 shadow-md">
+                          <CategoryIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        {/* Popular Badge */}
+                        {service.isPopular && (
+                          <span className="absolute top-3 right-3 bg-yellow-400 dark:bg-yellow-500 text-yellow-900 dark:text-yellow-950 px-2 py-1 rounded-md text-xs font-semibold shadow-md">
+                            {t("popular")}
+                          </span>
+                        )}
                       </div>
-                    </div>
+
+                      {/* Service Content */}
+                      <div className="p-4 flex flex-col flex-grow">
+                        <h4 className="font-semibold text-gray-900 dark:text-gray-100 text-lg mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                          {service.name}
+                        </h4>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 line-clamp-2 flex-grow">
+                          {service.shortDescription}
+                        </p>
+                        {service.priceRange && (
+                          <div className="mt-auto pt-3 border-t border-gray-200 dark:border-gray-700">
+                            <div className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                              {service.priceRange}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </button>
                   );
                 })}
               </div>

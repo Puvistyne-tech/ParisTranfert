@@ -1,8 +1,9 @@
 "use client";
 
-import { Edit, MessageSquare, Plus, Star, Trash2 } from "lucide-react";
+import { MessageSquare, Plus, Star } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
+import { MobileActionButtons } from "@/components/admin/MobileActionButtons";
 import { TestimonialModal } from "@/components/admin/TestimonialModal";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
@@ -88,19 +89,17 @@ export default function AdminTestimonialsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Testimonials Management
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
             Manage customer testimonials
           </p>
         </div>
-        <Button variant="primary" onClick={handleCreate}>
+        <Button variant="admin" size="sm" onClick={handleCreate} className="w-full sm:w-auto">
           <Plus className="w-4 h-4 mr-2" />
-          Add Testimonial
+          <span className="hidden sm:inline">Add Testimonial</span>
+          <span className="sm:hidden">Add</span>
         </Button>
       </div>
 
@@ -112,21 +111,21 @@ export default function AdminTestimonialsPage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-3">
           {testimonials.map((testimonial) => (
             <Card
               key={testimonial.id}
               className="dark:bg-gray-800 dark:border-gray-700"
             >
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4 flex-1">
-                    <div className="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
-                      <MessageSquare className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
+                    <div className="p-1.5 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex-shrink-0">
+                      <MessageSquare className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-2">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                           {testimonial.name}
                         </h3>
                         <div className="flex items-center">
@@ -138,34 +137,21 @@ export default function AdminTestimonialsPage() {
                           ))}
                         </div>
                       </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-3">
                         {testimonial.comment}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(testimonial)}
-                    >
-                      <Edit className="w-4 h-4 mr-1" />
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
-                      onClick={() =>
+                  <div className="flex items-center justify-end sm:justify-start">
+                    <MobileActionButtons
+                      onEdit={() => handleEdit(testimonial)}
+                      onDelete={() =>
                         setDeleteConfirm({
                           isOpen: true,
                           testimonialId: testimonial.id,
                         })
                       }
-                    >
-                      <Trash2 className="w-4 h-4 mr-1" />
-                      Delete
-                    </Button>
+                    />
                   </div>
                 </div>
               </CardContent>

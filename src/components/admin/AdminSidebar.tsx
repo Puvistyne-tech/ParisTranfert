@@ -1,9 +1,11 @@
 "use client";
 
 import {
+  ArrowLeft,
   Calendar,
   Car,
   DollarSign,
+  Filter,
   FolderTree,
   LayoutDashboard,
   LogOut,
@@ -11,6 +13,7 @@ import {
   Menu,
   MessageSquare,
   Package,
+  Search,
   Settings,
   Star,
   Users,
@@ -23,6 +26,7 @@ import { useState } from "react";
 import type { AdminUser } from "@/lib/auth";
 import { signOut } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { useAdminFilter } from "./AdminFilterContext";
 
 interface NavItem {
   name: string;
@@ -35,6 +39,7 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
   const pathname = usePathname();
   const locale = useLocale();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { filterContent, isFilterOpen, setIsFilterOpen } = useAdminFilter();
 
   // Get user display name
   const userName =
@@ -42,6 +47,58 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
     user.user_metadata?.name ||
     user.email?.split("@")[0] ||
     "User";
+
+  // Check if current page is from "More" tab
+  const isFromMoreTab = () => {
+    if (!pathname) return false;
+    const normalizedPath = pathname.split("?")[0].replace(/\/$/, "");
+    const moreTabRoutes = [
+      `/${locale}/admin/categories`,
+      `/${locale}/admin/vehicles`,
+      `/${locale}/admin/locations`,
+      `/${locale}/admin/pricing`,
+      `/${locale}/admin/features`,
+      `/${locale}/admin/testimonials`,
+    ];
+    return moreTabRoutes.some(
+      (route) =>
+        normalizedPath === route || normalizedPath.startsWith(route + "/")
+    );
+  };
+
+  // Get dynamic page title based on current route
+  const getPageTitle = () => {
+    if (!pathname) return "Admin Panel";
+    const normalizedPath = pathname.split("?")[0].replace(/\/$/, "");
+    
+    const titleMap: Record<string, string> = {
+      [`/${locale}/admin`]: "Dashboard",
+      [`/${locale}/admin/more`]: "More",
+      [`/${locale}/admin/reservations`]: "Reservations",
+      [`/${locale}/admin/users`]: "Clients",
+      [`/${locale}/admin/services`]: "Services",
+      [`/${locale}/admin/categories`]: "Categories",
+      [`/${locale}/admin/vehicles`]: "Vehicles",
+      [`/${locale}/admin/locations`]: "Locations",
+      [`/${locale}/admin/pricing`]: "Pricing",
+      [`/${locale}/admin/features`]: "Features",
+      [`/${locale}/admin/testimonials`]: "Testimonials",
+    };
+
+    // Check exact match first
+    if (titleMap[normalizedPath]) {
+      return titleMap[normalizedPath];
+    }
+
+    // Check if path starts with any admin route
+    for (const [route, title] of Object.entries(titleMap)) {
+      if (normalizedPath.startsWith(route + "/")) {
+        return title;
+      }
+    }
+
+    return "Admin Panel";
+  };
 
   const navItems: NavItem[] = [
     { name: "Dashboard", href: `/${locale}/admin`, icon: LayoutDashboard },
@@ -83,27 +140,56 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
   return (
     <>
       {/* Mobile menu button */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between shadow-sm">
-        <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
-          Admin Panel
-        </h1>
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="px-4 py-3 flex items-center justify-between">
+          {isFromMoreTab() ? (
+            <Link
+              href={`/${locale}/admin/more`}
           className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-          aria-label="Toggle menu"
-        >
-          {isMobileMenuOpen ? (
-            <X className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+              aria-label="Back to More"
+            >
+              <ArrowLeft className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+            </Link>
           ) : (
-            <Menu className="w-6 h-6 text-gray-600 dark:text-gray-300" />
+            <div className="w-10" />
+          )}
+          <h1 className="text-lg font-semibold text-gray-900 dark:text-white">
+            {getPageTitle()}
+          </h1>
+          {filterContent && (
+            <button
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              aria-label="Toggle filters"
+            >
+              {isFilterOpen ? (
+                <X className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+          ) : (
+                <Filter className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           )}
         </button>
+          )}
+          {!filterContent && <div className="w-10" />}
+        </div>
+        {/* Expandable filter section */}
+        {filterContent && (
+          <div
+            className={cn(
+              "overflow-hidden transition-all duration-300 ease-in-out border-t border-gray-200 dark:border-gray-700",
+              isFilterOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+            )}
+          >
+            <div className="p-4 bg-gray-50 dark:bg-gray-900">
+              {filterContent}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-14 left-0 z-40 h-[calc(100vh-3.5rem)] lg:top-0 lg:h-screen w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-transform lg:translate-x-0",
+          "fixed top-14 lg:top-0 left-0 z-40 h-[calc(100vh-3.5rem)] lg:h-screen w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-transform lg:translate-x-0",
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
           "lg:fixed lg:translate-x-0",
         )}

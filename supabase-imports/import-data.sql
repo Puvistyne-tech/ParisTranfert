@@ -221,12 +221,15 @@ ON CONFLICT (service_id, field_key) DO UPDATE SET
   field_order = EXCLUDED.field_order,
   updated_at = NOW();
 
--- Disneyland Service Fields (pickup is address_autocomplete, destination has default - all in French)
+-- Disneyland Service Fields
+-- pickup_location is hidden (location_select with default "paris" for pricing only)
+-- pickup_address is the visible address_autocomplete field for exact location
 INSERT INTO service_fields (service_id, field_key, field_type, label, required, is_pickup, is_destination, default_value, field_order) VALUES
-('disneyland', 'pickup_location', 'address_autocomplete', 'Lieu de prise en charge', true, true, false, NULL, 1),
-('disneyland', 'destination_location', 'text', 'Destination', true, false, true, 'Disneyland Paris', 2),
-('disneyland', 'hotel_name', 'text', 'Nom de l''hôtel (si applicable)', false, false, false, NULL, 3),
-('disneyland', 'return_time', 'time', 'Heure de retour', false, false, false, NULL, 4)
+('disneyland', 'pickup_location', 'location_select', 'Pickup Location (hidden)', false, true, false, 'paris', 1),
+('disneyland', 'pickup_address', 'address_autocomplete', 'Lieu de prise en charge', true, false, false, 'Paris', 2),
+('disneyland', 'destination_location', 'text', 'Destination (hidden)', true, false, true, 'disneyland', 3),
+('disneyland', 'hotel_name', 'text', 'Nom de l''hôtel (si applicable)', false, false, false, NULL, 4),
+('disneyland', 'return_time', 'time', 'Heure de retour', false, false, false, NULL, 5)
 ON CONFLICT (service_id, field_key) DO UPDATE SET
   field_type = EXCLUDED.field_type,
   label = EXCLUDED.label,
@@ -330,7 +333,12 @@ INSERT INTO service_vehicle_pricing (service_id, vehicle_type_id, pickup_locatio
 -- ORLY ↔ Beauvais (same price both ways - only store one)
 ('airport-transfers', 'van', 'orly', 'beauvais', 200.00),
 -- Beauvais ↔ Disneyland (same price both ways - only store one)
-('airport-transfers', 'van', 'beauvais', 'disneyland', 200.00)
+('airport-transfers', 'van', 'beauvais', 'disneyland', 200.00),
+-- Disneyland Service Pricing (Paris ↔ Disneyland)
+-- Car rates
+('disneyland', 'car', 'paris', 'disneyland', 80.00),
+-- Van rates
+('disneyland', 'van', 'paris', 'disneyland', 90.00)
 ON CONFLICT (service_id, vehicle_type_id, pickup_location_id, destination_location_id) DO UPDATE SET
   price = EXCLUDED.price,
   updated_at = NOW();

@@ -1,8 +1,9 @@
 "use client";
 
-import { Edit, MapPin, Plus, Trash2 } from "lucide-react";
+import { MapPin, Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
+import { MobileActionButtons } from "@/components/admin/MobileActionButtons";
 import { LocationModal } from "@/components/admin/LocationModal";
 import type { Location } from "@/components/models/locations";
 import { Button } from "@/components/ui/Button";
@@ -93,19 +94,17 @@ export default function AdminLocationsPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Locations Management
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
             Manage pickup and destination locations
           </p>
         </div>
-        <Button variant="primary" onClick={handleCreate}>
+        <Button variant="admin" size="sm" onClick={handleCreate} className="w-full sm:w-auto">
           <Plus className="w-4 h-4 mr-2" />
-          Add Location
+          <span className="hidden sm:inline">Add Location</span>
+          <span className="sm:hidden">Add</span>
         </Button>
       </div>
 
@@ -117,20 +116,20 @@ export default function AdminLocationsPage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-3">
           {locations.map((location) => (
             <Card
               key={location.id}
               className="dark:bg-gray-800 dark:border-gray-700"
             >
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
-                      <MapPin className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="p-1.5 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex-shrink-0">
+                      <MapPin className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                         {location.name}
                       </h3>
                       <span className="inline-block mt-2 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
@@ -138,29 +137,16 @@ export default function AdminLocationsPage() {
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(location)}
-                    >
-                      <Edit className="w-4 h-4 mr-1" />
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
-                      onClick={() =>
+                  <div className="flex items-center justify-end sm:justify-start">
+                    <MobileActionButtons
+                      onEdit={() => handleEdit(location)}
+                      onDelete={() =>
                         setDeleteConfirm({
                           isOpen: true,
                           locationId: location.id,
                         })
                       }
-                    >
-                      <Trash2 className="w-4 h-4 mr-1" />
-                      Delete
-                    </Button>
+                    />
                   </div>
                 </div>
               </CardContent>

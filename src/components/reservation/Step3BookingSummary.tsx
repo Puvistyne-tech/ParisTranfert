@@ -179,14 +179,14 @@ export function Step3BookingSummary({
             </div>
           )}
 
-          {/* Price Breakdown - Only show for airport-transfers */}
-          {selectedService?.id === "airport-transfers" && (
+          {/* Price Breakdown - Show for all services with pricing */}
+          {selectedService && (
             <div className="border-t dark:border-gray-700 pt-4 mb-4">
               {priceLoading ? (
                 <div className="text-sm text-gray-500 dark:text-gray-400">
                   {t("loadingPrice")}
                 </div>
-              ) : basePrice !== null ? (
+              ) : basePrice !== null && basePrice > 0 ? (
                 <>
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -207,14 +207,16 @@ export function Step3BookingSummary({
                 </>
               ) : (
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  {t("selectPickupDestination")}
+                  {serviceSubData?.pickup_location && serviceSubData?.destination_location
+                    ? t("quoteRequest") || "Quote Request"
+                    : t("selectPickupDestination")}
                 </div>
               )}
             </div>
           )}
 
-          {/* Additional Services Info - Only for airport-transfers */}
-          {selectedService?.id === "airport-transfers" &&
+          {/* Additional Services Info - Show for all services */}
+          {selectedService &&
             (additionalServices.babySeats > 0 ||
               additionalServices.boosters > 0 ||
               additionalServices.meetAndGreet) && (

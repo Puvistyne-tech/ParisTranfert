@@ -1,163 +1,90 @@
 "use client";
 
-import { Calendar, Download, Eye } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useLocale } from "next-intl";
-import { useEffect, useState } from "react";
+import { Calendar } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 import { FilterBar } from "@/components/admin/FilterBar";
 import { ReservationDetailModal } from "@/components/admin/ReservationDetailModal";
 import { StatusBadge } from "@/components/admin/StatusBadge";
-import type {
-  Reservation,
-  ReservationStatus,
-} from "@/components/models/reservations";
+import type { ReservationStatus } from "@/components/models/reservations";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
+import { useAdminReservations, useInvalidateReservations } from "@/hooks/admin/useAdminReservations";
 import { useServices } from "@/hooks/useServices";
 import { useVehicleTypes } from "@/hooks/useVehicleTypes";
-import { getReservations } from "@/lib/supabaseService";
+import { useReservationsStore } from "@/store/admin/reservationsStore";
 
 export default function AdminReservationsPage() {
-  const router = useRouter();
-  const locale = useLocale();
   const searchParams = useSearchParams();
-  const [reservations, setReservations] = useState<Reservation[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [selectedReservationId, setSelectedReservationId] = useState<string | null>(null);
-  const [filters, setFilters] = useState({
-    search: searchParams.get("search") || "",
-    status: "",
-    dateFrom: "",
-    dateTo: "",
-    serviceId: "",
-    vehicleTypeId: "",
-  });
+  const {
+    selectedReservationId,
+    searchQuery,
+    statusFilter,
+    dateFrom,
+    dateTo,
+    serviceId,
+    vehicleTypeId,
+    page,
+    setSelectedReservationId,
+    setSearchQuery,
+    setStatusFilter,
+    setDateFrom,
+    setDateTo,
+    setServiceId,
+    setVehicleTypeId,
+    setPage,
+  } = useReservationsStore();
+
   const pageSize = 20;
 
   // Check URL for reservation ID to auto-open modal
   useEffect(() => {
-    // Check for reservation ID in URL path (e.g., /{locale}/admin/reservation/{id})
     const pathname = window.location.pathname;
     const reservationMatch = pathname.match(/\/[^/]+\/admin\/reservation\/([^/]+)/);
-    
-    // Also check for reservation query parameter
     const reservationParam = searchParams.get("reservation");
     
     if (reservationMatch && reservationMatch[1]) {
       setSelectedReservationId(reservationMatch[1]);
-      // Clean up URL by removing the reservation path
       const newPath = pathname.replace(/\/reservation\/[^/]+/, "");
       if (newPath !== pathname) {
         window.history.replaceState({}, "", newPath);
       }
     } else if (reservationParam) {
       setSelectedReservationId(reservationParam);
-      // Clean up URL by removing the reservation query parameter
       const newSearchParams = new URLSearchParams(searchParams.toString());
       newSearchParams.delete("reservation");
       const newUrl = `${window.location.pathname}${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ""}`;
       window.history.replaceState({}, "", newUrl);
     }
-  }, [searchParams]);
 
-  // Use TanStack Query hooks for data fetching with automatic caching
+    // Initialize from URL search param
+    const searchParam = searchParams.get("search");
+    if (searchParam && !searchQuery) {
+      setSearchQuery(searchParam);
+    }
+  }, [searchParams, setSelectedReservationId, setSearchQuery, searchQuery]);
+
+  // Fetch data with TanStack Query
+  const { data, isLoading } = useAdminReservations({
+    search: searchQuery,
+    status: statusFilter ? (statusFilter as ReservationStatus) : undefined,
+    dateFrom,
+    dateTo,
+    serviceId,
+    vehicleTypeId,
+    page,
+    pageSize,
+  });
+
+  const reservations = data?.data || [];
+  const total = data?.total || 0;
+
+  // Use existing hooks for filter options
   const { data: servicesData = [] } = useServices();
   const { data: vehiclesData = [] } = useVehicleTypes();
 
   const services = servicesData.map((s) => ({ value: s.id, label: s.name }));
   const vehicles = vehiclesData.map((v) => ({ value: v.id, label: v.name }));
-
-  useEffect(() => {
-    fetchReservations();
-  }, [filters, page]);
-
-  const fetchReservations = async () => {
-    setLoading(true);
-    try {
-      const statusFilter = filters.status
-        ? (filters.status as ReservationStatus)
-        : undefined;
-      const result = await getReservations({
-        status: statusFilter,
-        limit: pageSize,
-        offset: (page - 1) * pageSize,
-      });
-
-      let filtered = result.data;
-
-      // Apply additional filters
-      if (filters.search) {
-        const searchLower = filters.search.toLowerCase().trim();
-        // Check if search is an exact UUID match (reservation ID)
-        // UUIDs are typically 36 characters with hyphens: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-        const isUUIDFormat =
-          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-            filters.search.trim(),
-          );
-        const isPartialUUID = /^[0-9a-f-]{8,}$/i.test(filters.search.trim());
-
-        if (isUUIDFormat) {
-          // Exact UUID match - prioritize this result
-          const exactMatch = filtered.find(
-            (r) => r.id.toLowerCase() === searchLower,
-          );
-          if (exactMatch) {
-            filtered = [exactMatch];
-          } else {
-            // No exact match found
-            filtered = [];
-          }
-        } else if (isPartialUUID) {
-          // Partial UUID - prioritize ID matches
-          const idMatches = filtered.filter((r) =>
-            r.id.toLowerCase().includes(searchLower),
-          );
-          const otherMatches = filtered.filter(
-            (r) =>
-              !r.id.toLowerCase().includes(searchLower) &&
-              (r.pickupLocation.toLowerCase().includes(searchLower) ||
-                r.destinationLocation?.toLowerCase().includes(searchLower)),
-          );
-          filtered = [...idMatches, ...otherMatches];
-        } else {
-          // Regular search - check all fields
-          filtered = filtered.filter(
-            (r) =>
-              r.id.toLowerCase().includes(searchLower) ||
-              r.pickupLocation.toLowerCase().includes(searchLower) ||
-              r.destinationLocation?.toLowerCase().includes(searchLower),
-          );
-        }
-      }
-
-      if (filters.serviceId) {
-        filtered = filtered.filter((r) => r.serviceId === filters.serviceId);
-      }
-
-      if (filters.vehicleTypeId) {
-        filtered = filtered.filter(
-          (r) => r.vehicleTypeId === filters.vehicleTypeId,
-        );
-      }
-
-      if (filters.dateFrom) {
-        filtered = filtered.filter((r) => r.date >= filters.dateFrom);
-      }
-
-      if (filters.dateTo) {
-        filtered = filtered.filter((r) => r.date <= filters.dateTo);
-      }
-
-      setReservations(filtered);
-      setTotal(filtered.length);
-    } catch (error) {
-      console.error("Error fetching reservations:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const statusOptions = [
     { value: "quote_requested", label: "Quote Requested" },
@@ -169,125 +96,128 @@ export default function AdminReservationsPage() {
     { value: "cancelled", label: "Cancelled" },
   ];
 
-  const handleViewDetails = (reservation: Reservation) => {
-    setSelectedReservationId(reservation.id);
+  const handleFilterChange = (newFilters: {
+    search?: string;
+    status?: string;
+    dateFrom?: string;
+    dateTo?: string;
+    serviceId?: string;
+    vehicleTypeId?: string;
+  }) => {
+    if (newFilters.search !== undefined) setSearchQuery(newFilters.search);
+    if (newFilters.status !== undefined) setStatusFilter(newFilters.status);
+    if (newFilters.dateFrom !== undefined) setDateFrom(newFilters.dateFrom);
+    if (newFilters.dateTo !== undefined) setDateTo(newFilters.dateTo);
+    if (newFilters.serviceId !== undefined) setServiceId(newFilters.serviceId);
+    if (newFilters.vehicleTypeId !== undefined) setVehicleTypeId(newFilters.vehicleTypeId);
   };
+
+  const invalidateReservations = useInvalidateReservations();
 
   const handleUpdate = () => {
-    fetchReservations();
+    invalidateReservations();
   };
-
-  // Remove unused imports
-  // ReservationDetailModal is no longer used - navigation goes to unified page
 
   const totalPages = Math.ceil(total / pageSize);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Reservations & Quotes
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
+    <div className="space-y-3">
+      <p className="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
           Manage all reservations and quotes
         </p>
-      </div>
 
       <FilterBar
-        filters={filters}
-        onFilterChange={(newFilters) => {
-          setFilters(newFilters as typeof filters);
-          setPage(1);
+        filters={{
+          search: searchQuery,
+          status: statusFilter,
+          dateFrom,
+          dateTo,
+          serviceId,
+          vehicleTypeId,
         }}
+        onFilterChange={handleFilterChange}
         statusOptions={statusOptions}
         serviceOptions={services}
         vehicleOptions={vehicles}
       />
 
-      {loading ? (
+      {isLoading ? (
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 dark:border-primary-400 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">
-            Loading reservations...
-          </p>
+          <p className="text-gray-600 dark:text-gray-400">Loading reservations...</p>
         </div>
       ) : (
         <>
-          <div className="grid gap-4">
+          <div className="grid gap-3">
             {reservations.map((reservation) => (
-              <Card key={reservation.id}>
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-4 mb-2 flex-wrap gap-2">
+              <Card
+                key={reservation.id}
+                className="dark:bg-gray-800 dark:border-gray-700 cursor-pointer hover:shadow-lg transition-shadow"
+                onClick={() => setSelectedReservationId(reservation.id)}
+              >
+                <CardContent className="p-3 sm:p-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      {/* Status and ID */}
+                      <div className="flex flex-wrap items-center gap-2 mb-3">
                         <StatusBadge status={reservation.status as any} />
-                        <span className="text-sm text-gray-500 dark:text-gray-400">
-                          ID: {reservation.id.slice(0, 8)}
+                        <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 font-mono">
+                          {reservation.id.slice(0, 8)}
                         </span>
-                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                      </div>
+
+                      {/* Date and Time */}
+                      <div className="mb-3">
+                        <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white">
                           {reservation.date} at {reservation.time}
-                        </span>
+                        </p>
                         {reservation.createdAt && (
-                          <span className="text-xs text-gray-400 dark:text-gray-500">
-                            Created:{" "}
-                            {new Date(reservation.createdAt).toLocaleString()}
-                          </span>
-                        )}
-                        {reservation.updatedAt &&
-                          reservation.updatedAt !== reservation.createdAt && (
-                            <span className="text-xs text-gray-400 dark:text-gray-500">
-                              Modified:{" "}
-                              {new Date(reservation.updatedAt).toLocaleString()}
-                            </span>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            Created: {new Date(reservation.createdAt).toLocaleDateString()}
+                          </p>
                           )}
                       </div>
-                      <div className="grid md:grid-cols-4 gap-4 text-sm">
+
+                      {/* Details Grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-sm">
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">
+                          <span className="text-gray-600 dark:text-gray-400 block sm:inline">
                             Service:
                           </span>{" "}
-                          <span className="font-medium text-gray-900 dark:text-gray-100">
+                          <span className="font-medium text-gray-900 dark:text-gray-100 block sm:inline">
                             {reservation.serviceId}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-600 dark:text-gray-400">
+                          <span className="text-gray-600 dark:text-gray-400 block sm:inline">
                             Vehicle:
                           </span>{" "}
-                          <span className="font-medium text-gray-900 dark:text-gray-100">
+                          <span className="font-medium text-gray-900 dark:text-gray-100 block sm:inline">
                             {reservation.vehicleTypeId}
                           </span>
                         </div>
-                        <div>
-                          <span className="text-gray-600 dark:text-gray-400">
+                        <div className="sm:col-span-2">
+                          <span className="text-gray-600 dark:text-gray-400 block sm:inline">
                             Route:
                           </span>{" "}
-                          <span className="font-medium text-gray-900 dark:text-gray-100">
+                          <span className="font-medium text-gray-900 dark:text-gray-100 block sm:inline">
                             {reservation.pickupLocation}
                             {reservation.destinationLocation
                               ? ` → ${reservation.destinationLocation}`
                               : ""}
                           </span>
                         </div>
-                        <div>
-                          <span className="text-gray-600 dark:text-gray-400">
-                            Price:
+                      </div>
+
+                      {/* Price */}
+                      <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          Total Price:
                           </span>{" "}
                           <span className="font-semibold text-lg text-gray-900 dark:text-gray-100">
                             €{reservation.totalPrice}
                           </span>
                         </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2 ml-4">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleViewDetails(reservation)}
-                      >
-                        <Eye className="w-4 h-4 mr-1" />
-                        View
-                      </Button>
                     </div>
                   </div>
                 </CardContent>
@@ -302,7 +232,12 @@ export default function AdminReservationsPage() {
                 No reservations found
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
-                {Object.values(filters).some((f) => f)
+                {searchQuery ||
+                statusFilter ||
+                dateFrom ||
+                dateTo ||
+                serviceId ||
+                vehicleTypeId
                   ? "Try adjusting your filters"
                   : "New reservations will appear here once customers submit them"}
               </p>
@@ -311,23 +246,25 @@ export default function AdminReservationsPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Showing {(page - 1) * pageSize + 1} to{" "}
-                {Math.min(page * pageSize, total)} of {total} reservations
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <p className="text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left">
+                Showing {(page - 1) * pageSize + 1} to {Math.min(page * pageSize, total)} of{" "}
+                {total} reservations
               </p>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  onClick={() => setPage(Math.max(1, page - 1))}
                   disabled={page === 1}
+                  size="sm"
                 >
                   Previous
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  onClick={() => setPage(Math.min(totalPages, page + 1))}
                   disabled={page === totalPages}
+                  size="sm"
                 >
                   Next
                 </Button>
@@ -343,7 +280,7 @@ export default function AdminReservationsPage() {
         isOpen={!!selectedReservationId}
           onClose={() => {
           setSelectedReservationId(null);
-          fetchReservations(); // Refresh list when modal closes
+          invalidateReservations();
           }}
         />
     </div>

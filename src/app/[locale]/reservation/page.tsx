@@ -120,20 +120,30 @@ export default function ReservationPage() {
 
   // Extract only location fields that affect pricing
   // This ensures price only refetches when locations change, not when other fields like flight_number change
+  // For Disneyland, use the hidden pickup_location field (not pickup_address)
   const pickupLocation = serviceSubData?.pickup_location;
   const destinationLocation = serviceSubData?.destination_location;
 
   // Use TanStack Query to fetch pricing with caching - prevents unnecessary refetches
-  const isAirportTransfer = selectedService?.id === "airport-transfers";
+  // Pricing now works for all services that have pickup and destination locations
+  const hasLocationFields = Boolean(pickupLocation && destinationLocation);
   const { data: pricingData, isLoading: priceLoading } = usePricing(
-    isAirportTransfer ? selectedService?.id : null,
-    isAirportTransfer ? selectedVehicleType?.id : null,
-    isAirportTransfer ? pickupLocation : null,
-    isAirportTransfer ? destinationLocation : null,
-    isAirportTransfer,
+    selectedService?.id ?? null,
+    selectedVehicleType?.id ?? null,
+    pickupLocation ?? null,
+    destinationLocation ?? null,
+    hasLocationFields,
   );
 
-  const basePrice = pricingData?.price ?? null;
+  // Calculate base price - double for Disneyland return trips
+  let basePrice = pricingData?.price ?? null;
+  if (
+    basePrice !== null &&
+    selectedService?.id === "disneyland" &&
+    serviceSubData?.return_trip === true
+  ) {
+    basePrice = basePrice * 2;
+  }
 
   const handleBackToHome = () => {
     const hasSelections =
@@ -420,6 +430,20 @@ export default function ReservationPage() {
           return false;
         }
       }
+
+      // For Disneyland service, check pickup_address and return_date requirements
+      if (selectedService.id === "disneyland") {
+        // Check pickup_address is required
+        if (!serviceSubData.pickup_address || serviceSubData.pickup_address === "") {
+          return false;
+        }
+        // Check return_date is required when return_trip is selected
+        if (serviceSubData.return_trip === true) {
+          if (!serviceSubData.return_date || serviceSubData.return_date === "") {
+            return false;
+          }
+        }
+      }
     }
 
     console.log("isFormValid", true);
@@ -524,6 +548,22 @@ export default function ReservationPage() {
             errors.push(`${destinationField.label} is required`);
             fieldsWithErrors.add(destinationField.fieldKey);
             fieldsWithErrors.add("destination");
+          }
+        }
+      }
+
+      // Validate Disneyland requirements
+      if (selectedService?.id === "disneyland") {
+        // Check pickup_address is required
+        if (!serviceSubData.pickup_address || serviceSubData.pickup_address === "") {
+          errors.push("Pickup address (Lieu de prise en charge) is required");
+          fieldsWithErrors.add("pickup_address");
+        }
+        // Check return_date is required when return_trip is selected
+        if (serviceSubData.return_trip === true) {
+          if (!serviceSubData.return_date || serviceSubData.return_date === "") {
+            errors.push("Return date is required when return trip is selected");
+            fieldsWithErrors.add("return_date");
           }
         }
       }

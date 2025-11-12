@@ -328,7 +328,17 @@
       "specialRequestsPlaceholderText": "Toute demande spéciale ou note...",
       "pleaseCompleteAllFields": "Veuillez compléter tous les champs requis",
       "loadingServiceFields": "Chargement des champs du service...",
-      "fieldRequired": "Ce champ est requis"
+      "fieldRequired": "Ce champ est requis",
+      "serviceFields": {
+        "pickupAddress": "Lieu de prise en charge",
+        "hotelName": "Nom de l'hôtel (si applicable)",
+        "returnTime": "Heure de retour",
+        "returnDate": "Date de retour",
+        "destination": "Destination",
+        "pickupLocationHidden": "Lieu de prise en charge (masqué)",
+        "destinationHidden": "Destination (masquée)"
+      },
+      "returnTrip": "Aller-retour"
     },
     "step3": {
       "title": "Réviser & Confirmer",
@@ -356,6 +366,7 @@
       "total": "Total",
       "selectPickupDestination": "Sélectionnez le lieu de prise en charge et la destination pour voir le prix",
       "loadingPrice": "Chargement du prix...",
+      "quoteRequest": "Demande de Devis",
       "additionalServicesFree": "Services Supplémentaires (Gratuit)",
       "babySeats": "Sièges Bébé",
       "boosterSeats": "Sièges Rehausseurs",

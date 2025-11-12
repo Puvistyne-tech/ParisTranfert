@@ -37,6 +37,7 @@ import {
   getTranslatedServiceName,
   getTranslatedVehicleDescription,
 } from "@/lib/translations";
+import { getLocationById } from "@/lib/supabaseService";
 import { useReservationStore } from "@/store/reservationStore";
 
 export default function ConfirmationPage() {
@@ -70,31 +71,104 @@ export default function ConfirmationPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
+  const [pickupLocationName, setPickupLocationName] = useState<string | null>(null);
+  const [destinationLocationName, setDestinationLocationName] = useState<string | null>(null);
 
   // Use submitted reservation ID from server if available, otherwise use local tracking ID
   const reservationId = submittedReservationId || storeReservationId || "";
 
   // Extract only location fields that affect pricing
   // This ensures price only refetches when locations change, not when other fields change
-  const pickupLocation = serviceSubData?.pickup_location;
-  const destinationLocation = serviceSubData?.destination_location;
+  // Check both serviceSubData (for services with location fields) and formData (for airport transfers)
+  const pickupLocation = serviceSubData?.pickup_location || formData.pickup || null;
+  const destinationLocation = serviceSubData?.destination_location || formData.destination || null;
 
   // Use TanStack Query to fetch pricing with caching - prevents unnecessary refetches
-  const isAirportTransfer = selectedService?.id === "airport-transfers";
+  // Pricing now works for all services that have pickup and destination locations
+  const hasLocationFields = Boolean(pickupLocation && destinationLocation);
   const { data: pricingData, isLoading: priceLoading } = usePricing(
-    isAirportTransfer ? selectedService?.id : null,
-    isAirportTransfer ? selectedVehicleType?.id : null,
-    isAirportTransfer ? pickupLocation : null,
-    isAirportTransfer ? destinationLocation : null,
-    isAirportTransfer,
+    selectedService?.id ?? null,
+    selectedVehicleType?.id ?? null,
+    pickupLocation ?? null,
+    destinationLocation ?? null,
+    hasLocationFields,
   );
 
-  const basePrice = pricingData?.price ?? null;
+  // Calculate base price - double for Disneyland return trips
+  let basePrice = pricingData?.price ?? null;
+  if (
+    basePrice !== null &&
+    selectedService?.id === "disneyland" &&
+    serviceSubData?.return_trip === true
+  ) {
+    basePrice = basePrice * 2;
+  }
+
+  // Debug logging
+  useEffect(() => {
+    console.log("Confirmation Page Pricing Debug:", {
+      selectedService: selectedService?.id,
+      selectedVehicleType: selectedVehicleType?.id,
+      pickupLocation,
+      destinationLocation,
+      hasLocationFields,
+      priceLoading,
+      pricingData,
+      basePrice,
+    });
+  }, [selectedService?.id, selectedVehicleType?.id, pickupLocation, destinationLocation, hasLocationFields, priceLoading, pricingData, basePrice]);
 
   // Reset image error when vehicle type changes
   useEffect(() => {
     setImageError(false);
   }, [selectedVehicleType?.id]);
+
+  // Convert location IDs to full names for display
+  useEffect(() => {
+    async function convertLocations() {
+      if (pickupLocation) {
+        // Check if it's a location ID (short string like 'paris', 'cdg', 'orly')
+        if (pickupLocation.length < 20 && /^[a-z0-9_-]+$/.test(pickupLocation.toLowerCase())) {
+          try {
+            const location = await getLocationById(pickupLocation);
+            if (location) {
+              setPickupLocationName(location.name);
+            } else {
+              setPickupLocationName(pickupLocation);
+            }
+          } catch {
+            setPickupLocationName(pickupLocation);
+          }
+        } else {
+          setPickupLocationName(pickupLocation);
+        }
+      } else {
+        setPickupLocationName(null);
+      }
+
+      if (destinationLocation) {
+        // Check if it's a location ID
+        if (destinationLocation.length < 20 && /^[a-z0-9_-]+$/.test(destinationLocation.toLowerCase())) {
+          try {
+            const location = await getLocationById(destinationLocation);
+            if (location) {
+              setDestinationLocationName(location.name);
+            } else {
+              setDestinationLocationName(destinationLocation);
+            }
+          } catch {
+            setDestinationLocationName(destinationLocation);
+          }
+        } else {
+          setDestinationLocationName(destinationLocation);
+        }
+      } else {
+        setDestinationLocationName(null);
+      }
+    }
+
+    convertLocations();
+  }, [pickupLocation, destinationLocation]);
 
   const handleSubmitReservation = () => {
     // Navigate to submit page instead of submitting here
@@ -102,11 +176,8 @@ export default function ConfirmationPage() {
   };
 
   const calculateTotalPrice = () => {
-    // Additional services are free, so only return base price for airport transfers
-    if (selectedService?.id === "airport-transfers" && basePrice !== null) {
-      return basePrice;
-    }
-    return 0; // For other services, pricing will be handled by admin
+    // Return base price if available (for all services)
+    return basePrice ?? 0;
   };
 
   const handleDownloadPDF = async () => {
@@ -134,6 +205,7 @@ export default function ConfirmationPage() {
         notes: formData.notes,
         status: "pending",
         createdAt: new Date().toISOString(),
+        serviceSubData: serviceSubData || undefined,
       };
 
       // Get PDF translations
@@ -512,6 +584,32 @@ export default function ConfirmationPage() {
                           </p>
                         </div>
                       </div>
+                      {pickupLocationName && (
+                        <div className="flex items-center space-x-2 sm:space-x-3">
+                          <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                          <div className="min-w-0">
+                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                              {t("pdf.from") || "From"}
+                            </p>
+                            <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 truncate">
+                              {pickupLocationName}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                      {destinationLocationName && (
+                        <div className="flex items-center space-x-2 sm:space-x-3">
+                          <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                          <div className="min-w-0">
+                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                              {t("pdf.to") || "To"}
+                            </p>
+                            <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 truncate">
+                              {destinationLocationName}
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -542,7 +640,11 @@ export default function ConfirmationPage() {
                       </div>
                       <div className="grid md:grid-cols-2 gap-4">
                         {Object.entries(serviceSubData).map(([key, value]) => {
-                          if (!value || value === "") return null;
+                          // Skip null, undefined, or empty string values
+                          if (value === null || value === undefined || value === "") {
+                            return null;
+                          }
+                          
                           const fieldLabel = key
                             .split("_")
                             .map(
@@ -550,18 +652,27 @@ export default function ConfirmationPage() {
                                 word.charAt(0).toUpperCase() + word.slice(1),
                             )
                             .join(" ");
+                          
+                          // Format value based on type
+                          let displayValue = String(value);
+                          if (key === "return_trip") {
+                            displayValue = value === true ? "Yes" : "No";
+                          } else if (typeof value === "boolean") {
+                            displayValue = value ? "Yes" : "No";
+                          }
+                          
                           return (
                             <div
                               key={key}
                               className="flex items-center space-x-3"
                             >
-                              <FileText className="w-4 h-4 text-gray-400 dark:text-gray-500" />
-                              <div>
+                              <FileText className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                              <div className="min-w-0 flex-1">
                                 <p className="text-sm text-gray-600 dark:text-gray-400">
                                   {fieldLabel}
                                 </p>
-                                <p className="font-medium text-gray-900 dark:text-gray-100">
-                                  {String(value)}
+                                <p className="font-medium text-gray-900 dark:text-gray-100 break-words">
+                                  {displayValue}
                                 </p>
                               </div>
                             </div>
@@ -724,24 +835,49 @@ export default function ConfirmationPage() {
                 transition={{ delay: 0.2 }}
                 className="sticky top-8 space-y-6"
               >
-                {/* Price Summary - Only show for airport-transfers with pricing */}
-                {selectedService?.id === "airport-transfers" &&
-                  basePrice !== null &&
-                  !priceLoading && (
-                    <Card>
-                      <CardContent className="p-4 sm:p-6">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">
-                          {t("priceSummary")}
-                        </h3>
+                {/* Price Summary - Always show for all services */}
+                {selectedService && (
+                  <Card>
+                    <CardContent className="p-4 sm:p-6">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4">
+                        {t("priceSummary")}
+                      </h3>
+                      {priceLoading ? (
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          {t("loadingPrice")}
+                        </div>
+                      ) : basePrice !== null && basePrice > 0 ? (
                         <div className="space-y-2">
-                          <div className="flex justify-between">
-                            <span className="text-sm text-gray-600 dark:text-gray-400">
-                              {t("basePrice")}
-                            </span>
-                            <span className="font-medium text-gray-900 dark:text-gray-100">
-                              €{basePrice.toFixed(2)}
-                            </span>
-                          </div>
+                          {selectedService.id === "disneyland" && serviceSubData?.return_trip === true && (
+                            <>
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600 dark:text-gray-400">
+                                  {t("basePrice")}
+                                </span>
+                                <span className="font-medium text-gray-900 dark:text-gray-100">
+                                  €{(basePrice / 2).toFixed(2)}
+                                </span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-sm text-gray-600 dark:text-gray-400">
+                                  {t("returnTrip")}
+                                </span>
+                                <span className="font-medium text-gray-900 dark:text-gray-100">
+                                  €{(basePrice / 2).toFixed(2)}
+                                </span>
+                              </div>
+                            </>
+                          )}
+                          {(!selectedService.id || selectedService.id !== "disneyland" || !serviceSubData?.return_trip) && (
+                            <div className="flex justify-between">
+                              <span className="text-sm text-gray-600 dark:text-gray-400">
+                                {t("basePrice")}
+                              </span>
+                              <span className="font-medium text-gray-900 dark:text-gray-100">
+                                €{basePrice.toFixed(2)}
+                              </span>
+                            </div>
+                          )}
                           <div className="border-t dark:border-gray-700 pt-2 mt-2">
                             <div className="flex justify-between text-lg font-bold">
                               <span className="text-gray-900 dark:text-gray-100">
@@ -753,9 +889,16 @@ export default function ConfirmationPage() {
                             </div>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  )}
+                      ) : (
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          {pickupLocation && destinationLocation
+                            ? t("quoteRequest") || "Quote Request"
+                            : t("selectPickupDestination")}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
 
                 {/* Additional Services Info - Always free */}
                 {(additionalServices.babySeats > 0 ||

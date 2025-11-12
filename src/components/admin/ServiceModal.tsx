@@ -1,6 +1,6 @@
 "use client";
 
-import { Upload, X } from "lucide-react";
+import { Settings, Upload, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { Category } from "@/components/models/categories";
 import type { Service } from "@/components/models/services";
@@ -25,6 +25,7 @@ interface ServiceModalProps {
   service?: Service | null;
   categories: Category[];
   loading?: boolean;
+  onManageFields?: (serviceId: string) => void;
 }
 
 export function ServiceModal({
@@ -34,6 +35,7 @@ export function ServiceModal({
   service,
   categories,
   loading = false,
+  onManageFields,
 }: ServiceModalProps) {
   const [formData, setFormData] = useState({
     id: "",
@@ -446,27 +448,49 @@ export function ServiceModal({
             </label>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          {service && onManageFields && (
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  onManageFields(service.id);
+                  onClose();
+                }}
+                disabled={loading}
+                className="w-full sm:w-auto"
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Manage Service Fields
+              </Button>
+            </div>
+          )}
+
+          <div className="flex flex-col sm:flex-row justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
             <Button
               type="button"
-              variant="outline"
+              variant="admin"
+              size="sm"
               onClick={onClose}
               disabled={loading}
+              className="w-full sm:w-auto"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              variant="primary"
+              variant="admin"
+              size="sm"
               disabled={loading || uploading}
+              className="w-full sm:w-auto"
             >
               {uploading
                 ? "Uploading..."
                 : loading
                 ? "Saving..."
                 : service
-                  ? "Update Service"
-                  : "Create Service"}
+                  ? "Update"
+                  : "Create"}
             </Button>
           </div>
         </form>

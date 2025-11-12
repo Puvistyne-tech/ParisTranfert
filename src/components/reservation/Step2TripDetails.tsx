@@ -14,8 +14,10 @@ import {
   TestTube,
   User,
   Users,
+  RotateCcw,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { getTranslatedFieldLabel } from "@/lib/translations";
 import { useEffect, useMemo, useState } from "react";
 import type { Service } from "@/components/models";
 import type { Location } from "@/components/models/locations";
@@ -47,6 +49,7 @@ interface Step2TripDetailsProps {
 
 const fieldIcons: Record<string, any> = {
   pickup_location: MapPin,
+  pickup_address: MapPin,
   destination_location: MapPin,
   flight_number: Plane,
   flight_date: Calendar,
@@ -158,13 +161,28 @@ export function Step2TripDetails({
     }
   };
 
+  // Apply default values immediately when Disneyland service is selected (before service fields load)
+  useEffect(() => {
+    if (selectedService?.id === "disneyland") {
+      // Prefill pickup_location = "paris" (hidden, for pricing only) if not already set
+      if (!serviceSubData.pickup_location || serviceSubData.pickup_location === "") {
+        onServiceFieldChange("pickup_location", "paris");
+      }
+      // Prefill destination_location = "disneyland" (hidden, for pricing only) if not already set
+      if (!serviceSubData.destination_location || serviceSubData.destination_location === "") {
+        onServiceFieldChange("destination_location", "disneyland");
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedService?.id]);
+
   // Apply default values and map to formData when service fields are loaded
   useEffect(() => {
     if (!selectedService || serviceFields.length === 0) {
       return;
     }
 
-    // Apply default values and map to formData
+    // Apply default values from service fields
     serviceFields.forEach((field) => {
       if (field.defaultValue) {
         // Set default value in serviceSubData if not already set
@@ -200,6 +218,7 @@ export function Step2TripDetails({
         }
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serviceSubData, serviceFields]);
 
   // Get error fields for highlighting - use prop if available, otherwise parse from errors
@@ -280,11 +299,16 @@ export function Step2TripDetails({
 
   const renderServiceField = (field: ServiceField) => {
     const Icon = fieldIcons[field.fieldKey] || FileText;
-    const value = serviceSubData[field.fieldKey] || field.defaultValue || "";
+    // Get value from serviceSubData, or use default value if not set
+    // For pickup_address, ensure we use the default if not set
+    const value = serviceSubData[field.fieldKey] ?? field.defaultValue ?? "";
     const hasError = errorFields.has(field.fieldKey);
     // If field has a default value and it's set, make it read-only
+    // Exception: pickup_address should always be editable
     const isReadOnly = Boolean(
-      field.defaultValue && value === field.defaultValue,
+      field.defaultValue && 
+      value === field.defaultValue &&
+      field.fieldKey !== "pickup_address"
     );
 
     // Common props for Input and Select components
@@ -357,9 +381,27 @@ export function Step2TripDetails({
           />
         );
       case "date":
-        return <Input {...commonInputProps} type="date" />;
+        return (
+          <Input
+            {...commonInputProps}
+            type="date"
+            className={cn(
+              commonInputProps.className,
+              "text-sm sm:text-base py-2 sm:py-3 px-2 sm:px-4 max-w-full",
+            )}
+          />
+        );
       case "time":
-        return <Input {...commonInputProps} type="time" />;
+        return (
+          <Input
+            {...commonInputProps}
+            type="time"
+            className={cn(
+              commonInputProps.className,
+              "text-sm sm:text-base py-2 sm:py-3 px-2 sm:px-4 max-w-full",
+            )}
+          />
+        );
       case "location_select": {
         // Filter out the selected location from the opposite field
         // If this is pickup_location, exclude the selected destination_location
@@ -497,30 +539,32 @@ export function Step2TripDetails({
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
               {t("basicInformation")}
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-              <div className="w-full">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  <Calendar className="w-4 h-4 inline mr-2" />
-                  {t("pickupDate")}
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6">
+              <div className="w-full min-w-0">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                  <Calendar className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">{t("pickupDate")}</span>
+                  <span className="sm:hidden">{t("date")}</span>
                 </label>
                 <Input
                   type="date"
                   value={formData.date || ""}
                   onChange={(e) => onFormFieldChange("date", e.target.value)}
-                  className={`w-full ${errorFields.has("date") ? "border-red-500 dark:border-red-500 border-2" : ""}`}
+                  className={`w-full max-w-full text-sm sm:text-base py-2 sm:py-3 px-2 sm:px-4 ${errorFields.has("date") ? "border-red-500 dark:border-red-500 border-2" : ""}`}
                 />
               </div>
 
-              <div className="w-full">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  <Clock className="w-4 h-4 inline mr-2" />
-                  {t("pickupTime")}
+              <div className="w-full min-w-0">
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
+                  <Clock className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-2" />
+                  <span className="hidden sm:inline">{t("pickupTime")}</span>
+                  <span className="sm:hidden">{t("time")}</span>
                 </label>
                 <Input
                   type="time"
                   value={formData.time || ""}
                   onChange={(e) => handleFieldChange("time", e.target.value)}
-                  className={`w-full ${errorFields.has("time") ? "border-red-500 dark:border-red-500 border-2" : ""}`}
+                  className={`w-full max-w-full text-sm sm:text-base py-2 sm:py-3 px-2 sm:px-4 ${errorFields.has("time") ? "border-red-500 dark:border-red-500 border-2" : ""}`}
                 />
               </div>
 
@@ -570,23 +614,104 @@ export function Step2TripDetails({
                   })}
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                  {serviceFields.map((field) => {
-                    const Icon = fieldIcons[field.fieldKey] || FileText;
-                    return (
-                      <div key={field.id} className="space-y-2 w-full">
-                        <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                          <Icon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                          <span>
-                            {field.label}
-                            {field.required && (
-                              <span className="text-red-500 ml-1">*</span>
-                            )}
-                          </span>
+                  {/* Return Trip Toggle for Disneyland Service */}
+                  {selectedService?.id === "disneyland" && (
+                    <div className="md:col-span-2 space-y-4">
+                      <div className="flex items-center space-x-3 p-4 border-2 border-gray-200 dark:border-gray-700 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 transition-colors">
+                        <input
+                          type="checkbox"
+                          id="return_trip"
+                          checked={serviceSubData.return_trip === true}
+                          onChange={(e) =>
+                            onServiceFieldChange("return_trip", e.target.checked)
+                          }
+                          className="w-5 h-5 text-blue-600 dark:text-blue-400 rounded focus:ring-blue-500 focus:ring-2"
+                        />
+                        <label
+                          htmlFor="return_trip"
+                          className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer flex-1"
+                        >
+                          <RotateCcw className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                          <span>{t("returnTrip") || "Return Trip"}</span>
                         </label>
-                        {renderServiceField(field)}
                       </div>
-                    );
-                  })}
+
+                      {/* Return Date - Required when return trip is selected */}
+                      {serviceSubData.return_trip === true && (
+                        <div className="space-y-2 w-full min-w-0">
+                          <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                            <span>
+                              {t("serviceFields.returnDate") || "Return Date"}
+                              <span className="text-red-500 ml-1">*</span>
+                            </span>
+                          </label>
+                          <Input
+                            type="date"
+                            value={serviceSubData.return_date || ""}
+                            onChange={(e) =>
+                              onServiceFieldChange("return_date", e.target.value)
+                            }
+                            className={`w-full max-w-full text-sm sm:text-base py-2 sm:py-3 px-2 sm:px-4 ${
+                              errorFields.has("return_date")
+                                ? "border-red-500 dark:border-red-500 border-2"
+                                : ""
+                            }`}
+                            min={formData.date || ""}
+                          />
+                        </div>
+                      )}
+
+                      {/* Return Time - Optional when return trip is selected */}
+                      {serviceSubData.return_trip === true && (
+                        <div className="space-y-2 w-full min-w-0">
+                          <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                            <span>{t("serviceFields.returnTime") || "Return Time"}</span>
+                          </label>
+                          <Input
+                            type="time"
+                            value={serviceSubData.return_time || ""}
+                            onChange={(e) =>
+                              onServiceFieldChange("return_time", e.target.value)
+                            }
+                            className="w-full max-w-full text-sm sm:text-base py-2 sm:py-3 px-2 sm:px-4"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Regular Service Fields - Exclude return_time, return_date, pickup_location, and destination_location (hidden) for Disneyland */}
+                  {serviceFields
+                    .filter(
+                      (field) =>
+                        !(
+                          selectedService?.id === "disneyland" &&
+                          (field.fieldKey === "return_time" ||
+                            field.fieldKey === "return_date" ||
+                            (field.fieldKey === "pickup_location" && field.isPickup) ||
+                            (field.fieldKey === "destination_location" && field.isDestination))
+                        ),
+                    )
+                    .map((field) => {
+                      const Icon = fieldIcons[field.fieldKey] || FileText;
+                      const translatedLabel = getTranslatedFieldLabel(field.label, t);
+                      return (
+                        <div key={field.id} className="space-y-2 w-full">
+                          <label className="flex items-center space-x-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                            <Icon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                            <span>
+                              {translatedLabel}
+                              {field.required && (
+                                <span className="text-red-500 ml-1">*</span>
+                              )}
+                            </span>
+                          </label>
+                          {renderServiceField(field)}
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
             )

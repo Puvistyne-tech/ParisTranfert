@@ -63,11 +63,13 @@ export function ConfirmDialog({
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
                 {message}
               </p>
-              <div className="flex items-center justify-end space-x-3">
-                <Button variant="outline" onClick={onClose} disabled={loading}>
+              <div className="flex items-center justify-end gap-2">
+                <Button variant="admin" size="sm" onClick={onClose} disabled={loading}>
                   {cancelText}
                 </Button>
                 <Button
+                  variant="admin"
+                  size="sm"
                   onClick={onConfirm}
                   disabled={loading}
                   className={buttonStyles[variant]}

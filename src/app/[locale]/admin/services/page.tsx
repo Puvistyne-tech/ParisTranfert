@@ -1,90 +1,142 @@
 "use client";
 
-import { Edit, Filter, Package, Plus, Search, Trash2 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { Filter, Package, Plus, Search, Settings } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useAdminFilter } from "@/components/admin/AdminFilterContext";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
+import { MobileActionButtons } from "@/components/admin/MobileActionButtons";
+import { ServiceFieldsModal } from "@/components/admin/ServiceFieldsModal";
 import { ServiceModal } from "@/components/admin/ServiceModal";
-import type { Category } from "@/components/models/categories";
 import type { Service } from "@/components/models/services";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import {
-  createService,
-  deleteService,
-  getAllServices,
-  getCategories,
-  updateService,
-} from "@/lib/supabaseService";
+  useAdminCategories,
+  useAdminServices,
+  useCreateService,
+  useDeleteService,
+  useUpdateService,
+} from "@/hooks/admin/useAdminServices";
+import { useAdminServiceFields } from "@/hooks/admin/useAdminServiceFields";
+import { useServicesStore } from "@/store/admin/servicesStore";
 
 export default function AdminServicesPage() {
-  const [services, setServices] = useState<Service[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [availabilityFilter, setAvailabilityFilter] = useState<string>("all"); // "all", "available", "unavailable"
-  const [popularFilter, setPopularFilter] = useState<string>("all"); // "all", "popular", "not-popular"
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedService, setSelectedService] = useState<Service | null>(null);
+  const {
+    isServiceModalOpen,
+    selectedService,
+    searchQuery,
+    selectedCategory,
+    availabilityFilter,
+    popularFilter,
+    openServiceModal,
+    closeServiceModal,
+    setSearchQuery,
+    setSelectedCategory,
+    setAvailabilityFilter,
+    setPopularFilter,
+    resetFilters,
+  } = useServicesStore();
+
   const [deleteConfirm, setDeleteConfirm] = useState<{
     isOpen: boolean;
     serviceId: string | null;
-  }>({
-    isOpen: false,
-    serviceId: null,
+  }>({ isOpen: false, serviceId: null });
+  const [isServiceFieldsModalOpen, setIsServiceFieldsModalOpen] = useState(false);
+  const [selectedServiceForFields, setSelectedServiceForFields] = useState<string | null>(null);
+  
+  const { setFilterContent } = useAdminFilter();
+
+  // Fetch data with TanStack Query
+  const { data: services = [], isLoading } = useAdminServices({
+    search: searchQuery,
+    category: selectedCategory,
+    availability: availabilityFilter,
+    popular: popularFilter,
   });
-  const [saving, setSaving] = useState(false);
+  const { data: categories = [] } = useAdminCategories();
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [servicesData, categoriesData] = await Promise.all([
-        getAllServices(),
-        getCategories(),
-      ]);
-      setServices(servicesData);
-      setCategories(categoriesData);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const createMutation = useCreateService();
+  const updateMutation = useUpdateService();
+  const deleteMutation = useDeleteService();
 
-  const filteredServices = services.filter((service) => {
-    const matchesSearch =
-      !search ||
-      service.name.toLowerCase().includes(search.toLowerCase()) ||
-      service.description?.toLowerCase().includes(search.toLowerCase());
-    const matchesCategory =
-      !selectedCategory || service.categoryId === selectedCategory;
-    const matchesAvailability =
-      availabilityFilter === "all" ||
-      (availabilityFilter === "available" && service.isAvailable) ||
-      (availabilityFilter === "unavailable" && !service.isAvailable);
-    const matchesPopular =
-      popularFilter === "all" ||
-      (popularFilter === "popular" && service.isPopular) ||
-      (popularFilter === "not-popular" && !service.isPopular);
-    return (
-      matchesSearch && matchesCategory && matchesAvailability && matchesPopular
+  // Register filter content in header
+  useEffect(() => {
+    const filterUI = (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div>
+          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Search
+          </label>
+          <div className="relative">
+            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-500" />
+            <Input
+              type="text"
+              placeholder="Search services..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-8 text-sm dark:bg-gray-700 dark:text-white dark:border-gray-600"
+            />
+          </div>
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Category
+          </label>
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
+          >
+            <option value="">All Categories</option>
+            {categories.map((cat) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Availability
+          </label>
+          <select
+            value={availabilityFilter}
+            onChange={(e) => setAvailabilityFilter(e.target.value)}
+            className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
+          >
+            <option value="all">All Services</option>
+            <option value="available">Available Only</option>
+            <option value="unavailable">Unavailable Only</option>
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Popular Status
+          </label>
+          <select
+            value={popularFilter}
+            onChange={(e) => setPopularFilter(e.target.value)}
+            className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
+          >
+            <option value="all">All Services</option>
+            <option value="popular">Popular Only</option>
+            <option value="not-popular">Not Popular</option>
+          </select>
+        </div>
+      </div>
     );
-  });
+    setFilterContent(filterUI);
+    return () => setFilterContent(null);
+  }, [searchQuery, selectedCategory, availabilityFilter, popularFilter, categories, setFilterContent, setSearchQuery, setSelectedCategory, setAvailabilityFilter, setPopularFilter]);
 
   const handleCreate = () => {
-    setSelectedService(null);
-    setIsModalOpen(true);
+    openServiceModal(null);
   };
 
-  const handleEdit = (service: Service) => {
-    setSelectedService(service);
-    setIsModalOpen(true);
+  const handleEdit = (service: typeof services[0]) => {
+    openServiceModal(service);
   };
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
 
   const handleSave = async (
     serviceData: Partial<Service> & {
@@ -92,11 +144,10 @@ export default function AdminServicesPage() {
       key: string;
       name: string;
       categoryId: string;
-    },
+    }
   ) => {
-    setSaving(true);
     try {
-      // Convert Service type to what the API expects
+      // Convert to API format
       const apiData = {
         id: serviceData.id,
         key: serviceData.key,
@@ -117,28 +168,26 @@ export default function AdminServicesPage() {
         isAvailable: serviceData.isAvailable ?? true,
         categoryId: serviceData.categoryId,
       };
+
       if (selectedService) {
-        await updateService(selectedService.id, apiData);
+        await updateMutation.mutateAsync({
+          id: selectedService.id,
+          data: apiData as any,
+        });
       } else {
-        await createService(apiData);
+        await createMutation.mutateAsync(apiData as any);
       }
-      await fetchData();
-      setIsModalOpen(false);
-      setSelectedService(null);
+      closeServiceModal();
     } catch (error) {
       console.error("Error saving service:", error);
       alert("Failed to save service. Please try again.");
-    } finally {
-      setSaving(false);
     }
   };
 
   const handleDelete = async () => {
     if (!deleteConfirm.serviceId) return;
-
     try {
-      await deleteService(deleteConfirm.serviceId);
-      await fetchData();
+      await deleteMutation.mutateAsync(deleteConfirm.serviceId);
       setDeleteConfirm({ isOpen: false, serviceId: null });
     } catch (error) {
       console.error("Error deleting service:", error);
@@ -146,226 +195,76 @@ export default function AdminServicesPage() {
     }
   };
 
+  const handleManageFields = (serviceId: string) => {
+    setSelectedServiceForFields(serviceId);
+    setIsServiceFieldsModalOpen(true);
+  };
+
+  const hasActiveFilters =
+    searchQuery ||
+    selectedCategory ||
+    availabilityFilter !== "all" ||
+    popularFilter !== "all";
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Services Management
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+    <div className="space-y-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <p className="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
             Manage all services
           </p>
-        </div>
-        <Button variant="primary" onClick={handleCreate}>
+        <Button variant="admin" size="sm" onClick={handleCreate} className="w-full sm:w-auto">
           <Plus className="w-4 h-4 mr-2" />
-          Add Service
+          <span className="hidden sm:inline">Add Service</span>
+          <span className="sm:hidden">Add</span>
         </Button>
       </div>
 
-      {/* Filters */}
-      <Card className="dark:bg-gray-800 dark:border-gray-700">
-        <CardContent className="p-4">
-          <div className="flex items-center space-x-2 mb-4">
-            <Filter className="w-5 h-5 text-gray-500 dark:text-gray-400" />
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              Filters
-            </h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div>
-              <label
-                htmlFor="search-input"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Search
-              </label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
-                <Input
-                  id="search-input"
-                  type="text"
-                  placeholder="Search services..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10 dark:bg-gray-700 dark:text-white dark:border-gray-600"
-                />
-              </div>
-            </div>
-            <div>
-              <label
-                htmlFor="category-select"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Category
-              </label>
-              <select
-                id="category-select"
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
-              >
-                <option value="">All Categories</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label
-                htmlFor="availability-select"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Availability
-              </label>
-              <select
-                id="availability-select"
-                value={availabilityFilter}
-                onChange={(e) => setAvailabilityFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
-              >
-                <option value="all">All Services</option>
-                <option value="available">Available Only</option>
-                <option value="unavailable">Unavailable Only</option>
-              </select>
-            </div>
-            <div>
-              <label
-                htmlFor="popular-select"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Popular Status
-              </label>
-              <select
-                id="popular-select"
-                value={popularFilter}
-                onChange={(e) => setPopularFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
-              >
-                <option value="all">All Services</option>
-                <option value="popular">Popular Only</option>
-                <option value="not-popular">Not Popular</option>
-              </select>
-            </div>
-          </div>
-          {(search ||
-            selectedCategory ||
-            availabilityFilter !== "all" ||
-            popularFilter !== "all") && (
-            <div className="mt-4 flex items-center space-x-2">
+      {hasActiveFilters && (
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => {
-                  setSearch("");
-                  setSelectedCategory("");
-                  setAvailabilityFilter("all");
-                  setPopularFilter("all");
-                }}
-                className="text-sm"
+            onClick={resetFilters}
+            className="text-sm w-full sm:w-auto"
               >
                 Clear Filters
               </Button>
-              <span className="text-sm text-gray-600 dark:text-gray-400">
-                Showing {filteredServices.length} of {services.length} services
+          <span className="text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left">
+            Showing {services.length} service{services.length !== 1 ? "s" : ""}
               </span>
             </div>
           )}
-        </CardContent>
-      </Card>
 
       {/* Services List */}
-      {loading ? (
+      {isLoading ? (
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 dark:border-primary-400 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">
-            Loading services...
-          </p>
+          <p className="text-gray-600 dark:text-gray-400">Loading services...</p>
         </div>
       ) : (
-        <div className="grid gap-4">
-          {filteredServices.map((service) => (
-            <Card
+        <div className="grid gap-3">
+          {services.map((service) => (
+            <ServiceCard
               key={service.id}
-              className="dark:bg-gray-800 dark:border-gray-700"
-            >
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-4">
-                      <div className="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
-                        <Package className="w-6 h-6 text-primary-600 dark:text-primary-400" />
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                          {service.name}
-                        </h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                          {service.description}
-                        </p>
-                        <div className="flex items-center space-x-4 mt-2">
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              service.isAvailable
-                                ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
-                                : "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
-                            }`}
-                          >
-                            {service.isAvailable ? "Available" : "Unavailable"}
-                          </span>
-                          {service.isPopular && (
-                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400">
-                              Popular
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(service)}
-                    >
-                      <Edit className="w-4 h-4 mr-1" />
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
-                      onClick={() =>
-                        setDeleteConfirm({
-                          isOpen: true,
-                          serviceId: service.id,
-                        })
-                      }
-                    >
-                      <Trash2 className="w-4 h-4 mr-1" />
-                      Delete
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+              service={service}
+              onEdit={() => handleEdit(service)}
+              onDelete={() =>
+                setDeleteConfirm({ isOpen: true, serviceId: service.id })
+              }
+              onManageFields={() => handleManageFields(service.id)}
+            />
           ))}
         </div>
       )}
 
-      {filteredServices.length === 0 && !loading && (
+      {services.length === 0 && !isLoading && (
         <div className="text-center py-12">
           <Package className="w-16 h-16 text-gray-400 dark:text-gray-600 mx-auto mb-4" />
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
             No services found
           </h3>
           <p className="text-gray-600 dark:text-gray-400">
-            {search ||
-            selectedCategory ||
-            availabilityFilter !== "all" ||
-            popularFilter !== "all"
+            {hasActiveFilters
               ? "Try adjusting your filters"
               : "Get started by creating a new service"}
           </p>
@@ -373,16 +272,28 @@ export default function AdminServicesPage() {
       )}
 
       <ServiceModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedService(null);
-        }}
+        isOpen={isServiceModalOpen}
+        onClose={closeServiceModal}
         onSave={handleSave}
         service={selectedService}
         categories={categories}
-        loading={saving}
+        loading={createMutation.isPending || updateMutation.isPending}
+        onManageFields={handleManageFields}
       />
+
+      {selectedServiceForFields && (
+        <ServiceFieldsModal
+          isOpen={isServiceFieldsModalOpen}
+          onClose={() => {
+            setIsServiceFieldsModalOpen(false);
+            setSelectedServiceForFields(null);
+          }}
+          serviceId={selectedServiceForFields}
+          serviceName={
+            services.find((s) => s.id === selectedServiceForFields)?.name || "Service"
+          }
+        />
+      )}
 
       <ConfirmDialog
         isOpen={deleteConfirm.isOpen}
@@ -395,5 +306,90 @@ export default function AdminServicesPage() {
         variant="danger"
       />
     </div>
+  );
+}
+
+// Service Card Component
+function ServiceCard({
+  service,
+  onEdit,
+  onDelete,
+  onManageFields,
+}: {
+  service: Service;
+  onEdit: () => void;
+  onDelete: () => void;
+  onManageFields: () => void;
+}) {
+  const { data: fields = [] } = useAdminServiceFields(service.id);
+
+  return (
+    <Card className="dark:bg-gray-800 dark:border-gray-700">
+      <CardContent className="p-3 sm:p-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start gap-3">
+              <div className="p-1.5 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex-shrink-0">
+                <Package className="w-4 h-4 text-primary-600 dark:text-primary-400" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                  {service.name}
+                </h3>
+                {service.description && (
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+                    {service.description}
+                  </p>
+                )}
+                <div className="flex flex-wrap items-center gap-2 mt-2">
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      service.isAvailable
+                        ? "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400"
+                        : "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-400"
+                    }`}
+                  >
+                    {service.isAvailable ? "Available" : "Unavailable"}
+                  </span>
+                      {(service.isPopular ?? false) && (
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-400">
+                          Popular
+                        </span>
+                      )}
+                      {fields.length > 0 && (
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400">
+                          {fields.length} field{fields.length !== 1 ? "s" : ""}
+                        </span>
+                      )}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center justify-end sm:justify-start gap-2 sm:gap-1">
+            <button
+              onClick={onManageFields}
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              title="Manage Fields"
+              aria-label="Manage Fields"
+            >
+              <Settings className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+            </button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onManageFields}
+              className="hidden lg:flex"
+            >
+              <Settings className="w-4 h-4 mr-1" />
+              Fields
+            </Button>
+            <MobileActionButtons
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

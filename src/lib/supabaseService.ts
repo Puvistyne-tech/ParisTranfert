@@ -15,7 +15,12 @@ import type {
     VehicleTypeId,
 } from "@/components/models/vehicleTypes";
 import { supabase } from "./supabase";
-import type { Database, Tables, TablesInsert } from "./supabaseTypes";
+import type {
+    Database,
+    Tables,
+    TablesInsert,
+    TablesUpdate,
+} from "./supabaseTypes";
 
 // Helper to map DB row to Category
 export function mapCategoryRow(row: Tables<"categories">): Category {
@@ -65,9 +70,9 @@ export function mapVehicleTypeRow(row: Tables<"vehicle_types">): VehicleType {
         id: row.id as VehicleTypeId,
         name: row.name,
         description: row.description || undefined,
-        image: (row as any).image || undefined,
-        minPassengers: (row as any).min_passengers || 1,
-        maxPassengers: (row as any).max_passengers || 8,
+        image: row.image || undefined,
+        minPassengers: row.min_passengers || 1,
+        maxPassengers: row.max_passengers || 8,
     };
 }
 
@@ -232,7 +237,7 @@ export async function getServiceFields(
     serviceId: string
 ): Promise<ServiceField[]> {
     const { data, error } = await supabase
-        .from("service_fields" as any)
+        .from("service_fields")
         .select("*")
         .eq("service_id", serviceId)
         .order("field_order", { ascending: true });
@@ -267,6 +272,141 @@ export async function getServiceFields(
         defaultValue: row.default_value || undefined,
         fieldOrder: row.field_order || 0,
     }));
+}
+
+/**
+ * Create a service field
+ */
+export async function createServiceField(
+    serviceId: string,
+    fieldData: Omit<ServiceField, "id" | "serviceId">
+): Promise<ServiceField> {
+    const insertData: any = {
+        service_id: serviceId,
+        field_key: fieldData.fieldKey,
+        field_type: fieldData.fieldType,
+        label: fieldData.label,
+        required: fieldData.required || false,
+        options: fieldData.options ? fieldData.options : null,
+        min_value: fieldData.minValue || null,
+        max_value: fieldData.maxValue || null,
+        is_pickup: fieldData.isPickup || false,
+        is_destination: fieldData.isDestination || false,
+        default_value: fieldData.defaultValue || null,
+        field_order: fieldData.fieldOrder || 0,
+    };
+
+    const { data, error } = await supabase
+        .from("service_fields")
+        .insert(insertData)
+        .select()
+        .single();
+
+    if (error) {
+        console.error("Error creating service field:", error);
+        throw new Error(`Failed to create service field: ${error.message}`);
+    }
+
+    if (!data) {
+        throw new Error("Failed to create service field: No data returned");
+    }
+
+    return {
+        id: data.id,
+        serviceId: data.service_id,
+        fieldKey: data.field_key,
+        fieldType: data.field_type,
+        label: data.label,
+        required: data.required || false,
+        options:
+            data.options && Array.isArray(data.options)
+                ? data.options.filter(
+                      (item): item is string => typeof item === "string"
+                  )
+                : undefined,
+        minValue: data.min_value || undefined,
+        maxValue: data.max_value || undefined,
+        isPickup: data.is_pickup || false,
+        isDestination: data.is_destination || false,
+        defaultValue: data.default_value || undefined,
+        fieldOrder: data.field_order || 0,
+    };
+}
+
+/**
+ * Update a service field
+ */
+export async function updateServiceField(
+    fieldId: string,
+    updates: Partial<Omit<ServiceField, "id" | "serviceId">>
+): Promise<ServiceField> {
+    const updateData: any = {};
+    if (updates.fieldKey !== undefined) updateData.field_key = updates.fieldKey;
+    if (updates.fieldType !== undefined)
+        updateData.field_type = updates.fieldType;
+    if (updates.label !== undefined) updateData.label = updates.label;
+    if (updates.required !== undefined) updateData.required = updates.required;
+    if (updates.options !== undefined)
+        updateData.options = updates.options || null;
+    if (updates.minValue !== undefined)
+        updateData.min_value = updates.minValue || null;
+    if (updates.maxValue !== undefined)
+        updateData.max_value = updates.maxValue || null;
+    if (updates.isPickup !== undefined) updateData.is_pickup = updates.isPickup;
+    if (updates.isDestination !== undefined)
+        updateData.is_destination = updates.isDestination;
+    if (updates.defaultValue !== undefined)
+        updateData.default_value = updates.defaultValue || null;
+    if (updates.fieldOrder !== undefined)
+        updateData.field_order = updates.fieldOrder;
+
+    const { data, error } = await supabase
+        .from("service_fields")
+        .update(updateData)
+        .eq("id", fieldId)
+        .select()
+        .single();
+
+    if (error) {
+        console.error("Error updating service field:", error);
+        throw new Error(`Failed to update service field: ${error.message}`);
+    }
+
+    return {
+        id: data.id,
+        serviceId: data.service_id,
+        fieldKey: data.field_key,
+        fieldType: data.field_type,
+        label: data.label,
+        required: data.required || false,
+        options:
+            data.options && Array.isArray(data.options)
+                ? data.options.filter(
+                      (item): item is string => typeof item === "string"
+                  )
+                : undefined,
+        minValue: data.min_value || undefined,
+        maxValue: data.max_value || undefined,
+        isPickup: data.is_pickup || false,
+        isDestination: data.is_destination || false,
+        defaultValue: data.default_value || undefined,
+        fieldOrder: data.field_order || 0,
+    };
+}
+
+/**
+ * Delete a service field
+ */
+export async function deleteServiceField(fieldId: string): Promise<void> {
+    const { error } = await supabase
+        .from("service_fields")
+        .delete()
+        .eq("id", fieldId);
+
+    if (error) {
+        console.error("Error deleting service field:", error);
+        throw new Error(`Failed to delete service field: ${error.message}`);
+    }
 }
 
 /**
@@ -742,7 +882,7 @@ export async function updateReservation(
         status: ReservationStatus;
     }>
 ): Promise<Reservation> {
-    const updateData: any = {};
+    const updateData: TablesUpdate<"reservations"> = {};
 
     if (updates.date !== undefined) updateData.date = updates.date;
     if (updates.time !== undefined) updateData.time = updates.time;
@@ -763,7 +903,7 @@ export async function updateReservation(
     if (updates.notes !== undefined) updateData.notes = updates.notes;
     if (updates.totalPrice !== undefined)
         updateData.total_price = updates.totalPrice;
-    if (updates.status !== undefined) updateData.status = updates.status as any;
+    if (updates.status !== undefined) updateData.status = updates.status;
 
     const { data, error } = await supabase
         .from("reservations")
@@ -880,7 +1020,7 @@ export async function updateClient(
         phone: string;
     }>
 ): Promise<Client> {
-    const updateData: any = {};
+    const updateData: TablesUpdate<"clients"> = {};
 
     if (updates.firstName !== undefined)
         updateData.first_name = updates.firstName;
@@ -983,7 +1123,7 @@ export async function updatePricing(
         price: number;
     }>
 ): Promise<ServiceVehiclePricing> {
-    const updateData: any = {};
+    const updateData: TablesUpdate<"service_vehicle_pricing"> = {};
 
     if (updates.pickupLocationId !== undefined) {
         updateData.pickup_location_id = updates.pickupLocationId;
@@ -1582,7 +1722,12 @@ export async function deleteFeature(key: string): Promise<void> {
  */
 const SERVICE_IMAGES_BUCKET = "service-images";
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ALLOWED_MIME_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+const ALLOWED_MIME_TYPES = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+];
 
 /**
  * Upload a service image to Supabase storage
@@ -1645,7 +1790,10 @@ export async function deleteServiceImage(imageUrl: string): Promise<void> {
         // URL format: https://{project}.supabase.co/storage/v1/object/public/service-images/{path}
         const urlParts = imageUrl.split("/service-images/");
         if (urlParts.length !== 2) {
-            console.warn("Invalid image URL format, skipping deletion:", imageUrl);
+            console.warn(
+                "Invalid image URL format, skipping deletion:",
+                imageUrl
+            );
             return;
         }
 

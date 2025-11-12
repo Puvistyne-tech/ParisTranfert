@@ -55,6 +55,102 @@ function getReservationUrl(reservationId: string, locale: string = "en"): string
 }
 
 /**
+ * Helper function to format service-specific field labels
+ */
+function formatFieldLabel(key: string): string {
+  const labelMap: Record<string, string> = {
+    flight_number: "Flight Number",
+    hotel_name: "Hotel Name",
+    pickup_address: "Pickup Address",
+    return_trip: "Return Trip",
+    return_date: "Return Date",
+    return_time: "Return Time",
+    pickup_location: "Pickup Location",
+    destination_location: "Destination Location",
+  };
+  return labelMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+}
+
+/**
+ * Helper function to format service-specific field values
+ */
+function formatFieldValue(key: string, value: any): string {
+  if (value === null || value === undefined || value === "") {
+    return "N/A";
+  }
+  if (key === "return_trip") {
+    return value === true ? "Yes" : "No";
+  }
+  if (typeof value === "boolean") {
+    return value ? "Yes" : "No";
+  }
+  return String(value);
+}
+
+/**
+ * Generate HTML for service-specific fields section
+ */
+function generateServiceFieldsHTML(serviceSubData?: Record<string, any>): string {
+  if (!serviceSubData || Object.keys(serviceSubData).length === 0) {
+    return "";
+  }
+
+  // Filter out null/empty fields - only show fields with actual values
+  const visibleFields = Object.entries(serviceSubData).filter(
+    ([key, value]) => value !== null && value !== undefined && value !== ""
+  );
+
+  if (visibleFields.length === 0) {
+    return "";
+  }
+
+  const fieldsHTML = visibleFields
+    .map(
+      ([key, value]) => `
+            <div class="info-row">
+              <span class="info-label">${formatFieldLabel(key)}:</span>
+              <span class="info-value">${formatFieldValue(key, value)}</span>
+            </div>
+          `
+    )
+    .join("");
+
+  return `
+          <div class="section">
+            <div class="section-title">Service Details</div>
+            ${fieldsHTML}
+          </div>
+        `;
+}
+
+/**
+ * Generate text version of service-specific fields
+ */
+function generateServiceFieldsText(serviceSubData?: Record<string, any>): string {
+  if (!serviceSubData || Object.keys(serviceSubData).length === 0) {
+    return "";
+  }
+
+  // Filter out null/empty fields - only show fields with actual values
+  const visibleFields = Object.entries(serviceSubData).filter(
+    ([key, value]) => value !== null && value !== undefined && value !== ""
+  );
+
+  if (visibleFields.length === 0) {
+    return "";
+  }
+
+  const fieldsText = visibleFields
+    .map(
+      ([key, value]) =>
+        `- ${formatFieldLabel(key)}: ${formatFieldValue(key, value)}`
+    )
+    .join("\n");
+
+  return `\nService Details:\n${fieldsText}\n`;
+}
+
+/**
  * QUOTE_REQUESTED - Customer receives confirmation with quote request details
  */
 export function generateQuoteRequestedEmail(
@@ -123,6 +219,7 @@ export function generateQuoteRequestedEmail(
               <span class="info-value">${reservation.vehicleTypeName || "N/A"}</span>
             </div>
           </div>
+          ${generateServiceFieldsHTML(reservation.serviceSubData)}
 
           <div style="text-align: center; margin-top: 30px;">
             <a href="${reservationUrl}" class="button">View Reservation</a>
@@ -155,7 +252,7 @@ ${reservation.destinationLocation ? `- Destination: ${reservation.destinationLoc
 
 Service Information:
 - Service: ${reservation.serviceName || "N/A"}
-- Vehicle Type: ${reservation.vehicleTypeName || "N/A"}
+- Vehicle Type: ${reservation.vehicleTypeName || "N/A"}${generateServiceFieldsText(reservation.serviceSubData)}
 
 View your reservation: ${reservationUrl}
 
@@ -246,6 +343,7 @@ export function generateQuoteSentEmail(
               <span class="info-value">${reservation.vehicleTypeName || "N/A"}</span>
             </div>
           </div>
+          ${generateServiceFieldsHTML(reservation.serviceSubData)}
           
           <div class="highlight-box">
             <p style="font-weight: 600; margin-bottom: 10px;">Next Steps:</p>
@@ -285,7 +383,7 @@ ${reservation.destinationLocation ? `- Destination: ${reservation.destinationLoc
 
 Service Information:
 - Service: ${reservation.serviceName || "N/A"}
-- Vehicle Type: ${reservation.vehicleTypeName || "N/A"}
+- Vehicle Type: ${reservation.vehicleTypeName || "N/A"}${generateServiceFieldsText(reservation.serviceSubData)}
 
 Next Steps:
 If you would like to proceed with this reservation, please visit the link below to accept the quote. You can also contact us directly if you have any questions.
@@ -914,10 +1012,17 @@ export function generateAdminNotificationEmail(
               <span class="info-label">Vehicle Type:</span>
               <span class="info-value">${reservation.vehicleTypeName || "N/A"}</span>
             </div>
+            ${reservation.totalPrice > 0 ? `
             <div class="info-row">
               <span class="info-label">Total Price:</span>
-              <span class="info-value" style="font-weight: 700; color: #0ea5e9;">€${reservation.totalPrice}</span>
+              <span class="info-value" style="font-weight: 700; color: #0ea5e9;">€${reservation.totalPrice.toFixed(2)}</span>
             </div>
+            ` : `
+            <div class="info-row">
+              <span class="info-label">Total Price:</span>
+              <span class="info-value" style="font-weight: 700; color: #6b7280;">Quote Request</span>
+            </div>
+            `}
             <div class="info-row">
               <span class="info-label">Status:</span>
               <span class="info-value">
@@ -962,7 +1067,7 @@ ${reservation.destinationLocation ? `- To: ${reservation.destinationLocation}` :
 Service & Pricing:
 - Service: ${reservation.serviceName}
 - Vehicle Type: ${reservation.vehicleTypeName || "N/A"}
-- Total Price: €${reservation.totalPrice}
+- Total Price: ${reservation.totalPrice > 0 ? `€${reservation.totalPrice.toFixed(2)}` : "Quote Request"}
 - Status: ${reservation.status === 'quote_requested' ? 'Quote Requested' : reservation.status}
 
 View in Admin Panel: ${adminUrl}
@@ -1102,7 +1207,7 @@ ${reservation.destinationLocation ? `- To: ${reservation.destinationLocation}` :
 Service & Pricing:
 - Service: ${reservation.serviceName}
 - Vehicle Type: ${reservation.vehicleTypeName || "N/A"}
-- Total Price: €${reservation.totalPrice}
+- Total Price: ${reservation.totalPrice > 0 ? `€${reservation.totalPrice.toFixed(2)}` : "Quote Request"}
 - Status: Quote Accepted
 
 View & Confirm Reservation: ${adminUrl}
@@ -1242,7 +1347,7 @@ ${reservation.destinationLocation ? `- To: ${reservation.destinationLocation}` :
 Service & Pricing:
 - Service: ${reservation.serviceName}
 - Vehicle Type: ${reservation.vehicleTypeName || "N/A"}
-- Total Price: €${reservation.totalPrice}
+- Total Price: ${reservation.totalPrice > 0 ? `€${reservation.totalPrice.toFixed(2)}` : "Quote Request"}
 - Status: Cancelled
 
 View Reservation: ${adminUrl}

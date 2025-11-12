@@ -3,6 +3,7 @@
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { CategoryType } from "@/components/models/categories";
+import { CategoryType as CategoryTypeEnum, CATEGORY_TYPES } from "@/components/models/categories";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
@@ -29,7 +30,7 @@ export function CategoryModal({
   const [formData, setFormData] = useState({
     id: "",
     name: "",
-    categoryType: "service" as CategoryType,
+    categoryType: CategoryTypeEnum.TRANSPORT as CategoryType,
     description: "",
   });
 
@@ -38,7 +39,7 @@ export function CategoryModal({
       setFormData({
         id: category.id,
         name: category.name || "",
-        categoryType: category.categoryType || "service",
+        categoryType: category.categoryType || CategoryTypeEnum.TRANSPORT,
         description: category.description || "",
       });
     } else {
@@ -46,7 +47,7 @@ export function CategoryModal({
       setFormData({
         id: newId,
         name: "",
-        categoryType: "service" as CategoryType,
+        categoryType: CategoryTypeEnum.TRANSPORT as CategoryType,
         description: "",
       });
     }
@@ -129,8 +130,11 @@ export function CategoryModal({
               required
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:bg-gray-700 dark:text-white"
             >
-              <option value="service">Service</option>
-              <option value="vehicle">Vehicle</option>
+              {CATEGORY_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -148,21 +152,18 @@ export function CategoryModal({
             />
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
             <Button
               type="button"
-              variant="outline"
+              variant="admin"
+              size="sm"
               onClick={onClose}
               disabled={loading}
             >
               Cancel
             </Button>
-            <Button type="submit" variant="primary" disabled={loading}>
-              {loading
-                ? "Saving..."
-                : category
-                  ? "Update Category"
-                  : "Create Category"}
+            <Button type="submit" variant="admin" size="sm" disabled={loading}>
+              {loading ? "Saving..." : category ? "Update" : "Create"}
             </Button>
           </div>
         </form>

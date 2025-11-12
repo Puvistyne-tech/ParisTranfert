@@ -1,9 +1,10 @@
 "use client";
 
-import { Edit, FolderTree, Plus, Trash2 } from "lucide-react";
+import { FolderTree, Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { CategoryModal } from "@/components/admin/CategoryModal";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
+import { MobileActionButtons } from "@/components/admin/MobileActionButtons";
 import type { Category, CategoryType } from "@/components/models/categories";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
@@ -103,19 +104,17 @@ export default function AdminCategoriesPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Categories Management
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
             Manage service categories
           </p>
         </div>
-        <Button variant="primary" onClick={handleCreate}>
+        <Button variant="admin" size="sm" onClick={handleCreate} className="w-full sm:w-auto">
           <Plus className="w-4 h-4 mr-2" />
-          Add Category
+          <span className="hidden sm:inline">Add Category</span>
+          <span className="sm:hidden">Add</span>
         </Button>
       </div>
 
@@ -127,53 +126,42 @@ export default function AdminCategoriesPage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-3">
           {categories.map((category) => (
             <Card
               key={category.id}
               className="dark:bg-gray-800 dark:border-gray-700"
             >
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
-                      <FolderTree className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="p-1.5 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex-shrink-0">
+                      <FolderTree className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                     </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                         {category.name}
                       </h3>
+                      {category.description && (
                       <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                         {category.description}
                       </p>
+                      )}
                       <span className="inline-block mt-2 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300">
-                        {category.categoryType}
+                        {category.categoryType.charAt(0).toUpperCase() + category.categoryType.slice(1)}
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(category)}
-                    >
-                      <Edit className="w-4 h-4 mr-1" />
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
-                      onClick={() =>
+                  <div className="flex items-center justify-end sm:justify-start">
+                    <MobileActionButtons
+                      onEdit={() => handleEdit(category)}
+                      onDelete={() =>
                         setDeleteConfirm({
                           isOpen: true,
                           categoryId: category.id,
                         })
                       }
-                    >
-                      <Trash2 className="w-4 h-4 mr-1" />
-                      Delete
-                    </Button>
+                    />
                   </div>
                 </div>
               </CardContent>

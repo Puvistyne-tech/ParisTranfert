@@ -65,6 +65,8 @@ export default function SubmitReservationPage() {
   const [copied, setCopied] = useState(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const [pdfData, setPdfData] = useState<ReservationPDFData | null>(null);
+  const [pickupLocationName, setPickupLocationName] = useState<string | null>(null);
+  const [destinationLocationName, setDestinationLocationName] = useState<string | null>(null);
 
   // Redirect if no valid reservation data - check first before doing anything
   useEffect(() => {
@@ -83,20 +85,30 @@ export default function SubmitReservationPage() {
 
   // Extract only location fields that affect pricing
   // This ensures price only refetches when locations change, not when other fields change
-  const pickupLocation = serviceSubData?.pickup_location;
-  const destinationLocation = serviceSubData?.destination_location;
+  // Check both serviceSubData (for services with location fields) and formData (for airport transfers)
+  const pickupLocation = serviceSubData?.pickup_location || formData.pickup || null;
+  const destinationLocation = serviceSubData?.destination_location || formData.destination || null;
 
   // Use TanStack Query to fetch pricing with caching - prevents unnecessary refetches
-  const isAirportTransfer = selectedService?.id === "airport-transfers";
-  const { data: pricingData } = usePricing(
-    isAirportTransfer ? selectedService?.id : null,
-    isAirportTransfer ? selectedVehicleType?.id : null,
-    isAirportTransfer ? pickupLocation : null,
-    isAirportTransfer ? destinationLocation : null,
-    isAirportTransfer,
+  // Pricing now works for all services that have pickup and destination locations
+  const hasLocationFields = Boolean(pickupLocation && destinationLocation);
+  const { data: pricingData, isLoading: priceLoading } = usePricing(
+    selectedService?.id ?? null,
+    selectedVehicleType?.id ?? null,
+    pickupLocation ?? null,
+    destinationLocation ?? null,
+    hasLocationFields,
   );
 
-  const basePrice = pricingData?.price ?? null;
+  // Calculate base price - double for Disneyland return trips
+  let basePrice = pricingData?.price ?? null;
+  if (
+    basePrice !== null &&
+    selectedService?.id === "disneyland" &&
+    serviceSubData?.return_trip === true
+  ) {
+    basePrice = basePrice * 2;
+  }
 
   // Use TanStack Query hook for service fields
   const { data: serviceFields = [] } = useServiceFields(selectedService?.id);
@@ -139,6 +151,7 @@ export default function SubmitReservationPage() {
       notes: formData.notes,
       status: "pending",
       createdAt: new Date().toISOString(),
+      serviceSubData: serviceSubData || undefined,
     };
     setPdfData(pdfData);
   }, [
@@ -152,15 +165,69 @@ export default function SubmitReservationPage() {
     basePrice,
   ]);
 
-  // Update PDF data when basePrice changes
+  // Update PDF data when basePrice changes (including when it's 0)
   useEffect(() => {
-    if (pdfData && basePrice !== null) {
-      setPdfData({
-        ...pdfData,
-        totalPrice: basePrice,
+    if (pdfData) {
+      setPdfData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          totalPrice: basePrice ?? 0,
+        };
       });
     }
   }, [basePrice]);
+
+  // Convert location IDs to full names for display
+  useEffect(() => {
+    async function convertLocations() {
+      if (pdfData?.pickupLocation) {
+        const loc = pdfData.pickupLocation;
+        // Check if it's a location ID (short string like 'paris', 'cdg', 'orly')
+        if (loc.length < 20 && /^[a-z0-9_-]+$/.test(loc.toLowerCase())) {
+          try {
+            const location = await getLocationById(loc);
+            if (location) {
+              setPickupLocationName(location.name);
+            } else {
+              setPickupLocationName(loc);
+            }
+          } catch {
+            setPickupLocationName(loc);
+          }
+        } else {
+          setPickupLocationName(loc);
+        }
+      } else {
+        setPickupLocationName(null);
+      }
+
+      if (pdfData?.destinationLocation) {
+        const loc = pdfData.destinationLocation;
+        // Check if it's a location ID
+        if (loc.length < 20 && /^[a-z0-9_-]+$/.test(loc.toLowerCase())) {
+          try {
+            const location = await getLocationById(loc);
+            if (location) {
+              setDestinationLocationName(location.name);
+            } else {
+              setDestinationLocationName(loc);
+            }
+          } catch {
+            setDestinationLocationName(loc);
+          }
+        } else {
+          setDestinationLocationName(loc);
+        }
+      } else {
+        setDestinationLocationName(null);
+      }
+    }
+
+    if (pdfData) {
+      convertLocations();
+    }
+  }, [pdfData?.pickupLocation, pdfData?.destinationLocation]);
 
   // Helper function to generate hash of reservation data for duplicate detection
   const generateReservationHash = (): string => {
@@ -724,7 +791,7 @@ export default function SubmitReservationPage() {
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
                     <div>
                       <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">
-                        PARIS TRANSFER
+                        PRESTIGE PARIS TRANSFERT
                       </h3>
                       <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                         Premium Transportation Services
@@ -820,16 +887,16 @@ export default function SubmitReservationPage() {
                           From:
                         </span>
                         <span className="font-medium text-gray-900 dark:text-gray-100">
-                          {pdfData.pickupLocation}
+                          {pickupLocationName || pdfData.pickupLocation}
                         </span>
                       </div>
-                      {pdfData.destinationLocation && (
+                      {(destinationLocationName || pdfData.destinationLocation) && (
                         <div className="flex justify-between">
                           <span className="text-gray-600 dark:text-gray-400">
                             To:
                           </span>
                           <span className="font-medium text-gray-900 dark:text-gray-100">
-                            {pdfData.destinationLocation}
+                            {destinationLocationName || pdfData.destinationLocation}
                           </span>
                         </div>
                       )}
@@ -893,6 +960,116 @@ export default function SubmitReservationPage() {
                       )}
                     </div>
                   </div>
+                </div>
+
+                {/* Service-Specific Fields */}
+                {pdfData.serviceSubData && Object.keys(pdfData.serviceSubData).length > 0 && (
+                  <div className="border-t dark:border-gray-700 pt-3 sm:pt-4">
+                    <h4 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3">
+                      Additional Service Information
+                    </h4>
+                    <div className="grid sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm">
+                      {Object.entries(pdfData.serviceSubData).map(([key, value]) => {
+                        // Skip null, undefined, or empty string values
+                        if (value === null || value === undefined || value === "") {
+                          return null;
+                        }
+                        
+                        // Skip hidden fields used only for pricing
+                        if (
+                          key === "pickup_location" ||
+                          key === "destination_location"
+                        ) {
+                          return null;
+                        }
+                        
+                        const fieldLabel = key
+                          .split("_")
+                          .map(
+                            (word) =>
+                              word.charAt(0).toUpperCase() + word.slice(1),
+                          )
+                          .join(" ");
+                        
+                        // Format value based on type
+                        let displayValue = String(value);
+                        if (key === "return_trip") {
+                          displayValue = value === true ? "Yes" : "No";
+                        } else if (typeof value === "boolean") {
+                          displayValue = value ? "Yes" : "No";
+                        }
+                        
+                        return (
+                          <div
+                            key={key}
+                            className="flex justify-between"
+                          >
+                            <span className="text-gray-600 dark:text-gray-400">
+                              {fieldLabel}:
+                            </span>
+                            <span className="font-medium text-gray-900 dark:text-gray-100 text-right break-words">
+                              {displayValue}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Pricing Section */}
+                <div className="border-t dark:border-gray-700 pt-3 sm:pt-4">
+                  <h4 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3">
+                    Pricing
+                  </h4>
+                  {pdfData.totalPrice > 0 ? (
+                    <div className="space-y-2 text-xs sm:text-sm">
+                      {selectedService?.id === "disneyland" && serviceSubData?.return_trip === true && (
+                        <>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600 dark:text-gray-400">
+                              Base Price:
+                            </span>
+                            <span className="font-medium text-gray-900 dark:text-gray-100">
+                              €{(pdfData.totalPrice / 2).toFixed(2)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-gray-600 dark:text-gray-400">
+                              Return Trip:
+                            </span>
+                            <span className="font-medium text-gray-900 dark:text-gray-100">
+                              €{(pdfData.totalPrice / 2).toFixed(2)}
+                            </span>
+                          </div>
+                        </>
+                      )}
+                      {(!selectedService?.id || selectedService.id !== "disneyland" || !serviceSubData?.return_trip) && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600 dark:text-gray-400">
+                            Base Price:
+                          </span>
+                          <span className="font-medium text-gray-900 dark:text-gray-100">
+                            €{pdfData.totalPrice.toFixed(2)}
+                          </span>
+                        </div>
+                      )}
+                      <div className="border-t dark:border-gray-700 pt-2 mt-2">
+                        <div className="flex justify-between text-base sm:text-lg font-bold">
+                          <span className="text-gray-900 dark:text-gray-100">
+                            Total:
+                          </span>
+                          <span className="text-gray-900 dark:text-gray-100">
+                            €{pdfData.totalPrice.toFixed(2)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                      Quote Request
+                    </div>
+                  )}
                 </div>
 
                 <div className="border-t dark:border-gray-700 pt-3 sm:pt-4">

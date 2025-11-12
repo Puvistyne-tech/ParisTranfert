@@ -320,7 +320,17 @@
       "specialRequestsPlaceholderText": "Any special requests or notes...",
       "pleaseCompleteAllFields": "Please complete all required fields",
       "loadingServiceFields": "Loading service fields...",
-      "fieldRequired": "This field is required"
+      "fieldRequired": "This field is required",
+      "serviceFields": {
+        "pickupAddress": "Pickup Address",
+        "hotelName": "Hotel Name (if applicable)",
+        "returnTime": "Return Time",
+        "returnDate": "Return Date",
+        "destination": "Destination",
+        "pickupLocationHidden": "Pickup Location (hidden)",
+        "destinationHidden": "Destination (hidden)"
+      },
+      "returnTrip": "Return Trip"
     },
     "step3": {
       "title": "Review & Confirm",
@@ -348,6 +358,7 @@
       "total": "Total",
       "selectPickupDestination": "Select pickup and destination to see price",
       "loadingPrice": "Loading price...",
+      "quoteRequest": "Quote Request",
       "additionalServicesFree": "Additional Services (Free)",
       "babySeats": "Baby Seats",
       "boosterSeats": "Booster Seats",

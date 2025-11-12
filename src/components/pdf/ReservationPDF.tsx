@@ -31,6 +31,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     padding: 20,
     fontFamily: "Helvetica",
+    justifyContent: "space-between",
   },
   header: {
     flexDirection: "row",
@@ -67,12 +68,21 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 15,
     marginBottom: 20,
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: "column",
   },
   tripInfo: {
     flex: 1,
-    marginRight: 10,
+    marginBottom: 8,
+  },
+  tripInfoRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  tripInfoColumn: {
+    flex: 1,
+    minWidth: "45%",
+    marginRight: 8,
+    marginBottom: 4,
   },
   tripTitle: {
     fontSize: 12,
@@ -87,7 +97,7 @@ const styles = StyleSheet.create({
   tripLabel: {
     fontSize: 9,
     color: "#6b7280",
-    width: 60,
+    width: 90,
     fontWeight: "bold",
   },
   tripValue: {
@@ -214,7 +224,7 @@ const styles = StyleSheet.create({
     lineHeight: 1.3,
   },
   footer: {
-    marginTop: 20,
+    marginTop: "auto",
     paddingTop: 15,
     borderTopWidth: 1,
     borderTopColor: "#e5e7eb",
@@ -249,10 +259,10 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   importantTitle: {
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: "bold",
     color: "#dc2626",
-    marginBottom: 4,
+    marginBottom: 3,
   },
   importantText: {
     fontSize: 7,
@@ -283,6 +293,7 @@ interface ReservationPDFData {
   notes?: string;
   status: string;
   createdAt: string;
+  serviceSubData?: Record<string, any>; // Service-specific fields
 }
 
 export interface PDFTranslations {
@@ -339,23 +350,71 @@ export const ReservationPDF: React.FC<ReservationPDFProps> = ({
   // Additional services are free
   const additionalServicesTotal = 0;
 
-  // Check if this is an airport transfer service (has pricing)
-  const isAirportTransfer =
-    data.serviceName.toLowerCase().includes("airport") ||
-    data.serviceName.toLowerCase().includes("transfer");
-
   // Check if status is a quote status
   const isQuoteStatus =
     data.status.toLowerCase() === "quote_requested" ||
     data.status.toLowerCase() === "quote_sent" ||
     data.status.toLowerCase() === "quote_accepted";
 
-  // Show pricing if price > 0 (for all statuses including confirmed, completed, etc.)
-  // The quote message should only appear for quote statuses when price is 0
-  const shouldShowPricing = data.totalPrice > 0;
+  // Use the totalPrice directly from the reservation
+  // For Disneyland return trips, check if price needs to be doubled
+  // (price might be stored as base price in database, not doubled)
+  let finalPrice = data.totalPrice;
+  const isDisneyland = data.serviceName.toLowerCase().includes("disneyland");
+  const hasReturnTrip = data.serviceSubData?.return_trip === true;
+  
+  // If Disneyland with return trip and price seems like base price (80-90 range), double it
+  if (
+    isDisneyland &&
+    hasReturnTrip &&
+    finalPrice > 0 &&
+    finalPrice < 150 // Base prices are typically 80-90, so if less than 150, likely needs doubling
+  ) {
+    finalPrice = finalPrice * 2;
+  }
 
-  // Show quote message only for quote statuses with price 0
-  const shouldShowQuoteMessage = isQuoteStatus && data.totalPrice === 0;
+  // Show pricing if price > 0 (for all services)
+  // Always show pricing section - either with price or quote message
+  const shouldShowPricing = finalPrice > 0;
+  const shouldShowQuoteMessage = finalPrice === 0 || (isQuoteStatus && finalPrice === 0);
+
+  // Helper function to format service-specific field labels
+  const formatFieldLabel = (key: string): string => {
+    const labelMap: Record<string, string> = {
+      flight_number: "Flight Number",
+      hotel_name: "Hotel Name",
+      pickup_address: "Pickup Address",
+      return_trip: "Return Trip",
+      return_date: "Return Date",
+      return_time: "Return Time",
+      pickup_location: "Pickup Location",
+      destination_location: "Destination Location",
+    };
+    return labelMap[key] || key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+  };
+
+  // Helper function to format service-specific field values
+  const formatFieldValue = (key: string, value: any): string => {
+    if (value === null || value === undefined || value === "") {
+      return "N/A";
+    }
+    if (key === "return_trip") {
+      return value === true ? "Yes" : "No";
+    }
+    if (typeof value === "boolean") {
+      return value ? "Yes" : "No";
+    }
+    return String(value);
+  };
+
+  // Filter out null/empty fields - only show fields with actual values
+  const shouldDisplayField = (key: string, value: any): boolean => {
+    // Skip null, undefined, or empty string values
+    if (value === null || value === undefined || value === "") {
+      return false;
+    }
+    return true;
+  };
 
   // Status color mapping
   const getStatusColors = (status: string) => {
@@ -443,46 +502,83 @@ export const ReservationPDF: React.FC<ReservationPDFProps> = ({
           {translations.reservationStatus}: {data.status.toUpperCase()}
         </Text>
 
-        {/* Trip Information Card - Top Center */}
+        {/* Main Content - flex: 1 to push footer down */}
+        <View style={{ flex: 1 }}>
+        {/* Trip Information Card - Main Box with all important details */}
         <View style={styles.tripCard}>
-          <View style={styles.tripInfo}>
-            <Text style={styles.tripTitle}>{translations.tripDetails}</Text>
-            <View style={styles.tripRow}>
-              <Text style={styles.tripLabel}>{translations.date}:</Text>
-              <Text style={styles.tripValue}>{data.pickupDate}</Text>
-            </View>
-            <View style={styles.tripRow}>
-              <Text style={styles.tripLabel}>{translations.time}:</Text>
-              <Text style={styles.tripValue}>{data.pickupTime}</Text>
-            </View>
-            <View style={styles.tripRow}>
-              <Text style={styles.tripLabel}>{translations.from}:</Text>
-              <Text style={styles.tripValue}>{data.pickupLocation}</Text>
-            </View>
-            {data.destinationLocation && (
+          <Text style={styles.tripTitle}>{translations.tripDetails}</Text>
+          <View style={styles.tripInfoRow}>
+            <View style={styles.tripInfoColumn}>
               <View style={styles.tripRow}>
-                <Text style={styles.tripLabel}>{translations.to}:</Text>
-                <Text style={styles.tripValue}>{data.destinationLocation}</Text>
+                <Text style={styles.tripLabel}>{translations.date}:</Text>
+                <Text style={styles.tripValue}>{data.pickupDate}</Text>
               </View>
-            )}
+              <View style={styles.tripRow}>
+                <Text style={styles.tripLabel}>{translations.time}:</Text>
+                <Text style={styles.tripValue}>{data.pickupTime}</Text>
+              </View>
+              <View style={styles.tripRow}>
+                <Text style={styles.tripLabel}>{translations.from}:</Text>
+                <Text style={styles.tripValue}>{data.pickupLocation}</Text>
+              </View>
+              {data.destinationLocation && (
+                <View style={styles.tripRow}>
+                  <Text style={styles.tripLabel}>{translations.to}:</Text>
+                  <Text style={styles.tripValue}>{data.destinationLocation}</Text>
+                </View>
+              )}
+            </View>
+            <View style={styles.tripInfoColumn}>
+              <View style={styles.tripRow}>
+                <Text style={styles.tripLabel}>{translations.vehicleType}:</Text>
+                <Text style={styles.tripValue}>{data.vehicleTypeName}</Text>
+              </View>
+              <View style={styles.tripRow}>
+                <Text style={styles.tripLabel}>{translations.service}:</Text>
+                <Text style={styles.tripValue}>{data.serviceName}</Text>
+              </View>
+              <View style={styles.tripRow}>
+                <Text style={styles.tripLabel}>{translations.passengers}:</Text>
+                <Text style={styles.tripValue}>{data.passengers}</Text>
+              </View>
+            </View>
           </View>
-          <View style={styles.tripInfo}>
-            <Text style={styles.tripTitle}>
-              {translations.vehicleTypeService}
-            </Text>
-            <View style={styles.tripRow}>
-              <Text style={styles.tripLabel}>{translations.vehicleType}:</Text>
-              <Text style={styles.tripValue}>{data.vehicleTypeName}</Text>
+          
+          {/* Service-Specific Fields in Trip Card */}
+          {data.serviceSubData && Object.keys(data.serviceSubData).length > 0 && (
+            <View style={{ marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: "#e2e8f0" }}>
+              <Text style={[styles.tripTitle, { fontSize: 10, marginBottom: 4 }]}>Service Details</Text>
+              <View style={styles.tripInfoRow}>
+                {Object.entries(data.serviceSubData)
+                  .filter(([key, value]) => shouldDisplayField(key, value))
+                  .slice(0, 6) // Limit to 6 fields to keep compact
+                  .map(([key, value]) => (
+                    <View key={key} style={styles.tripInfoColumn}>
+                      <View style={styles.tripRow}>
+                        <Text style={styles.tripLabel}>{formatFieldLabel(key)}:</Text>
+                        <Text style={styles.tripValue}>{formatFieldValue(key, value)}</Text>
+                      </View>
+                    </View>
+                  ))}
+              </View>
+              {/* Show remaining fields if more than 6 */}
+              {Object.entries(data.serviceSubData).filter(([key, value]) => shouldDisplayField(key, value)).length > 6 && (
+                <View style={styles.tripInfoRow}>
+                  {Object.entries(data.serviceSubData)
+                    .filter(([key, value]) => shouldDisplayField(key, value))
+                    .slice(6)
+                    .map(([key, value]) => (
+                      <View key={key} style={styles.tripInfoColumn}>
+                        <View style={styles.tripRow}>
+                          <Text style={styles.tripLabel}>{formatFieldLabel(key)}:</Text>
+                          <Text style={styles.tripValue}>{formatFieldValue(key, value)}</Text>
+                        </View>
+                      </View>
+                    ))}
+                </View>
+              )}
             </View>
-            <View style={styles.tripRow}>
-              <Text style={styles.tripLabel}>{translations.service}:</Text>
-              <Text style={styles.tripValue}>{data.serviceName}</Text>
-            </View>
-            <View style={styles.tripRow}>
-              <Text style={styles.tripLabel}>{translations.passengers}:</Text>
-              <Text style={styles.tripValue}>{data.passengers}</Text>
-            </View>
-          </View>
+          )}
         </View>
 
         {/* Two Column Layout */}
@@ -506,37 +602,16 @@ export const ReservationPDF: React.FC<ReservationPDFProps> = ({
               </View>
             </View>
 
-            {/* Vehicle Type Details */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>
-                {translations.vehicleType}
-              </Text>
-              <View style={styles.row}>
-                <Text style={styles.label}>{translations.vehicleType}:</Text>
-                <Text style={styles.value}>{data.vehicleTypeName}</Text>
-              </View>
-              {data.vehicleTypeDescription && (
+            {/* Service Description - Only if it adds value */}
+            {data.serviceDescription && data.serviceDescription.trim() !== "" && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>{translations.service}</Text>
                 <View style={styles.row}>
                   <Text style={styles.label}>{translations.description}:</Text>
-                  <Text style={styles.value}>
-                    {data.vehicleTypeDescription}
-                  </Text>
+                  <Text style={styles.value}>{data.serviceDescription}</Text>
                 </View>
-              )}
-            </View>
-
-            {/* Service Details */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>{translations.service}</Text>
-              <View style={styles.row}>
-                <Text style={styles.label}>{translations.service}:</Text>
-                <Text style={styles.value}>{data.serviceName}</Text>
               </View>
-              <View style={styles.row}>
-                <Text style={styles.label}>{translations.description}:</Text>
-                <Text style={styles.value}>{data.serviceDescription}</Text>
-              </View>
-            </View>
+            )}
 
             {/* Additional Services */}
             {(data.babySeats > 0 ||
@@ -576,35 +651,56 @@ export const ReservationPDF: React.FC<ReservationPDFProps> = ({
 
           {/* Right Column */}
           <View style={styles.rightColumn}>
-            {/* Pricing Section */}
-            {shouldShowPricing ? (
-              <View style={styles.priceSection}>
-                <Text style={styles.sectionTitle}>{translations.pricing}</Text>
-                <View style={styles.priceRow}>
-                  <Text style={styles.priceLabel}>
-                    {translations.basePrice}:
-                  </Text>
-                  <Text style={styles.priceValue}>
-                    €{data.totalPrice.toFixed(2)}
-                  </Text>
-                </View>
-                <View style={styles.totalRow}>
-                  <Text style={styles.totalLabel}>{translations.total}:</Text>
-                  <Text style={styles.totalValue}>
-                    €{data.totalPrice.toFixed(2)}
-                  </Text>
-                </View>
-              </View>
-            ) : shouldShowQuoteMessage ? (
-              <View style={styles.priceSection}>
-                <Text style={styles.sectionTitle}>{translations.pricing}</Text>
+            {/* Pricing Section - Always show for all services */}
+            <View style={styles.priceSection}>
+              <Text style={styles.sectionTitle}>{translations.pricing}</Text>
+              {shouldShowPricing ? (
+                <>
+                {/* Show breakdown for Disneyland return trips, otherwise show base price */}
+                {isDisneyland && hasReturnTrip && finalPrice > 0 ? (
+                  <>
+                    <View style={styles.priceRow}>
+                      <Text style={styles.priceLabel}>
+                        {translations.basePrice}:
+                      </Text>
+                      <Text style={styles.priceValue}>
+                        €{(finalPrice / 2).toFixed(2)}
+                      </Text>
+                    </View>
+                    <View style={styles.priceRow}>
+                      <Text style={styles.priceLabel}>
+                        Return Trip:
+                      </Text>
+                      <Text style={styles.priceValue}>
+                        €{(finalPrice / 2).toFixed(2)}
+                      </Text>
+                    </View>
+                  </>
+                ) : (
+                  <View style={styles.priceRow}>
+                    <Text style={styles.priceLabel}>
+                      {translations.basePrice}:
+                    </Text>
+                    <Text style={styles.priceValue}>
+                      €{finalPrice.toFixed(2)}
+                    </Text>
+                  </View>
+                )}
+                  <View style={styles.totalRow}>
+                    <Text style={styles.totalLabel}>{translations.total}:</Text>
+                    <Text style={styles.totalValue}>
+                      €{finalPrice.toFixed(2)}
+                    </Text>
+                  </View>
+                </>
+              ) : (
                 <View style={styles.notes}>
                   <Text style={styles.notesText}>
                     {translations.quoteMessage}
                   </Text>
                 </View>
-              </View>
-            ) : null}
+              )}
+            </View>
 
             {/* Special Requests */}
             {data.notes && (
@@ -645,6 +741,7 @@ export const ReservationPDF: React.FC<ReservationPDFProps> = ({
             • {translations.created}:{" "}
             {new Date(data.createdAt).toLocaleDateString()}
           </Text>
+        </View>
         </View>
 
         {/* Footer */}

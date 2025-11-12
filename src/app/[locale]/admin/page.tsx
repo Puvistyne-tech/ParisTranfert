@@ -139,23 +139,20 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-3 sm:space-y-4">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Dashboard
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400 mt-2">
+        <p className="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
           Overview of your reservations and business metrics
         </p>
       </div>
 
       {/* Quick Reservation Search */}
       <Card className="dark:bg-gray-800 dark:border-gray-700">
-        <CardContent className="p-6">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        <CardContent className="p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Quick Search Reservation
           </h2>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Input
               type="text"
               placeholder="Enter Reservation ID..."
@@ -167,6 +164,7 @@ export default function AdminDashboard() {
             <Button
               onClick={handleSearchReservation}
               disabled={searching || !searchId.trim()}
+              className="w-full sm:w-auto"
             >
               <Search className="w-4 h-4 mr-2" />
               {searching ? "Searching..." : "Search"}
@@ -176,74 +174,74 @@ export default function AdminDashboard() {
       </Card>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <Card className="dark:bg-gray-800 dark:border-gray-700">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
                   Total Reservations
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
+                <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mt-2">
                   {stats.totalReservations}
                 </p>
               </div>
-              <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-                <Calendar className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              <div className="p-2 sm:p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
+                <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="dark:bg-gray-800 dark:border-gray-700">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
                   Pending Quotes
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
+                <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mt-2">
                   {stats.pendingQuotes}
                 </p>
               </div>
-              <div className="p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
-                <Clock className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+              <div className="p-2 sm:p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg">
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600 dark:text-yellow-400" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="dark:bg-gray-800 dark:border-gray-700">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
                   Confirmed Reservations
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
+                <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mt-2">
                   {stats.confirmedReservations}
                 </p>
               </div>
-              <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                <TrendingUp className="w-6 h-6 text-green-600 dark:text-green-400" />
+              <div className="p-2 sm:p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
+                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card className="dark:bg-gray-800 dark:border-gray-700">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
                   Total Revenue
                 </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">
+                <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mt-2">
                   €{stats.totalRevenue.toLocaleString()}
                 </p>
               </div>
-              <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-                <DollarSign className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+              <div className="p-2 sm:p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+                <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400" />
               </div>
             </div>
           </CardContent>
@@ -252,14 +250,14 @@ export default function AdminDashboard() {
 
       {/* Recent Reservations */}
       <Card className="dark:bg-gray-800 dark:border-gray-700">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+        <CardContent className="p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4 sm:mb-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
               Recent Reservations
             </h2>
             <button
               onClick={() => router.push(`/${locale}/admin/reservations`)}
-              className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium"
+              className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium text-left sm:text-right"
             >
               View All
             </button>
@@ -273,16 +271,16 @@ export default function AdminDashboard() {
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {stats.recentReservations.map((reservation) => (
                 <div
                   key={reservation.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                   onClick={() => setSelectedReservationId(reservation.id)}
                 >
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-4 flex-wrap gap-2">
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white font-mono">
                         #{reservation.id.slice(0, 8)}
                       </span>
                       <span
@@ -297,25 +295,29 @@ export default function AdminDashboard() {
                         {reservation.status}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                      {reservation.date} at {reservation.time} • €
-                      {reservation.totalPrice}
+                    <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                      {reservation.date} at {reservation.time}
                     </p>
-                    <div className="flex items-center space-x-4 mt-1 flex-wrap gap-2">
+                    <p className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mt-1">
+                      €{reservation.totalPrice}
+                    </p>
+                    {(reservation.createdAt || reservation.updatedAt) && (
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 gap-1 sm:gap-0 mt-2">
                       {reservation.createdAt && (
                         <span className="text-xs text-gray-500 dark:text-gray-500">
                           Created:{" "}
-                          {new Date(reservation.createdAt).toLocaleString()}
+                            {new Date(reservation.createdAt).toLocaleDateString()}
                         </span>
                       )}
                       {reservation.updatedAt &&
                         reservation.updatedAt !== reservation.createdAt && (
                           <span className="text-xs text-gray-500 dark:text-gray-500">
                             Modified:{" "}
-                            {new Date(reservation.updatedAt).toLocaleString()}
+                              {new Date(reservation.updatedAt).toLocaleDateString()}
                           </span>
                         )}
                     </div>
+                    )}
                   </div>
                 </div>
               ))}

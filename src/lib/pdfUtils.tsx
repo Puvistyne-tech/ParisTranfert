@@ -26,6 +26,7 @@ export interface ReservationPDFData {
   notes?: string;
   status: string;
   createdAt: string;
+  serviceSubData?: Record<string, any>; // Service-specific fields (flight_number, hotel_name, pickup_address, return_trip, etc.)
 }
 
 /**

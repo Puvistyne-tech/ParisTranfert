@@ -5,7 +5,8 @@ import {
   getReservationById, 
   getClientById, 
   getServiceById, 
-  getVehicleTypeById 
+  getVehicleTypeById,
+  getLocationById,
 } from "@/lib/supabaseService";
 
 /**
@@ -57,6 +58,26 @@ export async function GET(
       );
     }
 
+    // Convert location IDs to full names if needed
+    let pickupLocationName = reservation.pickupLocation;
+    let destinationLocationName = reservation.destinationLocation || null;
+    
+    // Check if pickup location is an ID (short string like 'paris', 'cdg', 'orly')
+    if (pickupLocationName && pickupLocationName.length < 20 && /^[a-z0-9_-]+$/.test(pickupLocationName.toLowerCase())) {
+      const location = await getLocationById(pickupLocationName);
+      if (location) {
+        pickupLocationName = location.name;
+      }
+    }
+    
+    // Check if destination location is an ID
+    if (destinationLocationName && destinationLocationName.length < 20 && /^[a-z0-9_-]+$/.test(destinationLocationName.toLowerCase())) {
+      const location = await getLocationById(destinationLocationName);
+      if (location) {
+        destinationLocationName = location.name;
+      }
+    }
+
     // Prepare PDF data
     const pdfData: ReservationPDFData = {
       reservationId: reservation.id,
@@ -69,8 +90,8 @@ export async function GET(
       serviceDescription: service.description || "",
       pickupDate: reservation.date,
       pickupTime: reservation.time,
-      pickupLocation: reservation.pickupLocation,
-      destinationLocation: reservation.destinationLocation || null,
+      pickupLocation: pickupLocationName,
+      destinationLocation: destinationLocationName,
       passengers: reservation.passengers,
       babySeats: reservation.babySeats,
       boosterSeats: reservation.boosterSeats,
@@ -79,6 +100,7 @@ export async function GET(
       notes: reservation.notes,
       status: reservation.status,
       createdAt: reservation.createdAt || new Date().toISOString(),
+      serviceSubData: reservation.serviceSubData || undefined,
     };
 
     // Generate PDF buffer using the shared utility function

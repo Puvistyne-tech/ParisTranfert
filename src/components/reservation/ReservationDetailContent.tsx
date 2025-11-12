@@ -267,6 +267,7 @@ export function ReservationDetailContent({
       notes: reservation.notes,
       status: reservation.status,
       createdAt: reservation.createdAt || new Date().toISOString(),
+      serviceSubData: reservation.serviceSubData || undefined,
     };
   };
 

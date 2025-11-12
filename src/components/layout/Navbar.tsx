@@ -380,6 +380,48 @@ export function Navbar() {
                 </div>
               </div>
 
+              {/* Mobile User Menu - Only show if logged in */}
+              {user && (
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <div className="space-y-2">
+                    <div className="px-2 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                        {user.email}
+                      </p>
+                      {userIsAdmin && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          {user.user_metadata?.role || user.role || "Admin"}
+                        </p>
+                      )}
+                    </div>
+                    {userIsAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleAdminClick();
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-100 dark:border-gray-700"
+                      >
+                        <Settings className="w-4 h-4" />
+                        <span>Admin Panel</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleLogout();
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 flex items-center space-x-2 text-sm text-red-600 dark:text-red-400 border-b border-gray-100 dark:border-gray-700"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <Button
                 variant="primary"
                 size="md"

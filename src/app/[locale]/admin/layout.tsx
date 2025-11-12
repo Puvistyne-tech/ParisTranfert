@@ -5,7 +5,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import { useEffect, useState } from "react";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { AdminFilterProvider } from "@/components/admin/AdminFilterContext";
+import { BottomTabBar } from "@/components/admin/BottomTabBar";
 import { DarkModeProvider } from "@/components/providers/DarkModeProvider";
+import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistration";
 import type { AdminUser } from "@/lib/auth";
 import { getCurrentUser, isAdmin } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -142,6 +145,7 @@ export default function AdminLayout({
 
   return (
     <DarkModeProvider>
+      <AdminFilterProvider>
       <div
         id="admin-container"
         className="min-h-screen bg-gray-50 dark:bg-gray-900 flex"
@@ -149,11 +153,17 @@ export default function AdminLayout({
         {/* Sidebar */}
         <AdminSidebar user={user} />
 
-        {/* Main content area - with proper spacing for mobile menu */}
-        <div className="flex-1 lg:ml-64 min-h-screen pt-16 lg:pt-0">
-          <div className="p-6 lg:p-8">{children}</div>
+          {/* Main content area - with proper spacing for mobile menu and bottom tab bar */}
+          <div className="flex-1 lg:ml-64 min-h-screen pt-14 lg:pt-0 pb-20 lg:pb-0">
+            <div className="p-3 sm:p-4 lg:p-6">{children}</div>
+          </div>
+          
+          {/* Bottom Tab Bar - Mobile Only */}
+          <BottomTabBar />
         </div>
-      </div>
+        {/* PWA Service Worker Registration - Root scope to handle all routes */}
+        <ServiceWorkerRegistration enablePushNotifications={true} />
+      </AdminFilterProvider>
     </DarkModeProvider>
   );
 }

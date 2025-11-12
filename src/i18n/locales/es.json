@@ -328,7 +328,17 @@
       "specialRequestsPlaceholderText": "Cualquier solicitud especial o nota...",
       "pleaseCompleteAllFields": "Por favor completa todos los campos requeridos",
       "loadingServiceFields": "Cargando campos del servicio...",
-      "fieldRequired": "Este campo es requerido"
+      "fieldRequired": "Este campo es requerido",
+      "serviceFields": {
+        "pickupAddress": "Lugar de Recogida",
+        "hotelName": "Nombre del Hotel (si aplica)",
+        "returnTime": "Hora de Regreso",
+        "returnDate": "Fecha de Regreso",
+        "destination": "Destino",
+        "pickupLocationHidden": "Lugar de Recogida (oculto)",
+        "destinationHidden": "Destino (oculto)"
+      },
+      "returnTrip": "Viaje de Regreso"
     },
     "step3": {
       "title": "Revisar y Confirmar",
@@ -356,6 +366,7 @@
       "total": "Total",
       "selectPickupDestination": "Selecciona el lugar de recogida y destino para ver el precio",
       "loadingPrice": "Cargando precio...",
+      "quoteRequest": "Solicitud de Cotización",
       "additionalServicesFree": "Servicios Adicionales (Gratis)",
       "babySeats": "Asientos para Bebés",
       "boosterSeats": "Asientos Elevadores",

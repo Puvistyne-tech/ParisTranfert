@@ -1,9 +1,10 @@
 "use client";
 
-import { Car, Edit, Plus, Trash2 } from "lucide-react";
+import { Car, Plus } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
+import { MobileActionButtons } from "@/components/admin/MobileActionButtons";
 import { VehicleModal } from "@/components/admin/VehicleModal";
 import type { VehicleType } from "@/components/models/vehicleTypes";
 import { Button } from "@/components/ui/Button";
@@ -97,19 +98,17 @@ export default function AdminVehiclesPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Vehicle Types Management
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-2">
+          <p className="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
             Manage vehicle types and passenger limits
           </p>
         </div>
-        <Button variant="primary" onClick={handleCreate}>
+        <Button variant="admin" size="sm" onClick={handleCreate} className="w-full sm:w-auto">
           <Plus className="w-4 h-4 mr-2" />
-          Add Vehicle Type
+          <span className="hidden sm:inline">Add Vehicle Type</span>
+          <span className="sm:hidden">Add</span>
         </Button>
       </div>
 
@@ -121,17 +120,17 @@ export default function AdminVehiclesPage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-4">
+        <div className="grid gap-3">
           {vehicles.map((vehicle) => (
             <Card
               key={vehicle.id}
               className="dark:bg-gray-800 dark:border-gray-700"
             >
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4">
+              <CardContent className="p-3 sm:p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div className="flex items-start space-x-3 sm:space-x-4">
                     {vehicle.image ? (
-                      <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                      <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden flex-shrink-0">
                         <Image
                           src={vehicle.image}
                           alt={vehicle.name}
@@ -140,18 +139,20 @@ export default function AdminVehiclesPage() {
                         />
                       </div>
                     ) : (
-                      <div className="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
-                        <Car className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+                      <div className="p-1.5 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex-shrink-0">
+                        <Car className="w-4 h-4 text-primary-600 dark:text-primary-400" />
                       </div>
                     )}
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                         {vehicle.name}
                       </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      {vehicle.description && (
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
                         {vehicle.description}
                       </p>
-                      <div className="flex items-center space-x-4 mt-2">
+                      )}
+                      <div className="mt-2">
                         <span className="text-sm text-gray-600 dark:text-gray-400">
                           Passengers: {vehicle.minPassengers || 1} -{" "}
                           {vehicle.maxPassengers || 8}
@@ -159,29 +160,16 @@ export default function AdminVehiclesPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(vehicle)}
-                    >
-                      <Edit className="w-4 h-4 mr-1" />
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300"
-                      onClick={() =>
+                  <div className="flex items-center justify-end sm:justify-start">
+                    <MobileActionButtons
+                      onEdit={() => handleEdit(vehicle)}
+                      onDelete={() =>
                         setDeleteConfirm({
                           isOpen: true,
                           vehicleId: vehicle.id,
                         })
                       }
-                    >
-                      <Trash2 className="w-4 h-4 mr-1" />
-                      Delete
-                    </Button>
+                    />
                   </div>
                 </div>
               </CardContent>
