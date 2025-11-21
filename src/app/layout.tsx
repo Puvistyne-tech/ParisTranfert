@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -24,8 +26,16 @@ export const metadata: Metadata = {
     },
     icons: {
         apple: [
-            { url: "/web-app-manifest-192x192.png", sizes: "192x192", type: "image/png" },
-            { url: "/web-app-manifest-512x512.png", sizes: "512x512", type: "image/png" },
+            {
+                url: "/web-app-manifest-192x192.png",
+                sizes: "192x192",
+                type: "image/png",
+            },
+            {
+                url: "/web-app-manifest-512x512.png",
+                sizes: "512x512",
+                type: "image/png",
+            },
         ],
     },
     other: {
@@ -56,10 +66,7 @@ export default function RootLayout({
                     name="apple-mobile-web-app-title"
                     content="PrestigeParisTranfert"
                 />
-                <meta
-                    name="apple-mobile-web-app-capable"
-                    content="yes"
-                />
+                <meta name="apple-mobile-web-app-capable" content="yes" />
                 <meta
                     name="apple-mobile-web-app-status-bar-style"
                     content="default"
@@ -73,6 +80,8 @@ export default function RootLayout({
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
                 {children}
+                <SpeedInsights />
+                <Analytics />
             </body>
         </html>
     );
