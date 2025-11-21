@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run build)",
+      "Bash(npm run lint)",
+      "Bash(npm run format)",
+      "Bash(npm run lint:*)",
+      "Bash(npx @biomejs/biome check:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

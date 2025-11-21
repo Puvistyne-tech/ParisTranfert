@@ -80,10 +80,10 @@ export function Testimonials() {
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-4xl lg:text-6xl font-bold font-display text-gray-900 dark:text-gray-100 mb-6">
+          <h2 className="text-4xl lg:text-6xl xl:text-7xl font-bold font-display text-gray-900 dark:text-gray-100 mb-6">
             {t("title")}
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl lg:text-2xl xl:text-3xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
             {t("subtitle")}
           </p>
         </motion.div>
@@ -107,17 +107,17 @@ export function Testimonials() {
                       {testimonial.initials}
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-900 dark:text-gray-100">
+                      <h4 className="text-base lg:text-lg xl:text-xl font-bold text-gray-900 dark:text-gray-100">
                         {testimonial.name}
                       </h4>
                       <div className="flex text-warning-500 dark:text-warning-400">
                         {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} className="w-4 h-4 fill-current" />
+                          <Star key={i} className="w-4 h-4 lg:w-5 lg:h-5 xl:w-6 xl:h-6 fill-current" />
                         ))}
                       </div>
                     </div>
                   </div>
-                  <p className="text-gray-600 dark:text-gray-400 italic">
+                  <p className="text-sm lg:text-base xl:text-lg text-gray-600 dark:text-gray-400 italic">
                     "{testimonial.comment}"
                   </p>
                 </CardContent>

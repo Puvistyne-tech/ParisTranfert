@@ -71,10 +71,10 @@ export function VehicleClasses() {
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-4xl lg:text-6xl font-bold font-display text-gray-900 dark:text-gray-100 mb-6">
+          <h2 className="text-4xl lg:text-6xl xl:text-7xl font-bold font-display text-gray-900 dark:text-gray-100 mb-6">
             {t("title")}
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl lg:text-2xl xl:text-3xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
             {t("subtitle")}
           </p>
         </motion.div>
@@ -125,11 +125,11 @@ export function VehicleClasses() {
 
                         {/* Content */}
                         <div className="absolute bottom-6 left-6 right-6">
-                          <h3 className="text-3xl font-bold text-white mb-2">
+                          <h3 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-2">
                             {vehicleType.name}
                           </h3>
                           {vehicleType.description && (
-                            <p className="text-white/90 text-lg mb-4">
+                            <p className="text-white/90 text-lg lg:text-xl xl:text-2xl mb-4">
                               {vehicleType.description}
                             </p>
                           )}
@@ -167,10 +167,10 @@ export function VehicleClasses() {
           viewport={{ once: true }}
         >
           <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-2xl">
-            <h3 className="text-2xl font-bold mb-4 text-white">
+            <h3 className="text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 text-white">
               {t("needHelpChoosing")}
             </h3>
-            <p className="text-white/95 mb-6 max-w-2xl mx-auto">
+            <p className="text-base lg:text-lg xl:text-xl text-white/95 mb-6 max-w-2xl mx-auto">
               {t("teamCanHelp")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

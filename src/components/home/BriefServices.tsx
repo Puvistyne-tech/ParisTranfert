@@ -94,10 +94,10 @@ export function BriefServices() {
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-4xl lg:text-6xl font-bold font-display text-gray-900 dark:text-gray-100 mb-6">
+          <h2 className="text-4xl lg:text-6xl xl:text-7xl font-bold font-display text-gray-900 dark:text-gray-100 mb-6">
             {t("title")}
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed mb-8">
+          <p className="text-xl lg:text-2xl xl:text-3xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed mb-8">
             {t("subtitle")}
           </p>
           <Button
@@ -137,10 +137,10 @@ export function BriefServices() {
                     className="mb-12"
                   >
                     <div className="text-center mb-8">
-                      <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                      <h3 className="text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                         {category.name}
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-400">
+                      <p className="text-base lg:text-lg xl:text-xl text-gray-600 dark:text-gray-400">
                         {category.description}
                       </p>
                     </div>
@@ -175,16 +175,16 @@ export function BriefServices() {
                                   <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-all duration-300">
                                     <Icon className="text-white text-xl" />
                                   </div>
-                                  <h4 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">
+                                  <h4 className="text-lg lg:text-xl xl:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                                     {service.name}
                                   </h4>
-                                  <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm leading-relaxed flex-1">
+                                  <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm lg:text-base xl:text-lg leading-relaxed flex-1">
                                     {service.shortDescription}
                                   </p>
-                                  <div className="text-lg font-bold text-primary-600 dark:text-primary-400 mb-3">
+                                  <div className="text-lg lg:text-xl xl:text-2xl font-bold text-primary-600 dark:text-primary-400 mb-3">
                                     {service.priceRange}
                                   </div>
-                                  <div className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                                  <div className="text-xs lg:text-sm xl:text-base text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                                     {t("learnMore")}
                                   </div>
                                 </CardContent>
@@ -208,7 +208,7 @@ export function BriefServices() {
           transition={{ duration: 0.6, delay: 0.4 }}
           viewport={{ once: true }}
         >
-          <p className="text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-base lg:text-lg xl:text-xl text-gray-600 dark:text-gray-400 mb-6">
             {t("needCustomSolution")}
           </p>
           <Button

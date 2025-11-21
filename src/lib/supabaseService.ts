@@ -1721,6 +1721,7 @@ export async function deleteFeature(key: string): Promise<void> {
  * Storage: Upload service image to Supabase storage
  */
 const SERVICE_IMAGES_BUCKET = "service-images";
+const VEHICLE_IMAGES_BUCKET = "vehicle-images";
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_MIME_TYPES = [
     "image/jpeg",
@@ -1812,5 +1813,95 @@ export async function deleteServiceImage(imageUrl: string): Promise<void> {
     } catch (error) {
         // Don't throw - deletion is optional cleanup
         console.warn("Error deleting service image:", error);
+    }
+}
+
+/**
+ * Storage: Upload vehicle image to Supabase storage
+ */
+
+/**
+ * Upload a vehicle image to Supabase storage
+ * @param file - The image file to upload
+ * @param vehicleId - The vehicle ID to associate with the image
+ * @returns The public URL of the uploaded image
+ */
+export async function uploadVehicleImage(
+    file: File,
+    vehicleId: string
+): Promise<string> {
+    // Validate file type
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+        throw new Error(
+            `Invalid file type. Allowed types: ${ALLOWED_MIME_TYPES.join(", ")}`
+        );
+    }
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+        throw new Error(
+            `File size exceeds limit of ${MAX_FILE_SIZE / 1024 / 1024}MB`
+        );
+    }
+
+    // Generate unique filename
+    const fileExt = file.name.split(".").pop() || "jpg"; // Default to jpg if no extension
+    const timestamp = Date.now();
+    const fileName = `vehicle-${vehicleId}-${timestamp}.${fileExt}`;
+    const filePath = `${vehicleId}/${fileName}`;
+
+    // Upload file to storage
+    const { data, error } = await supabase.storage
+        .from(VEHICLE_IMAGES_BUCKET)
+        .upload(filePath, file, {
+            cacheControl: "3600",
+            upsert: false, // Don't overwrite existing files
+        });
+
+    if (error) {
+        console.error("Error uploading image:", error);
+        throw new Error(`Failed to upload image: ${error.message}`);
+    }
+
+    // Get public URL
+    const {
+        data: { publicUrl },
+    } = supabase.storage.from(VEHICLE_IMAGES_BUCKET).getPublicUrl(filePath);
+
+    return publicUrl;
+}
+
+/**
+ * Delete a vehicle image from Supabase storage
+ * @param imageUrl - The public URL of the image to delete
+ */
+export async function deleteVehicleImage(imageUrl: string): Promise<void> {
+    try {
+        // Extract file path from URL
+        // URL format: https://{project}.supabase.co/storage/v1/object/public/vehicle-images/{path}
+        const urlParts = imageUrl.split("/vehicle-images/");
+        if (urlParts.length !== 2) {
+            console.warn(
+                "Invalid image URL format, skipping deletion:",
+                imageUrl
+            );
+            return;
+        }
+
+        const filePath = urlParts[1];
+
+        // Delete file from storage
+        const { error } = await supabase.storage
+            .from(VEHICLE_IMAGES_BUCKET)
+            .remove([filePath]);
+
+        if (error) {
+            console.error("Error deleting image:", error);
+            // Don't throw - deletion is optional cleanup
+            console.warn(`Failed to delete image: ${error.message}`);
+        }
+    } catch (error) {
+        // Don't throw - deletion is optional cleanup
+        console.warn("Error deleting vehicle image:", error);
     }
 }

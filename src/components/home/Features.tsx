@@ -100,10 +100,10 @@ export function Features() {
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
         >
-          <h2 className="text-4xl lg:text-6xl font-bold font-display text-gray-900 dark:text-gray-100 mb-6">
+          <h2 className="text-4xl lg:text-6xl xl:text-7xl font-bold font-display text-gray-900 dark:text-gray-100 mb-6">
             {t("title")}
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl lg:text-2xl xl:text-3xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
             {t("subtitle")}
           </p>
         </motion.div>
@@ -129,10 +129,10 @@ export function Features() {
                 >
                   <Icon className="text-white text-2xl" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+                <h3 className="text-xl lg:text-2xl xl:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">
                   {t(`${feature.key}.title`)}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-base lg:text-lg xl:text-xl text-gray-600 dark:text-gray-400">
                   {t(`${feature.key}.description`)}
                 </p>
               </motion.div>

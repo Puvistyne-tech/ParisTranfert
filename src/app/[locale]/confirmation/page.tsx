@@ -378,9 +378,9 @@ export default function ConfirmationPage() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
         <div className="space-y-4 sm:space-y-6">
-          <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {/* Reservation Details */}
             <div className="lg:col-span-2 space-y-4 sm:space-y-6">
               {/* Category Details */}
@@ -435,11 +435,11 @@ export default function ConfirmationPage() {
 
                       {/* Vehicle Details */}
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-base text-gray-900 dark:text-gray-100 mb-1">
+                        <h4 className="font-semibold text-sm sm:text-base text-gray-900 dark:text-gray-100 mb-1 break-words">
                           {selectedVehicleType?.name}
                         </h4>
                         {selectedVehicleType?.description && (
-                          <p className="text-xs text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-2 sm:mb-3 line-clamp-2 sm:line-clamp-3 break-words">
                             {getTranslatedVehicleDescription(
                               selectedVehicleType.id,
                               selectedVehicleType.description,
@@ -495,7 +495,7 @@ export default function ConfirmationPage() {
                       </Button>
                     </div>
                     <div>
-                      <h4 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      <h4 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 break-words">
                         {getTranslatedServiceName(
                           selectedService.id,
                           selectedService.name,
@@ -508,17 +508,17 @@ export default function ConfirmationPage() {
                           },
                         )}
                       </h4>
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1 sm:mt-2 line-clamp-2 sm:line-clamp-3 break-words">
                         {selectedService.description}
                       </p>
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-4 mt-2 sm:mt-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                         {selectedService.duration && (
-                          <span>
+                          <span className="break-words">
                             {t("duration")}: {selectedService.duration}
                           </span>
                         )}
                         {selectedService.priceRange && (
-                          <span>
+                          <span className="break-words">
                             {t("priceRange")}: {selectedService.priceRange}
                           </span>
                         )}
@@ -550,61 +550,61 @@ export default function ConfirmationPage() {
                         {t("modify")}
                       </Button>
                     </div>
-                    <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
-                      <div className="flex items-center space-x-2 sm:space-x-3">
-                        <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                        <div className="min-w-0">
-                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                      <div className="flex items-start sm:items-center space-x-2 sm:space-x-3">
+                        <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 dark:text-gray-500 flex-shrink-0 mt-0.5 sm:mt-0" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-0.5">
                             {t("date")}
                           </p>
-                          <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 truncate">
+                          <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 break-words">
                             {formData.date || t("notAvailable")}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2 sm:space-x-3">
-                        <Clock className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                        <div className="min-w-0">
-                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex items-start sm:items-center space-x-2 sm:space-x-3">
+                        <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 dark:text-gray-500 flex-shrink-0 mt-0.5 sm:mt-0" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-0.5">
                             {t("time")}
                           </p>
-                          <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 truncate">
+                          <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 break-words">
                             {formData.time || t("notAvailable")}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2 sm:space-x-3">
-                        <Users className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                        <div className="min-w-0">
-                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                      <div className="flex items-start sm:items-center space-x-2 sm:space-x-3">
+                        <Users className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 dark:text-gray-500 flex-shrink-0 mt-0.5 sm:mt-0" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-0.5">
                             {t("passengers")}
                           </p>
-                          <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 truncate">
+                          <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 break-words">
                             {formData.passengers || t("notAvailable")}
                           </p>
                         </div>
                       </div>
                       {pickupLocationName && (
-                        <div className="flex items-center space-x-2 sm:space-x-3">
-                          <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                          <div className="min-w-0">
-                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                        <div className="flex items-start sm:items-center space-x-2 sm:space-x-3 sm:col-span-1">
+                          <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 dark:text-gray-500 flex-shrink-0 mt-0.5 sm:mt-0" />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-0.5">
                               {t("pdf.from") || "From"}
                             </p>
-                            <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 truncate">
+                            <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 break-words">
                               {pickupLocationName}
                             </p>
                           </div>
                         </div>
                       )}
                       {destinationLocationName && (
-                        <div className="flex items-center space-x-2 sm:space-x-3">
-                          <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                          <div className="min-w-0">
-                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                        <div className="flex items-start sm:items-center space-x-2 sm:space-x-3 sm:col-span-1">
+                          <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 dark:text-gray-500 flex-shrink-0 mt-0.5 sm:mt-0" />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-0.5">
                               {t("pdf.to") || "To"}
                             </p>
-                            <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 truncate">
+                            <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 break-words">
                               {destinationLocationName}
                             </p>
                           </div>
@@ -638,7 +638,7 @@ export default function ConfirmationPage() {
                           {t("modify")}
                         </Button>
                       </div>
-                      <div className="grid md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                         {Object.entries(serviceSubData).map(([key, value]) => {
                           // Skip null, undefined, or empty string values
                           if (value === null || value === undefined || value === "") {
@@ -664,14 +664,14 @@ export default function ConfirmationPage() {
                           return (
                             <div
                               key={key}
-                              className="flex items-center space-x-3"
+                              className="flex items-start sm:items-center space-x-2 sm:space-x-3"
                             >
-                              <FileText className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                              <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 dark:text-gray-500 flex-shrink-0 mt-0.5 sm:mt-0" />
                               <div className="min-w-0 flex-1">
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-0.5">
                                   {fieldLabel}
                                 </p>
-                                <p className="font-medium text-gray-900 dark:text-gray-100 break-words">
+                                <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 break-words">
                                   {displayValue}
                                 </p>
                               </div>
@@ -706,36 +706,36 @@ export default function ConfirmationPage() {
                         {t("modify")}
                       </Button>
                     </div>
-                    <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">
                           {t("name")}
                         </p>
-                        <p className="font-medium text-gray-900 dark:text-gray-100">
+                        <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 break-words">
                           {formData.firstName} {formData.lastName}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">
                           {t("email")}
                         </p>
-                        <p className="font-medium text-gray-900 dark:text-gray-100">
+                        <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 break-words">
                           {formData.email}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">
                           {t("phone")}
                         </p>
-                        <p className="font-medium text-gray-900 dark:text-gray-100">
+                        <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 break-words">
                           {formData.phone}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">
                           {t("passengers")}
                         </p>
-                        <p className="font-medium text-gray-900 dark:text-gray-100">
+                        <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 break-words">
                           {formData.passengers}
                         </p>
                       </div>
@@ -768,34 +768,34 @@ export default function ConfirmationPage() {
                           {t("modify")}
                         </Button>
                       </div>
-                      <div className="space-y-2">
+                      <div className="space-y-2 sm:space-y-3">
                         {additionalServices.babySeats > 0 && (
-                          <div className="flex justify-between">
-                            <span className="text-gray-900 dark:text-gray-100">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm sm:text-base text-gray-900 dark:text-gray-100">
                               {t("babySeats")} ({additionalServices.babySeats})
                             </span>
-                            <span className="text-green-600 dark:text-green-400 font-medium">
+                            <span className="text-sm sm:text-base text-green-600 dark:text-green-400 font-medium">
                               {t("free")}
                             </span>
                           </div>
                         )}
                         {additionalServices.boosters > 0 && (
-                          <div className="flex justify-between">
-                            <span className="text-gray-900 dark:text-gray-100">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm sm:text-base text-gray-900 dark:text-gray-100">
                               {t("boosterSeats")} ({additionalServices.boosters}
                               )
                             </span>
-                            <span className="text-green-600 dark:text-green-400 font-medium">
+                            <span className="text-sm sm:text-base text-green-600 dark:text-green-400 font-medium">
                               {t("free")}
                             </span>
                           </div>
                         )}
                         {additionalServices.meetAndGreet && (
-                          <div className="flex justify-between">
-                            <span className="text-gray-900 dark:text-gray-100">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm sm:text-base text-gray-900 dark:text-gray-100">
                               {t("meetAndGreet")}
                             </span>
-                            <span className="text-green-600 dark:text-green-400 font-medium">
+                            <span className="text-sm sm:text-base text-green-600 dark:text-green-400 font-medium">
                               {t("free")}
                             </span>
                           </div>
@@ -833,7 +833,7 @@ export default function ConfirmationPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                className="sticky top-8 space-y-6"
+                className="lg:sticky lg:top-8 space-y-4 sm:space-y-6"
               >
                 {/* Price Summary - Always show for all services */}
                 {selectedService && (
@@ -850,36 +850,36 @@ export default function ConfirmationPage() {
                         <div className="space-y-2">
                           {selectedService.id === "disneyland" && serviceSubData?.return_trip === true && (
                             <>
-                              <div className="flex justify-between">
-                                <span className="text-sm text-gray-600 dark:text-gray-400">
+                              <div className="flex justify-between items-center">
+                                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                                   {t("basePrice")}
                                 </span>
-                                <span className="font-medium text-gray-900 dark:text-gray-100">
+                                <span className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100">
                                   €{(basePrice / 2).toFixed(2)}
                                 </span>
                               </div>
-                              <div className="flex justify-between">
-                                <span className="text-sm text-gray-600 dark:text-gray-400">
+                              <div className="flex justify-between items-center">
+                                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                                   {t("returnTrip")}
                                 </span>
-                                <span className="font-medium text-gray-900 dark:text-gray-100">
+                                <span className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100">
                                   €{(basePrice / 2).toFixed(2)}
                                 </span>
                               </div>
                             </>
                           )}
                           {(!selectedService.id || selectedService.id !== "disneyland" || !serviceSubData?.return_trip) && (
-                            <div className="flex justify-between">
-                              <span className="text-sm text-gray-600 dark:text-gray-400">
+                            <div className="flex justify-between items-center">
+                              <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                                 {t("basePrice")}
                               </span>
-                              <span className="font-medium text-gray-900 dark:text-gray-100">
+                              <span className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100">
                                 €{basePrice.toFixed(2)}
                               </span>
                             </div>
                           )}
                           <div className="border-t dark:border-gray-700 pt-2 mt-2">
-                            <div className="flex justify-between text-lg font-bold">
+                            <div className="flex justify-between items-center text-base sm:text-lg font-bold">
                               <span className="text-gray-900 dark:text-gray-100">
                                 {t("total")}
                               </span>
@@ -892,7 +892,7 @@ export default function ConfirmationPage() {
                       ) : (
                         <div className="text-sm text-gray-500 dark:text-gray-400">
                           {pickupLocation && destinationLocation
-                            ? t("quoteRequest") || "Quote Request"
+                            ? t("quoteRequest")
                             : t("selectPickupDestination")}
                         </div>
                       )}
@@ -949,12 +949,12 @@ export default function ConfirmationPage() {
                 {/* Actions */}
                 <Card>
                   <CardContent className="p-4 sm:p-6">
-                    <div className="space-y-3">
+                    <div className="space-y-3 sm:space-y-4">
                       <Button
                         size="lg"
                         onClick={handleSubmitReservation}
                         disabled={isSubmitting || isSubmitted}
-                        className={`w-full ${
+                        className={`w-full text-sm sm:text-base ${
                           selectedService?.id !== "airport-transfers" &&
                           basePrice === null
                             ? "bg-yellow-500 hover:bg-yellow-600 text-white"

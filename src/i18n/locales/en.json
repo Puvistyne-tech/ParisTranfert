@@ -486,6 +486,10 @@
     "shareTitle": "Reservation #{reservationId}",
     "shareText": "Reservation confirmation for {customerName}",
     "submissionFailed": "Submission Failed",
+    "quoteRequest": "Quote Request",
+    "selectPickupDestination": "Select pickup and destination to see price",
+    "loadingPrice": "Loading price...",
+    "returnTrip": "Return Trip",
     "pdf": {
       "companyName": "PARIS TRANSFER",
       "companySubtitle": "Premium Transportation Services",

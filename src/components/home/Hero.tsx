@@ -958,7 +958,7 @@ export function Hero() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left Content */}
           <div className="text-white">
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold font-display mb-6 leading-tight">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl xl:text-8xl font-bold font-display mb-6 leading-tight">
               Premium{" "}
               <span className="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
                 Paris
@@ -966,7 +966,7 @@ export function Hero() {
               <br />
               Transfers
             </h1>
-            <p className="text-lg sm:text-xl lg:text-2xl mb-8 text-white/90 leading-relaxed">
+            <p className="text-lg sm:text-xl lg:text-2xl xl:text-3xl mb-8 text-white/90 leading-relaxed">
               {t("subtitle")}
             </p>
 
@@ -997,7 +997,7 @@ export function Hero() {
             </div>
 
             {/* Trust Indicators */}
-            <div className="flex items-center space-x-8 text-sm text-white/90">
+            <div className="flex items-center space-x-8 text-sm lg:text-base xl:text-lg text-white/90">
               <div className="flex items-center">
                 <Shield className="mr-2 w-4 h-4 text-yellow-300" />
                 <span>{t("trustIndicators.insured")}</span>

@@ -494,6 +494,10 @@
     "shareTitle": "Reserva #{reservationId}",
     "shareText": "Confirmación de reserva para {customerName}",
     "submissionFailed": "Error al Enviar",
+    "quoteRequest": "Solicitud de Cotización",
+    "selectPickupDestination": "Selecciona el lugar de recogida y destino para ver el precio",
+    "loadingPrice": "Cargando precio...",
+    "returnTrip": "Viaje de Regreso",
     "pdf": {
       "companyName": "PARIS TRANSFER",
       "companySubtitle": "Servicios de Transporte Premium",

@@ -1,7 +1,7 @@
 "use client";
 
 import { Filter, Package, Plus, Search, Settings } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAdminFilter } from "@/components/admin/AdminFilterContext";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { MobileActionButtons } from "@/components/admin/MobileActionButtons";
@@ -60,9 +60,16 @@ export default function AdminServicesPage() {
   const updateMutation = useUpdateService();
   const deleteMutation = useDeleteService();
 
-  // Register filter content in header
-  useEffect(() => {
-    const filterUI = (
+  // Create a stable key for categories to prevent unnecessary re-renders
+  const categoriesKey = useMemo(
+    () => categories.map((cat) => `${cat.id}:${cat.name}`).join(","),
+    [categories]
+  );
+
+  // Memoize filter UI to prevent unnecessary re-renders
+  // Note: Zustand setter functions are stable and don't need to be in dependencies
+  const filterUI = useMemo(
+    () => (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div>
           <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -125,10 +132,19 @@ export default function AdminServicesPage() {
           </select>
         </div>
       </div>
+    ),
+    [searchQuery, selectedCategory, availabilityFilter, popularFilter, categoriesKey, categories]
     );
+
+  // Register filter content in header
+  // setFilterContent is stable from useState, so we don't need it in dependencies
+  useEffect(() => {
     setFilterContent(filterUI);
-    return () => setFilterContent(null);
-  }, [searchQuery, selectedCategory, availabilityFilter, popularFilter, categories, setFilterContent, setSearchQuery, setSelectedCategory, setAvailabilityFilter, setPopularFilter]);
+    return () => {
+      setFilterContent(null);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filterUI]);
 
   const handleCreate = () => {
     openServiceModal(null);
