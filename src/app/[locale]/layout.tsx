@@ -5,6 +5,8 @@ import { LayoutWrapper } from "@/components/layout/LayoutWrapper";
 import { QueryProvider } from "@/components/providers/QueryProvider";
 import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistration";
 import { routing } from "@/i18n/routing";
+import { SpeedInsights } from '@vercel/speed-insights/next';
+
 
 export default async function LocaleLayout({
   children,
@@ -29,6 +31,7 @@ export default async function LocaleLayout({
       <QueryProvider>
         <LayoutWrapper>
           {children}
+          <SpeedInsights />
           <ServiceWorkerRegistration enablePushNotifications={true} />
         </LayoutWrapper>
       </QueryProvider>

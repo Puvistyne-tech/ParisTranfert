@@ -21,7 +21,7 @@ BEGIN
   IF function_url IS NULL OR function_url = '' THEN
     -- Try to get from Supabase project URL
     -- This will be set via: ALTER DATABASE postgres SET app.settings.edge_function_url = 'https://...';
-    function_url := 'https://etsuopxjlgtjggzemeoy.supabase.co/functions/v1/send-reservation-email';
+    function_url := 'https://XYZ.supabase.co/functions/v1/send-reservation-email';
   END IF;
 
   -- Build payload based on trigger operation
@@ -79,22 +79,3 @@ CREATE TRIGGER trigger_reservation_email_update
   FOR EACH ROW
   WHEN (OLD.status IS DISTINCT FROM NEW.status OR OLD.total_price IS DISTINCT FROM NEW.total_price)
   EXECUTE FUNCTION notify_reservation_email();
-
--- Alternative approach using Supabase's built-in webhooks (if pg_net is not available)
--- You can also set up webhooks directly in Supabase Dashboard:
--- 1. Go to Database > Webhooks
--- 2. Create webhook for 'reservations' table
--- 3. Set events: INSERT, UPDATE
--- 4. Set URL to: https://<project-ref>.supabase.co/functions/v1/send-reservation-email
--- 5. Set HTTP method: POST
--- 6. Add header: Authorization: Bearer <service_role_key>
-
--- Note: To use pg_net, you need to:
--- 1. Enable the extension: CREATE EXTENSION IF NOT EXISTS "pg_net";
--- 2. Set the function URL: ALTER DATABASE postgres SET app.settings.edge_function_url = 'https://etsuopxjlgtjggzemeoy.supabase.co/functions/v1/send-reservation-email';
--- 3. Set the service role key: ALTER DATABASE postgres SET app.settings.service_role_key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV0c3VvcHhqbGd0amdnemVtZW95Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MDk3ODM4MCwiZXhwIjoyMDc2NTU0MzgwfQ.ev5Nccj3AHOZ5QoH8ULK88Ql0Y6uTikPSqrtdOiBwyM';
-
--- For local development, you can set these in your local Supabase instance:
--- ALTER DATABASE postgres SET app.settings.edge_function_url = 'http://localhost:54321/functions/v1/send-reservation-email';
--- ALTER DATABASE postgres SET app.settings.service_role_key = 'your-local-service-role-key';
-
