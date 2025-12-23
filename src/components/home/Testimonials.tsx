@@ -2,16 +2,20 @@
 
 import { motion } from "framer-motion";
 import { Star } from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/Card";
 import { getTestimonials } from "@/lib/supabaseService";
+import { useHomePageImages } from "@/hooks/useHomePageImages";
 
 export function Testimonials() {
   const t = useTranslations("testimonials");
   const tCommon = useTranslations("common");
   const [testimonials, setTestimonials] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { data: backgroundImages = [] } = useHomePageImages("testimonials");
+  const backgroundImage = backgroundImages.length > 0 && backgroundImages[0]?.imageUrl ? backgroundImages[0] : null;
 
   useEffect(() => {
     async function loadTestimonials() {
@@ -41,8 +45,23 @@ export function Testimonials() {
 
   return (
     <section className="py-20 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 dark:from-gray-900 dark:via-amber-900/20 dark:to-gray-800 relative overflow-hidden">
+      {/* Background Image (if available) */}
+      {backgroundImage && (
+        <div className="absolute inset-0 z-0">
+          <Image
+            src={backgroundImage.imageUrl}
+            alt="Testimonials background"
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority={false}
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-50/90 via-orange-50/85 to-yellow-50/90 dark:from-gray-900/80 dark:via-amber-900/70 dark:to-gray-800/80" />
+        </div>
+      )}
+
       {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className={`absolute inset-0 overflow-hidden ${backgroundImage ? "opacity-30" : ""}`}>
         <motion.div
           className="absolute top-20 right-1/3 w-96 h-96 bg-amber-300/20 dark:bg-amber-500/10 rounded-full blur-3xl"
           animate={{

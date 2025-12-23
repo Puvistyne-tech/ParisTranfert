@@ -138,6 +138,36 @@ export type Database = {
         }
         Relationships: []
       }
+      home_page_images: {
+        Row: {
+          created_at: string | null
+          display_order: number | null
+          id: string
+          image_url: string
+          is_active: boolean | null
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          image_url: string
+          is_active?: boolean | null
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          image_url?: string
+          is_active?: boolean | null
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       locations: {
         Row: {
           created_at: string | null

@@ -15,6 +15,7 @@ import {
   Star,
   X,
 } from "lucide-react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
@@ -27,6 +28,7 @@ import { Select } from "@/components/ui/Select";
 import { useLocationsByService } from "@/hooks/useLocationsByService";
 import { useServices } from "@/hooks/useServices";
 import { useVehicleTypes } from "@/hooks/useVehicleTypes";
+import { useHomePageImages } from "@/hooks/useHomePageImages";
 import { useReservationStore } from "@/store/reservationStore";
 
 export function Hero() {
@@ -298,6 +300,8 @@ export function Hero() {
   const { data: vehicleTypes = [] } = useVehicleTypes();
   const { data: airportLocationsData = [] } =
     useLocationsByService("airport-transfers");
+  const { data: heroImages = [] } = useHomePageImages("hero");
+  const heroImage = heroImages.length > 0 && heroImages[0]?.imageUrl ? heroImages[0] : null;
 
   // Find airport transfers service and car vehicle type
   useEffect(() => {
@@ -401,8 +405,23 @@ export function Hero() {
       id="home"
       className="min-h-screen flex items-center relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-400 to-indigo-800 pt-20 md:pt-24"
     >
+      {/* Hero Background Image (if available) */}
+      {heroImage && (
+        <div className="absolute inset-0 z-0">
+          <Image
+            src={heroImage.imageUrl}
+            alt="Hero background"
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-600/80 via-blue-400/70 to-indigo-800/80" />
+        </div>
+      )}
+
       {/* Modern Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className={`absolute inset-0 overflow-hidden ${heroImage ? "opacity-50" : ""}`}>
         {/* Animated gradient orbs */}
         <motion.div
           className="absolute top-20 left-20 w-72 h-72 bg-blue-400/30 rounded-full blur-3xl"

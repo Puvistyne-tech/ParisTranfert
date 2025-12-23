@@ -9,6 +9,7 @@ import type { VehicleType } from "@/components/models/vehicleTypes";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { useVehicleTypes } from "@/hooks/useVehicleTypes";
+import { useHomePageImages } from "@/hooks/useHomePageImages";
 import { useReservationStore } from "@/store/reservationStore";
 
 export function VehicleClasses() {
@@ -19,6 +20,8 @@ export function VehicleClasses() {
 
   // Use TanStack Query hook for data fetching with automatic caching
   const { data: vehicleTypes = [], isLoading: loading } = useVehicleTypes();
+  const { data: backgroundImages = [] } = useHomePageImages("vehicles");
+  const backgroundImage = backgroundImages.length > 0 && backgroundImages[0]?.imageUrl ? backgroundImages[0] : null;
 
   const handleSelectVehicleType = (vehicleTypeId: string) => {
     // Find the vehicle type object and save it to the store
@@ -32,8 +35,23 @@ export function VehicleClasses() {
 
   return (
     <section className="py-20 bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 dark:from-gray-900 dark:via-emerald-900/20 dark:to-gray-800 relative overflow-hidden">
+      {/* Background Image (if available) */}
+      {backgroundImage && (
+        <div className="absolute inset-0 z-0">
+          <Image
+            src={backgroundImage.imageUrl}
+            alt="Vehicles background"
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority={false}
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/90 via-teal-50/85 to-cyan-50/90 dark:from-gray-900/80 dark:via-emerald-900/70 dark:to-gray-800/80" />
+        </div>
+      )}
+
       {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className={`absolute inset-0 overflow-hidden ${backgroundImage ? "opacity-30" : ""}`}>
         <motion.div
           className="absolute top-20 left-20 w-72 h-72 bg-emerald-300/20 dark:bg-emerald-500/10 rounded-full blur-3xl"
           animate={{
@@ -99,17 +117,23 @@ export function VehicleClasses() {
                     <CardContent className="p-0">
                       {/* Background Image */}
                       <div className="relative h-64">
-                        <Image
-                          src={
-                            vehicleType.image ||
-                            (vehicleType.id === "car"
-                              ? "https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80"
-                              : "https://images.unsplash.com/photo-1560958089-b8a1929cea89?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80")
-                          }
-                          alt={vehicleType.name}
-                          fill
-                          className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
+                        {vehicleType.image ? (
+                          <Image
+                            src={vehicleType.image}
+                            alt={vehicleType.name}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-700 flex items-center justify-center">
+                            {vehicleType.id === "car" ? (
+                              <Briefcase className="w-16 h-16 text-white/50" />
+                            ) : (
+                              <Crown className="w-16 h-16 text-white/50" />
+                            )}
+                          </div>
+                        )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
 
                         {/* Vehicle Type Icon */}

@@ -21,7 +21,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ServiceIcon } from "@/components/models/services";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
@@ -38,11 +38,13 @@ export default function ServicesPage() {
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
 
   // Use TanStack Query hooks for data fetching with automatic caching
-  const { data: categories = [], isLoading: categoriesLoading } =
-    useCategories();
   const { data: services = [], isLoading: servicesLoading } = useServices();
+  const { data: categories = [] } = useCategories();
+  const [serviceImageErrors, setServiceImageErrors] = useState<
+    Record<string, boolean>
+  >({});
 
-  const isLoading = categoriesLoading || servicesLoading;
+  const isLoading = servicesLoading;
 
   // Memoize the icon map to prevent recreation on every render
   const iconMap = useMemo(
@@ -61,17 +63,20 @@ export default function ServicesPage() {
     [],
   );
 
-  // Memoize filtered services by category to prevent recalculation
-  const servicesByCategory = useMemo(() => {
-    return categories
-      .map((category) => ({
-        ...category,
-        services: services.filter(
-          (service) => service.categoryId === category.id,
-        ),
-      }))
-      .filter((category) => category.services.length > 0);
-  }, [categories, services]);
+  // Get category icon for a service
+  const getCategoryIcon = (service: any) => {
+    const category = categories.find((cat) => cat.id === service.categoryId);
+    if (!category) return Star;
+    // Map category types to icons
+    const categoryIconMap: { [key: string]: any } = {
+      transport: Plane,
+      luxury: Crown,
+      tour: Globe,
+      security: Shield,
+      special: Heart,
+    };
+    return categoryIconMap[category.categoryType] || Star;
+  };
 
   const handleBookService = (service: any) => {
     // Save selected service to store
@@ -154,186 +159,176 @@ export default function ServicesPage() {
         </div>
       </div>
 
-      {/* Services by Category */}
+      {/* Services Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        {servicesByCategory.map((category, categoryIndex) => {
-          return (
-            <motion.div
-              key={category.id}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              viewport={{ once: true, margin: "-100px" }}
-              className="mb-16"
-            >
-              <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-                  {category.name}
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-                  {category.description}
-                </p>
-              </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+          {services.map((service, serviceIndex) => {
+            const iconName =
+              typeof service.icon === "string"
+                ? service.icon
+                : service.icon;
+            const Icon = (iconMap as Record<string, any>)[iconName] || Star;
+            const CategoryIcon = getCategoryIcon(service);
+            const hasImageError = serviceImageErrors[service.id];
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {category.services.map((service, serviceIndex) => {
-                  const iconName =
-                    typeof service.icon === "string"
-                      ? service.icon
-                      : service.icon;
-                  const Icon =
-                    (iconMap as Record<string, any>)[iconName] || Star;
+            return (
+              <motion.div
+                key={service.id}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: serviceIndex * 0.05 }}
+                viewport={{ once: true, margin: "-100px" }}
+              >
+                <Card
+                  className="p-0 shadow-lg card-hover h-full flex flex-col group cursor-pointer hover:shadow-xl transition-all duration-300 relative overflow-hidden"
+                  onClick={() => handleBookService(service)}
+                >
+                  <CardContent className="text-center flex flex-col h-full relative p-0">
+                    {/* Service Image - Full Width */}
+                    <div className="w-full h-48 relative overflow-hidden group-hover:scale-105 md:group-hover:scale-105 transition-all duration-300">
+                      {!hasImageError && service.image ? (
+                        <Image
+                          src={service.image}
+                          alt={service.name}
+                          fill
+                          className="object-cover"
+                          loading="lazy"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          quality={85}
+                          onError={() =>
+                            setServiceImageErrors((prev) => ({
+                              ...prev,
+                              [service.id]: true,
+                            }))
+                          }
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-700 flex items-center justify-center relative overflow-hidden">
+                          {/* Static background pattern - removed animations for performance */}
+                          <div className="absolute inset-0 opacity-20">
+                            <div className="absolute top-4 left-4 w-8 h-8 bg-white/30 rounded-full"></div>
+                            <div className="absolute top-12 right-8 w-6 h-6 bg-white/20 rounded-full"></div>
+                            <div className="absolute bottom-8 left-8 w-4 h-4 bg-white/25 rounded-full"></div>
+                            <div className="absolute bottom-4 right-4 w-10 h-10 bg-white/15 rounded-full"></div>
+                          </div>
 
-                  return (
-                    <motion.div
-                      key={service.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
-                      viewport={{ once: true, margin: "-100px" }}
-                    >
-                      <Card
-                        className="p-0 shadow-lg card-hover h-full flex flex-col group cursor-pointer hover:shadow-xl transition-all duration-300 relative overflow-hidden"
-                        onClick={() => handleBookService(service)}
-                      >
-                        <CardContent className="text-center flex flex-col h-full relative p-0">
-                          {/* Service Image - Full Width */}
-                          <div className="w-full h-48 relative overflow-hidden group-hover:scale-105 md:group-hover:scale-105 transition-all duration-300">
-                            {service.image ? (
-                              <Image
-                                src={service.image}
-                                alt={service.name}
-                                fill
-                                className="object-cover"
-                                loading="lazy"
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                                quality={85}
-                              />
-                            ) : (
-                              <div className="w-full h-full bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-700 flex items-center justify-center relative overflow-hidden">
-                                {/* Static background pattern - removed animations for performance */}
-                                <div className="absolute inset-0 opacity-20">
-                                  <div className="absolute top-4 left-4 w-8 h-8 bg-white/30 rounded-full"></div>
-                                  <div className="absolute top-12 right-8 w-6 h-6 bg-white/20 rounded-full"></div>
-                                  <div className="absolute bottom-8 left-8 w-4 h-4 bg-white/25 rounded-full"></div>
-                                  <div className="absolute bottom-4 right-4 w-10 h-10 bg-white/15 rounded-full"></div>
-                                </div>
-
-                                {/* Large beautiful icon */}
-                                <div className="relative z-10">
-                                  <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4 shadow-2xl">
-                                    <Icon className="text-white text-4xl drop-shadow-lg" />
-                                  </div>
-                                  <div className="text-white/90 text-sm font-medium tracking-wide">
-                                    {service.name}
-                                  </div>
-                                </div>
-
-                                {/* Gradient overlay */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-                              </div>
-                            )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-
-                            {/* Popular Badge */}
-                            {service.isPopular && (
-                              <div className="absolute top-2 right-2 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium shadow-lg">
-                                {t("popular")}
-                              </div>
-                            )}
-
-                            {/* Service Name Overlay */}
-                            <div className="absolute bottom-2 left-2 right-2">
-                              <div className="bg-gradient-to-r from-blue-500 to-transparent text-white px-2 py-1 rounded text-xs font-semibold">
-                                {service.name}
-                              </div>
+                          {/* Large beautiful icon */}
+                          <div className="relative z-10">
+                            <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mb-4 shadow-2xl">
+                              <Icon className="text-white text-4xl drop-shadow-lg" />
                             </div>
-                          </div>
-
-                          {/* Hover Overlay with Book Button - Visible on hover (desktop) and always on mobile */}
-                          <div className="absolute inset-0 bg-black/30 opacity-0 md:group-hover:opacity-100 md:transition-opacity duration-300 flex items-center justify-center z-20 pointer-events-none">
-                            <Button
-                              variant="primary"
-                              size="lg"
-                              className="btn-premium scale-110 shadow-2xl pointer-events-auto"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleBookService(service);
-                              }}
-                            >
-                              <Calendar className="w-5 h-5 mr-2" />
-                              {t("bookNow")}
-                            </Button>
-                          </div>
-
-                          {/* Mobile Book Button - Always visible on mobile */}
-                          <div className="md:hidden absolute bottom-4 left-4 right-4 z-20">
-                            <Button
-                              variant="primary"
-                              size="sm"
-                              className="w-full btn-premium shadow-xl"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleBookService(service);
-                              }}
-                            >
-                              <Calendar className="w-4 h-4 mr-2" />
-                              {t("bookNow")}
-                            </Button>
-                          </div>
-
-                          {/* Service Info */}
-                          <div className="px-4 py-3 flex-1 flex flex-col">
-                            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">
+                            <div className="text-white/90 text-sm font-medium tracking-wide">
                               {service.name}
-                            </h3>
-
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 flex-1">
-                              {service.shortDescription}
-                            </p>
-
-                            {/* Features */}
-                            <div className="space-y-1 text-left mb-3">
-                              {Array.isArray(service.features)
-                                ? service.features
-                                    .slice(0, 3)
-                                    .map(
-                                      (feature: any, featureIndex: number) => (
-                                        <div
-                                          key={featureIndex}
-                                          className="flex items-center text-xs text-gray-500 dark:text-gray-400"
-                                        >
-                                          <span className="w-1.5 h-1.5 bg-green-500 dark:bg-green-400 rounded-full mr-2"></span>
-                                          <span>
-                                            {typeof feature === "string"
-                                              ? feature
-                                              : JSON.stringify(feature)}
-                                          </span>
-                                        </div>
-                                      ),
-                                    )
-                                : null}
-                            </div>
-
-                            {/* Price */}
-                            <div className="flex justify-between items-center">
-                              <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
-                                {service.priceRange}
-                              </span>
-                              <span className="text-xs text-gray-500 dark:text-gray-400">
-                                {service.duration}
-                              </span>
                             </div>
                           </div>
-                        </CardContent>
-                      </Card>
-                    </motion.div>
-                  );
-                })}
-              </div>
-            </motion.div>
-          );
-        })}
+
+                          {/* Gradient overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+
+                      {/* Category Icon Badge */}
+                      <div className="absolute top-3 left-3 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg p-2 shadow-md">
+                        <CategoryIcon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                      </div>
+
+                      {/* Popular Badge */}
+                      {service.isPopular && (
+                        <div className="absolute top-2 right-2 bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-medium shadow-lg">
+                          {t("popular")}
+                        </div>
+                      )}
+
+                      {/* Service Name Overlay */}
+                      <div className="absolute bottom-2 left-2 right-2">
+                        <div className="bg-gradient-to-r from-blue-500 to-transparent text-white px-2 py-1 rounded text-xs font-semibold">
+                          {service.name}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Hover Overlay with Book Button - Visible on hover (desktop) and always on mobile */}
+                    <div className="absolute inset-0 bg-black/30 opacity-0 md:group-hover:opacity-100 md:transition-opacity duration-300 flex items-center justify-center z-20 pointer-events-none">
+                      <Button
+                        variant="primary"
+                        size="lg"
+                        className="btn-premium scale-110 shadow-2xl pointer-events-auto"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBookService(service);
+                        }}
+                      >
+                        <Calendar className="w-5 h-5 mr-2" />
+                        {t("bookNow")}
+                      </Button>
+                    </div>
+
+                    {/* Mobile Book Button - Always visible on mobile */}
+                    <div className="md:hidden absolute bottom-4 left-4 right-4 z-20">
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        className="w-full btn-premium shadow-xl"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBookService(service);
+                        }}
+                      >
+                        <Calendar className="w-4 h-4 mr-2" />
+                        {t("bookNow")}
+                      </Button>
+                    </div>
+
+                    {/* Service Info */}
+                    <div className="px-4 py-3 flex-1 flex flex-col">
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-2">
+                        {service.name}
+                      </h3>
+
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 flex-1">
+                        {service.shortDescription}
+                      </p>
+
+                      {/* Features */}
+                      <div className="space-y-1 text-left mb-3">
+                        {Array.isArray(service.features)
+                          ? service.features
+                              .slice(0, 3)
+                              .map(
+                                (feature: any, featureIndex: number) => (
+                                  <div
+                                    key={featureIndex}
+                                    className="flex items-center text-xs text-gray-500 dark:text-gray-400"
+                                  >
+                                    <span className="w-1.5 h-1.5 bg-green-500 dark:bg-green-400 rounded-full mr-2"></span>
+                                    <span>
+                                      {typeof feature === "string"
+                                        ? feature
+                                        : JSON.stringify(feature)}
+                                    </span>
+                                  </div>
+                                ),
+                              )
+                          : null}
+                      </div>
+
+                      {/* Price */}
+                      <div className="flex justify-between items-center">
+                        <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
+                          {service.priceRange}
+                        </span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {service.duration}
+                        </span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Exit Confirmation Dialog */}

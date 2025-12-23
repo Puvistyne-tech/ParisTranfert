@@ -14,6 +14,7 @@ import type {
     VehicleType,
     VehicleTypeId,
 } from "@/components/models/vehicleTypes";
+import type { HomePageImage } from "@/components/models/homePageImages";
 import { supabase } from "./supabase";
 import type {
     Database,
@@ -1722,6 +1723,7 @@ export async function deleteFeature(key: string): Promise<void> {
  */
 const SERVICE_IMAGES_BUCKET = "service-images";
 const VEHICLE_IMAGES_BUCKET = "vehicle-images";
+const WEBSITE_IMAGES_BUCKET = "website-images";
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_MIME_TYPES = [
     "image/jpeg",
@@ -1903,5 +1905,335 @@ export async function deleteVehicleImage(imageUrl: string): Promise<void> {
     } catch (error) {
         // Don't throw - deletion is optional cleanup
         console.warn("Error deleting vehicle image:", error);
+    }
+}
+
+/**
+ * Storage: Upload website image to Supabase storage (for carousel, hero, etc.)
+ */
+
+/**
+ * Upload a website image to Supabase storage
+ * @param file - The image file to upload
+ * @param type - The type of image ('carousel' or 'hero')
+ * @param order - Optional display order for carousel images
+ * @returns The public URL of the uploaded image
+ */
+export async function uploadWebsiteImage(
+    file: File,
+    type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials",
+    order?: number
+): Promise<string> {
+    // Validate file type
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+        throw new Error(
+            `Invalid file type. Allowed types: ${ALLOWED_MIME_TYPES.join(", ")}`
+        );
+    }
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+        throw new Error(
+            `File size exceeds limit of ${MAX_FILE_SIZE / 1024 / 1024}MB`
+        );
+    }
+
+    // Generate unique filename
+    const fileExt = file.name.split(".").pop() || "jpg"; // Default to jpg if no extension
+    const timestamp = Date.now();
+    const fileName = `${type}-${timestamp}.${fileExt}`;
+    const filePath = `${type}/${fileName}`;
+
+    // Upload file to storage
+    const { data, error } = await supabase.storage
+        .from(WEBSITE_IMAGES_BUCKET)
+        .upload(filePath, file, {
+            cacheControl: "3600",
+            upsert: false, // Don't overwrite existing files
+        });
+
+    if (error) {
+        console.error("Error uploading image:", error);
+        throw new Error(`Failed to upload image: ${error.message}`);
+    }
+
+    // Get public URL
+    const {
+        data: { publicUrl },
+    } = supabase.storage.from(WEBSITE_IMAGES_BUCKET).getPublicUrl(filePath);
+
+    return publicUrl;
+}
+
+/**
+ * Delete a website image from Supabase storage
+ * @param imageUrl - The public URL of the image to delete
+ * @param type - The type of image ('carousel' or 'hero')
+ */
+export async function deleteWebsiteImage(
+    imageUrl: string,
+    type: string
+): Promise<void> {
+    try {
+        // Extract file path from URL
+        // URL format: https://{project}.supabase.co/storage/v1/object/public/website-images/{path}
+        const urlParts = imageUrl.split("/website-images/");
+        if (urlParts.length !== 2) {
+            console.warn(
+                "Invalid image URL format, skipping deletion:",
+                imageUrl
+            );
+            return;
+        }
+
+        const filePath = urlParts[1];
+
+        // Delete file from storage
+        const { error } = await supabase.storage
+            .from(WEBSITE_IMAGES_BUCKET)
+            .remove([filePath]);
+
+        if (error) {
+            console.error("Error deleting image:", error);
+            // Don't throw - deletion is optional cleanup
+            console.warn(`Failed to delete image: ${error.message}`);
+        }
+    } catch (error) {
+        // Don't throw - deletion is optional cleanup
+        console.warn("Error deleting website image:", error);
+    }
+}
+
+/**
+ * Home Page Images: CRUD operations
+ */
+
+/**
+ * Get home page images by type
+ * @param type - The type of image ('carousel' or 'hero')
+ * @returns Array of home page images
+ */
+export async function getHomePageImages(
+    type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials"
+): Promise<HomePageImage[]> {
+    const { data, error } = await supabase
+        .from("home_page_images")
+        .select("*")
+        .eq("type", type)
+        .eq("is_active", true)
+        .order("display_order", { ascending: true });
+
+    if (error) {
+        console.error("Error fetching home page images:", error);
+        throw new Error(
+            `Failed to fetch home page images: ${error.message}`
+        );
+    }
+
+    return data.map((row) => ({
+        id: row.id,
+        type: row.type,
+        imageUrl: row.image_url,
+        displayOrder: row.display_order ?? 0,
+        isActive: row.is_active ?? true,
+        createdAt: row.created_at || undefined,
+        updatedAt: row.updated_at || undefined,
+    }));
+}
+
+/**
+ * Get all home page images (including inactive) - for admin
+ * @param type - The type of image ('carousel' or 'hero')
+ * @returns Array of all home page images
+ */
+export async function getAllHomePageImages(
+    type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials"
+): Promise<HomePageImage[]> {
+    const { data, error } = await supabase
+        .from("home_page_images")
+        .select("*")
+        .eq("type", type)
+        .order("display_order", { ascending: true });
+
+    if (error) {
+        console.error("Error fetching all home page images:", error);
+        throw new Error(
+            `Failed to fetch all home page images: ${error.message}`
+        );
+    }
+
+    return data.map((row) => ({
+        id: row.id,
+        type: row.type,
+        imageUrl: row.image_url,
+        displayOrder: row.display_order ?? 0,
+        isActive: row.is_active ?? true,
+        createdAt: row.created_at || undefined,
+        updatedAt: row.updated_at || undefined,
+    }));
+}
+
+/**
+ * Create a home page image record
+ * @param imageData - The image data
+ * @returns The created home page image
+ */
+export async function createHomePageImage(imageData: {
+    type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials";
+    imageUrl: string;
+    displayOrder?: number;
+    isActive?: boolean;
+}): Promise<HomePageImage> {
+    // Get max display order for the type if not provided
+    let displayOrder = imageData.displayOrder;
+    if (displayOrder === undefined) {
+        const existing = await getAllHomePageImages(imageData.type);
+        displayOrder =
+            existing.length > 0
+                ? Math.max(...existing.map((img) => img.displayOrder)) + 1
+                : 0;
+    }
+
+    const { data, error } = await supabase
+        .from("home_page_images")
+        .insert({
+            type: imageData.type,
+            image_url: imageData.imageUrl,
+            display_order: displayOrder,
+            is_active: imageData.isActive ?? true,
+        })
+        .select()
+        .single();
+
+    if (error) {
+        console.error("Error creating home page image:", error);
+        throw new Error(
+            `Failed to create home page image: ${error.message}`
+        );
+    }
+
+    return {
+        id: data.id,
+        type: data.type,
+        imageUrl: data.image_url,
+        displayOrder: data.display_order ?? 0,
+        isActive: data.is_active ?? true,
+        createdAt: data.created_at || undefined,
+        updatedAt: data.updated_at || undefined,
+    };
+}
+
+/**
+ * Update home page image order
+ * @param images - Array of images with updated display orders
+ */
+export async function updateHomePageImageOrder(
+    images: HomePageImage[]
+): Promise<void> {
+    const updates = images.map((img) => ({
+        id: img.id,
+        display_order: img.displayOrder,
+    }));
+
+    for (const update of updates) {
+        const { error } = await supabase
+            .from("home_page_images")
+            .update({ display_order: update.display_order })
+            .eq("id", update.id);
+
+        if (error) {
+            console.error("Error updating image order:", error);
+            throw new Error(
+                `Failed to update image order: ${error.message}`
+            );
+        }
+    }
+}
+
+/**
+ * Update a home page image
+ * @param id - The image ID
+ * @param updates - The updates to apply
+ * @returns The updated home page image
+ */
+export async function updateHomePageImage(
+    id: string,
+    updates: Partial<{
+        imageUrl: string;
+        displayOrder: number;
+        isActive: boolean;
+    }>
+): Promise<HomePageImage> {
+    const updateData: any = {};
+    if (updates.imageUrl !== undefined) {
+        updateData.image_url = updates.imageUrl;
+    }
+    if (updates.displayOrder !== undefined) {
+        updateData.display_order = updates.displayOrder;
+    }
+    if (updates.isActive !== undefined) {
+        updateData.is_active = updates.isActive;
+    }
+
+    const { data, error } = await supabase
+        .from("home_page_images")
+        .update(updateData)
+        .eq("id", id)
+        .select()
+        .single();
+
+    if (error) {
+        console.error("Error updating home page image:", error);
+        throw new Error(
+            `Failed to update home page image: ${error.message}`
+        );
+    }
+
+    return {
+        id: data.id,
+        type: data.type,
+        imageUrl: data.image_url,
+        displayOrder: data.display_order ?? 0,
+        isActive: data.is_active ?? true,
+        createdAt: data.created_at || undefined,
+        updatedAt: data.updated_at || undefined,
+    };
+}
+
+/**
+ * Delete a home page image
+ * @param id - The image ID
+ */
+export async function deleteHomePageImage(id: string): Promise<void> {
+    // First get the image to delete the file from storage
+    const { data: image, error: fetchError } = await supabase
+        .from("home_page_images")
+        .select("*")
+        .eq("id", id)
+        .single();
+
+    if (fetchError) {
+        console.error("Error fetching image for deletion:", fetchError);
+        throw new Error(
+            `Failed to fetch image for deletion: ${fetchError.message}`
+        );
+    }
+
+    // Delete from database
+    const { error } = await supabase
+        .from("home_page_images")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+        console.error("Error deleting home page image:", error);
+        throw new Error(
+            `Failed to delete home page image: ${error.message}`
+        );
+    }
+
+    // Try to delete from storage (optional cleanup)
+    if (image) {
+        await deleteWebsiteImage(image.image_url, image.type);
     }
 }

@@ -43,6 +43,7 @@ export function VehicleModal({
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     if (vehicle) {
@@ -71,10 +72,7 @@ export function VehicleModal({
     setUploadError(null);
   }, [vehicle]);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const processFile = (file: File) => {
     // Validate file type
     const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
@@ -102,10 +100,53 @@ export function VehicleModal({
     reader.readAsDataURL(file);
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    processFile(file);
+    
+    // Reset input to allow selecting the same file again
+    if (e.target) {
+      e.target.value = "";
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processFile(file);
+    }
+  };
+
   const handleRemoveImage = () => {
     setSelectedFile(null);
-    setImagePreview(null);
-    setFormData({ ...formData, image: "" });
+    // Only clear preview and image if we're removing a newly selected file
+    // If editing, keep the existing image URL unless explicitly cleared
+    if (selectedFile) {
+      // User selected a new file but wants to remove it - restore original
+      setImagePreview(vehicle?.image || null);
+      setFormData({ ...formData, image: vehicle?.image || "" });
+    } else {
+      // User wants to remove existing image
+      setImagePreview(null);
+      setFormData({ ...formData, image: "" });
+    }
     setUploadError(null);
   };
 
@@ -120,33 +161,45 @@ export function VehicleModal({
       if (selectedFile) {
         setUploading(true);
         try {
-          // Delete old image if replacing
+          // Delete old image if replacing (only if it's from our storage)
           if (vehicle?.image && vehicle.image.includes("vehicle-images")) {
-            await deleteVehicleImage(vehicle.image);
+            try {
+              await deleteVehicleImage(vehicle.image);
+            } catch (deleteError) {
+              // Don't fail if deletion fails - it's just cleanup
+              console.warn("Failed to delete old image:", deleteError);
+            }
           }
 
           // Upload new image
           imageUrl = await uploadVehicleImage(selectedFile, formData.id);
-          setFormData({ ...formData, image: imageUrl });
+          
+          // Update formData with new image URL
+          setFormData((prev) => ({ ...prev, image: imageUrl }));
         } catch (error: any) {
-          setUploadError(error.message || "Failed to upload image");
+          console.error("Error uploading image:", error);
+          setUploadError(error.message || "Failed to upload image. Please try again.");
           setUploading(false);
           return;
         }
         setUploading(false);
       }
 
-      // Save vehicle with image URL
+      // Save vehicle with image URL (use the updated imageUrl from upload or existing formData.image)
       await onSave({
         ...formData,
-        image: imageUrl,
+        image: imageUrl || formData.image,
         minPassengers: Number(formData.minPassengers),
         maxPassengers: Number(formData.maxPassengers),
       });
+      
+      // Reset form state after successful save
+      setSelectedFile(null);
+      setUploadError(null);
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving vehicle:", error);
-      setUploadError("Failed to save vehicle. Please try again.");
+      setUploadError(error.message || "Failed to save vehicle. Please try again.");
     }
   };
 
@@ -228,12 +281,19 @@ export function VehicleModal({
                     src={imagePreview}
                     alt="Vehicle preview"
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      // If image fails to load, clear the preview
+                      console.warn("Failed to load image preview");
+                      setImagePreview(null);
+                      setFormData({ ...formData, image: "" });
+                    }}
                   />
                   <button
                     type="button"
                     onClick={handleRemoveImage}
-                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors z-10"
                     title="Remove image"
+                    disabled={uploading || loading}
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -241,10 +301,18 @@ export function VehicleModal({
               )}
 
               {/* File Upload Input */}
-              <div>
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
                 <label
                   htmlFor="vehicle-image-upload"
-                  className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                  className={`flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+                    isDragging
+                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-400"
+                      : "border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600"
+                  }`}
                 >
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                     <Upload className="w-8 h-8 mb-2 text-gray-500 dark:text-gray-400" />

@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     appleWebApp: {
         capable: true,
         statusBarStyle: "default",
-        title: "PrestigeParisTranfert",
+        title: "ParisTranfert",
     },
     icons: {
         apple: [
@@ -40,6 +40,9 @@ export const metadata: Metadata = {
     },
     other: {
         "mobile-web-app-capable": "yes",
+        "apple-mobile-web-app-title": "ParisTranfert",
+        "apple-mobile-web-app-capable": "yes",
+        "apple-mobile-web-app-status-bar-style": "default",
     },
 };
 
@@ -61,21 +64,6 @@ export default function RootLayout({
 }>) {
     return (
         <html>
-            <head>
-                <meta
-                    name="apple-mobile-web-app-title"
-                    content="PrestigeParisTranfert"
-                />
-                <meta name="apple-mobile-web-app-capable" content="yes" />
-                <meta
-                    name="apple-mobile-web-app-status-bar-style"
-                    content="default"
-                />
-                <link
-                    rel="apple-touch-icon"
-                    href="/web-app-manifest-192x192.png"
-                />
-            </head>
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >

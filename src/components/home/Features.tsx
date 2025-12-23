@@ -10,15 +10,19 @@ import {
   UserCheck,
   WifiHigh,
 } from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { getFeatures } from "@/lib/supabaseService";
+import { useHomePageImages } from "@/hooks/useHomePageImages";
 
 export function Features() {
   const t = useTranslations("features");
   const tCommon = useTranslations("common");
   const [features, setFeatures] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { data: backgroundImages = [] } = useHomePageImages("features");
+  const backgroundImage = backgroundImages.length > 0 && backgroundImages[0]?.imageUrl ? backgroundImages[0] : null;
 
   useEffect(() => {
     async function loadFeatures() {
@@ -61,8 +65,23 @@ export function Features() {
       id="about"
       className="py-20 bg-gradient-to-br from-violet-50 via-purple-50 to-fuchsia-50 dark:from-gray-900 dark:via-purple-900/20 dark:to-gray-800 relative overflow-hidden"
     >
+      {/* Background Image (if available) */}
+      {backgroundImage && (
+        <div className="absolute inset-0 z-0">
+          <Image
+            src={backgroundImage.imageUrl}
+            alt="Features background"
+            fill
+            className="object-cover"
+            sizes="100vw"
+            priority={false}
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-violet-50/90 via-purple-50/85 to-fuchsia-50/90 dark:from-gray-900/80 dark:via-purple-900/70 dark:to-gray-800/80" />
+        </div>
+      )}
+
       {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className={`absolute inset-0 overflow-hidden ${backgroundImage ? "opacity-30" : ""}`}>
         <motion.div
           className="absolute top-10 left-1/4 w-80 h-80 bg-violet-300/20 dark:bg-violet-500/10 rounded-full blur-3xl"
           animate={{

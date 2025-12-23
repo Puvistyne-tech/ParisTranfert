@@ -7,6 +7,7 @@ import {
   DollarSign,
   Filter,
   FolderTree,
+  Image as ImageIcon,
   LayoutDashboard,
   LogOut,
   MapPin,
@@ -77,6 +78,7 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
       [`/${locale}/admin/reservations`]: "Reservations",
       [`/${locale}/admin/users`]: "Clients",
       [`/${locale}/admin/services`]: "Services",
+      [`/${locale}/admin/home-images`]: "Home Images",
       [`/${locale}/admin/categories`]: "Categories",
       [`/${locale}/admin/vehicles`]: "Vehicles",
       [`/${locale}/admin/locations`]: "Locations",
@@ -109,6 +111,11 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
     },
     { name: "Users & Clients", href: `/${locale}/admin/users`, icon: Users },
     { name: "Services", href: `/${locale}/admin/services`, icon: Package },
+    {
+      name: "Home Images",
+      href: `/${locale}/admin/home-images`,
+      icon: ImageIcon,
+    },
     {
       name: "Categories",
       href: `/${locale}/admin/categories`,
