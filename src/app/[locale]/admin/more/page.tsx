@@ -4,6 +4,7 @@ import {
   Car,
   DollarSign,
   FolderTree,
+  Image as ImageIcon,
   LogOut,
   MapPin,
   MessageSquare,
@@ -49,6 +50,11 @@ export default function AdminMorePage() {
     "User";
 
   const moreNavItems: MoreNavItem[] = [
+    {
+      name: "Home Images",
+      href: `/${locale}/admin/home-images`,
+      icon: ImageIcon,
+    },
     {
       name: "Categories",
       href: `/${locale}/admin/categories`,

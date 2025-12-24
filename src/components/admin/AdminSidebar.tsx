@@ -54,6 +54,7 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
     if (!pathname) return false;
     const normalizedPath = pathname.split("?")[0].replace(/\/$/, "");
     const moreTabRoutes = [
+      `/${locale}/admin/home-images`,
       `/${locale}/admin/categories`,
       `/${locale}/admin/vehicles`,
       `/${locale}/admin/locations`,

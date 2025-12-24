@@ -51,12 +51,14 @@ export function BottomTabBar() {
             (normalizedHref !== `/${locale}/admin` &&
               normalizedPathname.startsWith(normalizedHref + "/")) ||
             (tab.name === "More" &&
-              (normalizedPathname === `/${locale}/admin/categories` ||
+              (normalizedPathname === `/${locale}/admin/home-images` ||
+                normalizedPathname === `/${locale}/admin/categories` ||
                 normalizedPathname === `/${locale}/admin/vehicles` ||
                 normalizedPathname === `/${locale}/admin/locations` ||
                 normalizedPathname === `/${locale}/admin/pricing` ||
                 normalizedPathname === `/${locale}/admin/features` ||
                 normalizedPathname === `/${locale}/admin/testimonials` ||
+                normalizedPathname.startsWith(`/${locale}/admin/home-images/`) ||
                 normalizedPathname.startsWith(`/${locale}/admin/categories/`) ||
                 normalizedPathname.startsWith(`/${locale}/admin/vehicles/`) ||
                 normalizedPathname.startsWith(`/${locale}/admin/locations/`) ||
