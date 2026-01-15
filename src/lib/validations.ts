@@ -1,11 +1,17 @@
 import { z } from "zod";
+import { isValidPhoneNumber } from "react-phone-number-input";
 
 // Base reservation schema (pickup and destination are optional - validated via service fields)
 export const reservationSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number must be at least 10 characters"),
+  email: z.email("Invalid email address"),
+  phone: z
+    .string()
+    .min(1, "Phone number is required")
+    .refine((val) => isValidPhoneNumber(val), {
+      message: "Please enter a valid phone number",
+    }),
   pickup: z.string().optional(), // Validated via service fields if needed
   destination: z.string().optional(), // Validated via service fields if needed
   date: z.string().min(1, "Date is required"),
@@ -93,8 +99,8 @@ export const contactSchema = z.object({
   phone: z
     .string()
     .optional()
-    .refine((val) => !val || val.length >= 10, {
-      message: "Phone number must be at least 10 characters if provided",
+    .refine((val) => !val || isValidPhoneNumber(val), {
+      message: "Please enter a valid phone number",
     }),
   message: z.string().min(1, "Message is required"),
 });

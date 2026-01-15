@@ -1,4 +1,5 @@
 import { BriefServices } from "@/components/home/BriefServices";
+import { DisneylandPromo } from "@/components/home/DisneylandPromo";
 import { Features } from "@/components/home/Features";
 import { Hero } from "@/components/home/Hero";
 import { ImageCarousel } from "@/components/home/ImageCarousel";
@@ -10,6 +11,7 @@ export default function HomePage() {
     <>
       <Hero />
       <ImageCarousel />
+      <DisneylandPromo />
       <BriefServices />
       <VehicleClasses />
       <Features />

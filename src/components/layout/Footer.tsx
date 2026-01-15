@@ -12,6 +12,9 @@ import {
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
+import Script from "next/script";
+import Image from "next/image";
+import { useEffect } from "react";
 import { Link } from "@/i18n/navigation";
 
 export function Footer() {
@@ -21,6 +24,52 @@ export function Footer() {
   const pathname = usePathname();
 
   const currentYear = new Date().getFullYear();
+
+  // Inject TripAdvisor script with proper attributes
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src =
+      "https://www.jscache.com/wejs?wtype=rated&uniq=770&locationId=33396177&lang=fr&display_version=2";
+    script.async = true;
+    script.setAttribute("data-loadtrk", "");
+    script.onload = function () {
+      // Set loadtrk property on script element (TripAdvisor requirement)
+      (this as HTMLScriptElement & { loadtrk?: boolean }).loadtrk = true;
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      // Cleanup: remove script on unmount
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+
+  // Inject TRANSFEERO script to ensure it loads after the div exists
+  useEffect(() => {
+    // Check if script already exists
+    const existingScript = document.querySelector(
+      'script[src*="top_rating_top_130_b.js"]'
+    );
+    if (existingScript) {
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src =
+      "https://w4.transfeero.com/data_ext/js/top_rating_top_130_b.js?vers=22";
+    script.async = true;
+    script.setAttribute("charset", "utf-8");
+    document.body.appendChild(script);
+
+    return () => {
+      // Cleanup: remove script on unmount
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
 
   // Hide admin login button on admin pages
   const isAdminPage = pathname?.includes("/admin");
@@ -61,6 +110,40 @@ export function Footer() {
               >
                 <Instagram className="text-white w-5 h-5" />
               </a>
+            </div>
+
+            {/* Rating Badges */}
+            <div className="mt-6 flex flex-wrap items-center gap-4">
+              {/* TRANSFEERO Banner */}
+              <div id="banner_rating_transfeero_130"></div>
+
+              {/* TripAdvisor Widget */}
+              <div id="TA_rated770" className="TA_rated">
+                <ul id="yWzThh" className="TA_links NUXpESgIhLu8">
+                  <li id="yi0u9fkDk" className="J1BGUYQ8">
+                    <a
+                      target="_blank"
+                      href="https://www.tripadvisor.fr/Attraction_Review-g196571-d33396177-Reviews-Prestige_Shuttle_Group-Le_Blanc_Mesnil_Seine_Saint_Denis_Ile_de_France.html"
+                      rel="noopener noreferrer"
+                      className="inline-block"
+                    >
+                      <div className="relative inline-block">
+                        <Image
+                          src="/Tripadvisor_lockup_horizontal_registered.png"
+                          alt="TripAdvisor"
+                          width={200}
+                          height={50}
+                          style={{
+                            filter:
+                              "brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(106deg) brightness(104%) contrast(97%)",
+                          }}
+                          unoptimized
+                        />
+                      </div>
+                    </a>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
 

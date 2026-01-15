@@ -109,6 +109,17 @@
         "Expérience Personnalisée"
       ]
     },
+    "vipLuxe": {
+      "name": "Service Chauffeur VIP Luxe",
+      "description": "Profitez de flexibilité et de confort avec notre voiture avec chauffeur à disposition. Que ce soit pour des réunions d'affaires, des sorties shopping ou des événements spéciaux, nos chauffeurs professionnels sont disponibles à l'heure.",
+      "features": [
+        "Chauffeur Professionnel",
+        "Véhicules Premium",
+        "Planification Flexible",
+        "Services de Conciergerie",
+        "Rafraîchissements à Bord"
+      ]
+    },
     "tourGuide": {
       "name": "Service de Guide Touristique",
       "description": "Visites guidées professionnelles de Paris avec des guides locaux experts. Découvrez l'histoire, la culture et les joyaux cachés de la ville avec des itinéraires personnalisés adaptés à vos intérêts.",
@@ -308,21 +319,21 @@
       "reviewConfirm": "Réviser & Confirmer",
       "tripDetailsTitle": "Détails du Voyage",
       "basicInformation": "Informations de Base",
-      "pickupDate": "Date de Prise en Charge *",
-      "pickupTime": "Heure de Prise en Charge *",
-      "numberOfPassengers": "Nombre de Passagers *",
+      "pickupDate": "Date de Prise en Charge",
+      "pickupTime": "Heure de Prise en Charge",
+      "numberOfPassengers": "Nombre de Passagers",
       "passenger": "passager",
       "passengers": "passagers",
       "serviceDetails": "Détails du Service",
       "pleaseProvideInfo": "Veuillez fournir les informations suivantes pour votre service {serviceName} :",
       "contactInformation": "Informations de Contact",
-      "firstNameLabel": "Prénom *",
+      "firstNameLabel": "Prénom",
       "enterFirstName": "Entrez le prénom",
-      "lastNameLabel": "Nom *",
+      "lastNameLabel": "Nom",
       "enterLastName": "Entrez le nom",
-      "emailAddressLabel": "Adresse Email *",
+      "emailAddressLabel": "Adresse Email",
       "enterEmailAddress": "Entrez l'adresse email",
-      "phoneNumberLabel": "Numéro de Téléphone *",
+      "phoneNumberLabel": "Numéro de Téléphone",
       "enterPhoneNumber": "Entrez le numéro de téléphone",
       "specialRequestsOptional": "Demandes Spéciales (Optionnel)",
       "specialRequestsPlaceholderText": "Toute demande spéciale ou note...",
@@ -477,6 +488,7 @@
     "boosterSeats": "Sièges Rehausseurs",
     "meetAndGreet": "Accueil et Assistance",
     "free": "Gratuit",
+    "included": "Inclus",
     "priceSummary": "Résumé des Prix",
     "basePrice": "Prix de Base",
     "total": "Total",
@@ -666,5 +678,78 @@
     "loading": "Chargement de la réservation...",
     "viewReservation": "Voir le Statut de la Réservation",
     "error": "Erreur lors du chargement de la réservation"
+  },
+  "disneylandPage": {
+    "hero": {
+      "title": "Disneyland Paris",
+      "subtitle": "Découvrez la magie de Disneyland Paris avec nos services de transfert premium. Votre voyage magique commence ici !",
+      "bookDisneyTour": "Réserver un Tour Disney",
+      "bookAirportTransfer": "Réserver un Transfert Aéroport"
+    },
+    "thingsToDo": {
+      "title": "Que Faire à Disneyland Paris",
+      "subtitle": "Découvrez la magie, les attractions, la restauration et les spectacles qui vous attendent dans l'endroit le plus magique du monde"
+    },
+    "attractions": {
+      "title": "Attractions",
+      "castle": {
+        "title": "Le Château de la Belle au Bois Dormant",
+        "description": "Explorez l'emblématique château de la Belle au Bois Dormant, avec La Galerie de la Belle au Bois Dormant et La Tanière du Dragon"
+      },
+      "alice": {
+        "title": "Alice's Curious Labyrinth",
+        "description": "Naviguez dans un labyrinthe de haies fantastique inspiré d'Alice au Pays des Merveilles"
+      },
+      "dragon": {
+        "title": "La Tanière du Dragon",
+        "description": "Découvrez la tanière du dragon sous le château, abritant un dragon animatronique réaliste"
+      },
+      "studios": {
+        "title": "Walt Disney Studios",
+        "description": "Découvrez la magie des coulisses avec des attractions palpitantes et des spectacles"
+      }
+    },
+    "dining": {
+      "title": "Restauration",
+      "cinderella": {
+        "title": "L'Auberge de Cendrillon",
+        "description": "Dînez dans un restaurant sur le thème de Cendrillon offrant une cuisine d'inspiration française avec des rencontres de personnages"
+      },
+      "blueLagoon": {
+        "title": "Restaurant Blue Lagoon",
+        "description": "Savourez une cuisine d'inspiration caribéenne dans un cadre tropical avec vue sur l'attraction Pirates des Caraïbes"
+      }
+    },
+    "entertainment": {
+      "title": "Divertissement",
+      "talesOfMagic": {
+        "title": "Disney Tales of Magic",
+        "description": "Découvrez le spectacle nocturne spectaculaire avec des drones, des lasers et des projections qui donnent vie aux histoires Disney"
+      },
+      "parades": {
+        "title": "Parades Disney",
+        "description": "Regardez les parades magiques mettant en scène vos personnages Disney préférés, de la musique et des chars tout au long de la journée"
+      }
+    },
+    "booking": {
+      "title": "Réservez Votre Voyage Magique",
+      "subtitle": "Choisissez le service de transfert parfait pour votre aventure à Disneyland Paris",
+      "disneyTour": {
+        "title": "Tours Disney",
+        "description": "Transfers directs vers Disneyland Paris et ses hôtels avec confort magique pour toute la famille",
+        "button": "Réserver un Tour Disney"
+      },
+      "airportTransfer": {
+        "title": "Transfert Aéroport",
+        "description": "Transfers fluides depuis les aéroports Charles de Gaulle, Orly ou Beauvais directement vers Disneyland Paris",
+        "button": "Réserver un Transfert Aéroport"
+      }
+    }
+  },
+  "disneylandPromo": {
+    "title": "Découvrez Disneyland Paris",
+    "subtitle": "Découvrez la magie avec nos services de transfert premium. Réservez votre voyage magique dès aujourd'hui !",
+    "button": "Explorer Disneyland",
+    "clickHint": "Cliquez pour explorer →"
   }
 }

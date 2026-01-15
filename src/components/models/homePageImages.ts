@@ -5,6 +5,8 @@ export enum HomePageImageType {
   VEHICLES = "vehicles",
   FEATURES = "features",
   TESTIMONIALS = "testimonials",
+  DISNEYLAND_PROMO = "disneyland-promo",
+  DISNEYLAND_PAGE = "disneyland-page",
 }
 
 export interface HomePageImage {

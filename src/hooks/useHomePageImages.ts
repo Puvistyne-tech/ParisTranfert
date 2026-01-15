@@ -14,7 +14,7 @@ import {
 /**
  * Hook to fetch active home page images
  */
-export function useHomePageImages(type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials") {
+export function useHomePageImages(type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials" | "disneyland-promo" | "disneyland-page") {
     return useQuery({
         queryKey: ["homePageImages", type],
         queryFn: () => getHomePageImages(type),
@@ -24,7 +24,7 @@ export function useHomePageImages(type: "carousel" | "hero" | "services" | "vehi
 /**
  * Hook to fetch all home page images (including inactive) - for admin
  */
-export function useAllHomePageImages(type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials") {
+export function useAllHomePageImages(type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials" | "disneyland-promo" | "disneyland-page") {
     return useQuery({
         queryKey: ["allHomePageImages", type],
         queryFn: () => getAllHomePageImages(type),
@@ -39,7 +39,7 @@ export function useCreateHomePageImage() {
 
     return useMutation({
         mutationFn: async (data: {
-            type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials";
+            type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials" | "disneyland-promo" | "disneyland-page";
             file: File;
             displayOrder?: number;
             isActive?: boolean;
@@ -85,7 +85,7 @@ export function useUpdateHomePageImage() {
                 displayOrder: number;
                 isActive: boolean;
             }>;
-            type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials";
+            type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials" | "disneyland-promo" | "disneyland-page";
         }) => {
             return updateHomePageImage(data.id, data.updates);
         },
@@ -110,7 +110,7 @@ export function useUpdateHomePageImageOrder() {
     return useMutation({
         mutationFn: async (data: {
             images: HomePageImage[];
-            type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials";
+            type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials" | "disneyland-promo" | "disneyland-page";
         }) => {
             return updateHomePageImageOrder(data.images);
         },
@@ -135,7 +135,7 @@ export function useDeleteHomePageImage() {
     return useMutation({
         mutationFn: async (data: {
             id: string;
-            type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials";
+            type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials" | "disneyland-promo" | "disneyland-page";
         }) => {
             return deleteHomePageImage(data.id);
         },

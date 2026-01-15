@@ -7,6 +7,7 @@
 const serviceIdToTranslationKey: Record<string, string> = {
   "airport-transfers": "airportTransfer",
   "disneyland-paris": "disneyland",
+  "disneyland": "disneyland",
   "private-tours": "privateTour",
   "wedding-transfers": "weddingTransfer",
   "business-transfers": "businessTransfer",
@@ -15,8 +16,11 @@ const serviceIdToTranslationKey: Record<string, string> = {
   "transport-international": "international",
   "greeter-service": "greeterService",
   "service-vip": "serviceVip",
+  "vip-luxe": "vipLuxe",
   "tour-guide": "tourGuide",
   "event-transport": "eventTransport",
+  "personal-security": "personal-security",
+  "paris-city-tour": "paris-city-tour",
 };
 
 /**
@@ -39,7 +43,9 @@ export function getTranslatedServiceName(
       return serviceName;
     }
     return translated;
-  } catch {
+  } catch (error) {
+    // If translation key doesn't exist, next-intl throws an error
+    // Fall back to the original service name
     return serviceName;
   }
 }

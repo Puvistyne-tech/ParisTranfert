@@ -109,6 +109,17 @@
         "Experiencia Personalizada"
       ]
     },
+    "vipLuxe": {
+      "name": "Servicio de Chófer VIP Luxe",
+      "description": "Disfrute de flexibilidad y comodidad con nuestro automóvil con chófer a disposición. Ya sea para reuniones de negocios, compras o eventos especiales, nuestros conductores profesionales están disponibles por hora.",
+      "features": [
+        "Chófer Profesional",
+        "Vehículos Premium",
+        "Programación Flexible",
+        "Servicios de Conserjería",
+        "Refrigerios a Bordo"
+      ]
+    },
     "tourGuide": {
       "name": "Servicio de Guía Turístico",
       "description": "Tours guiados profesionales de París con guías locales expertos. Descubra la historia, cultura y joyas ocultas de la ciudad con itinerarios personalizados adaptados a sus intereses.",
@@ -308,21 +319,21 @@
       "reviewConfirm": "Revisar y Confirmar",
       "tripDetailsTitle": "Detalles del Viaje",
       "basicInformation": "Información Básica",
-      "pickupDate": "Fecha de Recogida *",
-      "pickupTime": "Hora de Recogida *",
-      "numberOfPassengers": "Número de Pasajeros *",
+      "pickupDate": "Fecha de Recogida",
+      "pickupTime": "Hora de Recogida",
+      "numberOfPassengers": "Número de Pasajeros",
       "passenger": "pasajero",
       "passengers": "pasajeros",
       "serviceDetails": "Detalles del Servicio",
       "pleaseProvideInfo": "Por favor proporciona la siguiente información para tu servicio {serviceName}:",
       "contactInformation": "Información de Contacto",
-      "firstNameLabel": "Nombre *",
+      "firstNameLabel": "Nombre",
       "enterFirstName": "Ingresa el nombre",
-      "lastNameLabel": "Apellido *",
+      "lastNameLabel": "Apellido",
       "enterLastName": "Ingresa el apellido",
-      "emailAddressLabel": "Dirección de Email *",
+      "emailAddressLabel": "Dirección de Email",
       "enterEmailAddress": "Ingresa la dirección de email",
-      "phoneNumberLabel": "Número de Teléfono *",
+      "phoneNumberLabel": "Número de Teléfono",
       "enterPhoneNumber": "Ingresa el número de teléfono",
       "specialRequestsOptional": "Solicitudes Especiales (Opcional)",
       "specialRequestsPlaceholderText": "Cualquier solicitud especial o nota...",
@@ -477,6 +488,7 @@
     "boosterSeats": "Asientos Elevadores",
     "meetAndGreet": "Encuentro y Saludo",
     "free": "Gratis",
+    "included": "Incluido",
     "priceSummary": "Resumen de Precios",
     "basePrice": "Precio Base",
     "total": "Total",
@@ -666,5 +678,78 @@
     "loading": "Cargando reserva...",
     "viewReservation": "Ver Estado de la Reserva",
     "error": "Error al cargar la reserva"
+  },
+  "disneylandPage": {
+    "hero": {
+      "title": "Disneyland París",
+      "subtitle": "Experimenta la magia de Disneyland París con nuestros servicios de transfer premium. ¡Tu viaje mágico comienza aquí!",
+      "bookDisneyTour": "Reservar Tour Disney",
+      "bookAirportTransfer": "Reservar Transfer Aeropuerto"
+    },
+    "thingsToDo": {
+      "title": "Qué Hacer en Disneyland París",
+      "subtitle": "Descubre la magia, atracciones, restaurantes y entretenimiento que te esperan en el lugar más mágico del mundo"
+    },
+    "attractions": {
+      "title": "Atracciones",
+      "castle": {
+        "title": "El Castillo de la Bella Durmiente",
+        "description": "Explora el icónico Castillo de la Bella Durmiente, con La Galería de la Bella Durmiente y La Guarida del Dragón"
+      },
+      "alice": {
+        "title": "El Laberinto Curioso de Alicia",
+        "description": "Navega por un laberinto de setos caprichoso inspirado en Alicia en el País de las Maravillas"
+      },
+      "dragon": {
+        "title": "La Guarida del Dragón",
+        "description": "Descubre la guarida del dragón bajo el castillo, hogar de un dragón animatrónico realista"
+      },
+      "studios": {
+        "title": "Walt Disney Studios",
+        "description": "Experimenta la magia detrás de escena con atracciones emocionantes y espectáculos"
+      }
+    },
+    "dining": {
+      "title": "Restaurantes",
+      "cinderella": {
+        "title": "L'Auberge de Cendrillon",
+        "description": "Cena en un restaurante temático de Cenicienta que ofrece cocina de inspiración francesa con encuentros de personajes"
+      },
+      "blueLagoon": {
+        "title": "Restaurante Blue Lagoon",
+        "description": "Disfruta de cocina de inspiración caribeña en un ambiente tropical con vistas a la atracción Piratas del Caribe"
+      }
+    },
+    "entertainment": {
+      "title": "Entretenimiento",
+      "talesOfMagic": {
+        "title": "Disney Tales of Magic",
+        "description": "Experimenta el espectacular espectáculo nocturno con drones, láseres y proyecciones que dan vida a las historias de Disney"
+      },
+      "parades": {
+        "title": "Desfiles Disney",
+        "description": "Mira los desfiles mágicos con tus personajes Disney favoritos, música y carrozas durante todo el día"
+      }
+    },
+    "booking": {
+      "title": "Reserva Tu Viaje Mágico",
+      "subtitle": "Elige el servicio de transfer perfecto para tu aventura en Disneyland París",
+      "disneyTour": {
+        "title": "Tours Disney",
+        "description": "Transfers directos a Disneyland París y sus hoteles con comodidad mágica para toda la familia",
+        "button": "Reservar Tour Disney"
+      },
+      "airportTransfer": {
+        "title": "Transfer Aeropuerto",
+        "description": "Transfers fluidos desde los aeropuertos Charles de Gaulle, Orly o Beauvais directamente a Disneyland París",
+        "button": "Reservar Transfer Aeropuerto"
+      }
+    }
+  },
+  "disneylandPromo": {
+    "title": "Descubre Disneyland París",
+    "subtitle": "Experimenta la magia con nuestros servicios de transfer premium. ¡Reserva tu viaje mágico hoy!",
+    "button": "Explorar Disneyland",
+    "clickHint": "Haz clic para explorar →"
   }
 }

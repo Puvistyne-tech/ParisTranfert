@@ -151,6 +151,107 @@ function generateServiceFieldsText(serviceSubData?: Record<string, any>): string
 }
 
 /**
+ * Generate HTML for additional services section
+ */
+function generateAdditionalServicesHTML(
+  babySeats?: number,
+  boosterSeats?: number,
+  meetAndGreet?: boolean,
+): string {
+  const services: string[] = [];
+  
+  if (babySeats && babySeats > 0) {
+    services.push(`<div class="info-row">
+      <span class="info-label">Baby Seats:</span>
+      <span class="info-value">${babySeats} (Free)</span>
+    </div>`);
+  }
+  
+  if (boosterSeats && boosterSeats > 0) {
+    services.push(`<div class="info-row">
+      <span class="info-label">Booster Seats:</span>
+      <span class="info-value">${boosterSeats} (Free)</span>
+    </div>`);
+  }
+  
+  if (meetAndGreet) {
+    services.push(`<div class="info-row">
+      <span class="info-label">Meet & Greet:</span>
+      <span class="info-value">Yes (Free)</span>
+    </div>`);
+  }
+
+  if (services.length === 0) {
+    return "";
+  }
+
+  return `
+    <div class="section">
+      <div class="section-title">Additional Services</div>
+      ${services.join("")}
+    </div>
+  `;
+}
+
+/**
+ * Generate text version of additional services
+ */
+function generateAdditionalServicesText(
+  babySeats?: number,
+  boosterSeats?: number,
+  meetAndGreet?: boolean,
+): string {
+  const services: string[] = [];
+  
+  if (babySeats && babySeats > 0) {
+    services.push(`- Baby Seats: ${babySeats} (Free)`);
+  }
+  
+  if (boosterSeats && boosterSeats > 0) {
+    services.push(`- Booster Seats: ${boosterSeats} (Free)`);
+  }
+  
+  if (meetAndGreet) {
+    services.push(`- Meet & Greet: Yes (Free)`);
+  }
+
+  if (services.length === 0) {
+    return "";
+  }
+
+  return `\nAdditional Services:\n${services.join("\n")}\n`;
+}
+
+/**
+ * Generate HTML for notes section
+ */
+function generateNotesHTML(notes?: string): string {
+  if (!notes || notes.trim() === "") {
+    return "";
+  }
+
+  return `
+    <div class="section">
+      <div class="section-title">Special Requests / Notes</div>
+      <div class="info-box" style="background: #fef3c7; border-left: 4px solid #f59e0b;">
+        <p style="white-space: pre-wrap; margin: 0;">${notes.replace(/\n/g, "<br>")}</p>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Generate text version of notes
+ */
+function generateNotesText(notes?: string): string {
+  if (!notes || notes.trim() === "") {
+    return "";
+  }
+
+  return `\nSpecial Requests / Notes:\n${notes}\n`;
+}
+
+/**
  * QUOTE_REQUESTED - Customer receives confirmation with quote request details
  */
 export function generateQuoteRequestedEmail(
@@ -220,6 +321,8 @@ export function generateQuoteRequestedEmail(
             </div>
           </div>
           ${generateServiceFieldsHTML(reservation.serviceSubData)}
+          ${generateAdditionalServicesHTML(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}
+          ${generateNotesHTML(reservation.notes)}
 
           <div style="text-align: center; margin-top: 30px;">
             <a href="${reservationUrl}" class="button">View Reservation</a>
@@ -252,7 +355,7 @@ ${reservation.destinationLocation ? `- Destination: ${reservation.destinationLoc
 
 Service Information:
 - Service: ${reservation.serviceName || "N/A"}
-- Vehicle Type: ${reservation.vehicleTypeName || "N/A"}${generateServiceFieldsText(reservation.serviceSubData)}
+- Vehicle Type: ${reservation.vehicleTypeName || "N/A"}${generateServiceFieldsText(reservation.serviceSubData)}${generateAdditionalServicesText(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}${generateNotesText(reservation.notes)}
 
 View your reservation: ${reservationUrl}
 
@@ -344,6 +447,8 @@ export function generateQuoteSentEmail(
             </div>
           </div>
           ${generateServiceFieldsHTML(reservation.serviceSubData)}
+          ${generateAdditionalServicesHTML(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}
+          ${generateNotesHTML(reservation.notes)}
           
           <div class="highlight-box">
             <p style="font-weight: 600; margin-bottom: 10px;">Next Steps:</p>
@@ -383,7 +488,7 @@ ${reservation.destinationLocation ? `- Destination: ${reservation.destinationLoc
 
 Service Information:
 - Service: ${reservation.serviceName || "N/A"}
-- Vehicle Type: ${reservation.vehicleTypeName || "N/A"}${generateServiceFieldsText(reservation.serviceSubData)}
+- Vehicle Type: ${reservation.vehicleTypeName || "N/A"}${generateServiceFieldsText(reservation.serviceSubData)}${generateAdditionalServicesText(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}${generateNotesText(reservation.notes)}
 
 Next Steps:
 If you would like to proceed with this reservation, please visit the link below to accept the quote. You can also contact us directly if you have any questions.
@@ -457,6 +562,21 @@ export function generateQuoteAcceptedEmail(
               <span class="info-value" style="font-weight: 700; color: #0ea5e9;">€${reservation.totalPrice.toFixed(2)}</span>
             </div>
           </div>
+          
+          <div class="section">
+            <div class="section-title">Service Information</div>
+            <div class="info-row">
+              <span class="info-label">Service:</span>
+              <span class="info-value">${reservation.serviceName || "N/A"}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Vehicle Type:</span>
+              <span class="info-value">${reservation.vehicleTypeName || "N/A"}</span>
+            </div>
+          </div>
+          ${generateServiceFieldsHTML(reservation.serviceSubData)}
+          ${generateAdditionalServicesHTML(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}
+          ${generateNotesHTML(reservation.notes)}
 
           <div class="info-box">
             <p style="font-weight: 600; margin-bottom: 10px;">Important Information:</p>
@@ -496,6 +616,10 @@ Trip Details:
 - Pickup: ${reservation.pickupLocation}
 ${reservation.destinationLocation ? `- Destination: ${reservation.destinationLocation}` : ""}
 - Total Price: €${reservation.totalPrice.toFixed(2)}
+
+Service Information:
+- Service: ${reservation.serviceName || "N/A"}
+- Vehicle Type: ${reservation.vehicleTypeName || "N/A"}${generateServiceFieldsText(reservation.serviceSubData)}${generateAdditionalServicesText(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}${generateNotesText(reservation.notes)}
 
 Important Information:
 - Please arrive 10 minutes before your scheduled pickup time
@@ -576,6 +700,21 @@ export function generatePendingEmail(
               <span class="info-value" style="font-weight: 700; color: #0ea5e9;">€${reservation.totalPrice.toFixed(2)}</span>
             </div>
           </div>
+          
+          <div class="section">
+            <div class="section-title">Service Information</div>
+            <div class="info-row">
+              <span class="info-label">Service:</span>
+              <span class="info-value">${reservation.serviceName || "N/A"}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Vehicle Type:</span>
+              <span class="info-value">${reservation.vehicleTypeName || "N/A"}</span>
+            </div>
+          </div>
+          ${generateServiceFieldsHTML(reservation.serviceSubData)}
+          ${generateAdditionalServicesHTML(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}
+          ${generateNotesHTML(reservation.notes)}
 
           <div style="text-align: center; margin-top: 30px;">
             <a href="${reservationUrl}" class="button">View Reservation Status</a>
@@ -606,6 +745,10 @@ Trip Details:
 ${reservation.destinationLocation ? `- Destination: ${reservation.destinationLocation}` : ""}
 - Passengers: ${reservation.passengers}
 - Total Price: €${reservation.totalPrice.toFixed(2)}
+
+Service Information:
+- Service: ${reservation.serviceName || "N/A"}
+- Vehicle Type: ${reservation.vehicleTypeName || "N/A"}${generateServiceFieldsText(reservation.serviceSubData)}${generateAdditionalServicesText(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}${generateNotesText(reservation.notes)}
 
 View reservation: ${reservationUrl}
 
@@ -680,6 +823,21 @@ export function generateConfirmedEmail(
               <span class="info-value" style="font-weight: 700; color: #10b981; font-size: 18px;">€${reservation.totalPrice.toFixed(2)}</span>
             </div>
           </div>
+          
+          <div class="section">
+            <div class="section-title">Service Information</div>
+            <div class="info-row">
+              <span class="info-label">Service:</span>
+              <span class="info-value">${reservation.serviceName || "N/A"}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Vehicle Type:</span>
+              <span class="info-value">${reservation.vehicleTypeName || "N/A"}</span>
+            </div>
+          </div>
+          ${generateServiceFieldsHTML(reservation.serviceSubData)}
+          ${generateAdditionalServicesHTML(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}
+          ${generateNotesHTML(reservation.notes)}
 
           <div class="info-box">
             <p style="font-weight: 600; margin-bottom: 10px;">Important Information:</p>
@@ -720,6 +878,10 @@ Trip Details:
 ${reservation.destinationLocation ? `- Destination: ${reservation.destinationLocation}` : ""}
 - Passengers: ${reservation.passengers}
 - Total Price: €${reservation.totalPrice.toFixed(2)}
+
+Service Information:
+- Service: ${reservation.serviceName || "N/A"}
+- Vehicle Type: ${reservation.vehicleTypeName || "N/A"}${generateServiceFieldsText(reservation.serviceSubData)}${generateAdditionalServicesText(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}${generateNotesText(reservation.notes)}
 
 Important Information:
 - Please arrive 10 minutes before your scheduled pickup time
@@ -791,7 +953,26 @@ export function generateCancelledEmail(
               <span class="info-value">${reservation.destinationLocation}</span>
             </div>
             ` : ""}
+            <div class="info-row">
+              <span class="info-label">Passengers:</span>
+              <span class="info-value">${reservation.passengers}</span>
+            </div>
           </div>
+          
+          <div class="section">
+            <div class="section-title">Service Information</div>
+            <div class="info-row">
+              <span class="info-label">Service:</span>
+              <span class="info-value">${reservation.serviceName || "N/A"}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Vehicle Type:</span>
+              <span class="info-value">${reservation.vehicleTypeName || "N/A"}</span>
+            </div>
+          </div>
+          ${generateServiceFieldsHTML(reservation.serviceSubData)}
+          ${generateAdditionalServicesHTML(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}
+          ${generateNotesHTML(reservation.notes)}
           
           <div style="text-align: center; margin-top: 30px;">
             <a href="${reservationUrl}" class="button">View Details</a>
@@ -821,6 +1002,11 @@ Cancelled Reservation Details:
 - Time: ${reservation.time}
 - Pickup: ${reservation.pickupLocation}
 ${reservation.destinationLocation ? `- Destination: ${reservation.destinationLocation}` : ""}
+- Passengers: ${reservation.passengers}
+
+Service Information:
+- Service: ${reservation.serviceName || "N/A"}
+- Vehicle Type: ${reservation.vehicleTypeName || "N/A"}${generateServiceFieldsText(reservation.serviceSubData)}${generateAdditionalServicesText(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}${generateNotesText(reservation.notes)}
 
 View details: ${reservationUrl}
 
@@ -889,7 +1075,26 @@ export function generateCompletedEmail(
               <span class="info-value">${reservation.destinationLocation}</span>
             </div>
             ` : ""}
+            <div class="info-row">
+              <span class="info-label">Passengers:</span>
+              <span class="info-value">${reservation.passengers}</span>
+            </div>
           </div>
+          
+          <div class="section">
+            <div class="section-title">Service Information</div>
+            <div class="info-row">
+              <span class="info-label">Service:</span>
+              <span class="info-value">${reservation.serviceName || "N/A"}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Vehicle Type:</span>
+              <span class="info-value">${reservation.vehicleTypeName || "N/A"}</span>
+            </div>
+          </div>
+          ${generateServiceFieldsHTML(reservation.serviceSubData)}
+          ${generateAdditionalServicesHTML(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}
+          ${generateNotesHTML(reservation.notes)}
         </div>
 
         <div class="footer">
@@ -919,6 +1124,11 @@ Trip Details:
 - Time: ${reservation.time}
 - Pickup: ${reservation.pickupLocation}
 ${reservation.destinationLocation ? `- Destination: ${reservation.destinationLocation}` : ""}
+- Passengers: ${reservation.passengers}
+
+Service Information:
+- Service: ${reservation.serviceName || "N/A"}
+- Vehicle Type: ${reservation.vehicleTypeName || "N/A"}${generateServiceFieldsText(reservation.serviceSubData)}${generateAdditionalServicesText(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}${generateNotesText(reservation.notes)}
 
 Contact us:
 Email: support@prestigeshuttlegroup.com
@@ -1032,6 +1242,9 @@ export function generateAdminNotificationEmail(
               </span>
             </div>
           </div>
+          ${generateServiceFieldsHTML(reservation.serviceSubData)}
+          ${generateAdditionalServicesHTML(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}
+          ${generateNotesHTML(reservation.notes)}
 
           <div style="text-align: center; margin-top: 30px;">
             <a href="${adminUrl}" class="button">View in Admin Panel</a>
@@ -1068,7 +1281,7 @@ Service & Pricing:
 - Service: ${reservation.serviceName}
 - Vehicle Type: ${reservation.vehicleTypeName || "N/A"}
 - Total Price: ${reservation.totalPrice > 0 ? `€${reservation.totalPrice.toFixed(2)}` : "Quote Request"}
-- Status: ${reservation.status === 'quote_requested' ? 'Quote Requested' : reservation.status}
+- Status: ${reservation.status === 'quote_requested' ? 'Quote Requested' : reservation.status}${generateServiceFieldsText(reservation.serviceSubData)}${generateAdditionalServicesText(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}${generateNotesText(reservation.notes)}
 
 View in Admin Panel: ${adminUrl}
   `.trim();
@@ -1172,6 +1385,9 @@ export function generateAdminQuoteAcceptedEmail(
               </span>
             </div>
           </div>
+          ${generateServiceFieldsHTML(reservation.serviceSubData)}
+          ${generateAdditionalServicesHTML(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}
+          ${generateNotesHTML(reservation.notes)}
           
           <div style="text-align: center; margin-top: 30px;">
             <a href="${adminUrl}" class="button">View & Confirm Reservation</a>
@@ -1208,7 +1424,7 @@ Service & Pricing:
 - Service: ${reservation.serviceName}
 - Vehicle Type: ${reservation.vehicleTypeName || "N/A"}
 - Total Price: ${reservation.totalPrice > 0 ? `€${reservation.totalPrice.toFixed(2)}` : "Quote Request"}
-- Status: Quote Accepted
+- Status: Quote Accepted${generateServiceFieldsText(reservation.serviceSubData)}${generateAdditionalServicesText(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}${generateNotesText(reservation.notes)}
 
 View & Confirm Reservation: ${adminUrl}
   `.trim();
@@ -1312,6 +1528,9 @@ export function generateAdminQuoteDeclinedEmail(
               </span>
             </div>
           </div>
+          ${generateServiceFieldsHTML(reservation.serviceSubData)}
+          ${generateAdditionalServicesHTML(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}
+          ${generateNotesHTML(reservation.notes)}
 
           <div style="text-align: center; margin-top: 30px;">
             <a href="${adminUrl}" class="button">View Reservation</a>
@@ -1348,7 +1567,7 @@ Service & Pricing:
 - Service: ${reservation.serviceName}
 - Vehicle Type: ${reservation.vehicleTypeName || "N/A"}
 - Total Price: ${reservation.totalPrice > 0 ? `€${reservation.totalPrice.toFixed(2)}` : "Quote Request"}
-- Status: Cancelled
+- Status: Cancelled${generateServiceFieldsText(reservation.serviceSubData)}${generateAdditionalServicesText(reservation.babySeats, reservation.boosterSeats, reservation.meetAndGreet)}${generateNotesText(reservation.notes)}
 
 View Reservation: ${adminUrl}
   `.trim();

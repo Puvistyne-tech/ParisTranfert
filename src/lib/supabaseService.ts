@@ -988,6 +988,27 @@ export async function getClientById(id: string): Promise<Client | null> {
 }
 
 /**
+ * Get client by email
+ */
+export async function getClientByEmail(email: string): Promise<Client | null> {
+    const { data, error } = await supabase
+        .from("clients")
+        .select("*")
+        .eq("email", email.toLowerCase().trim())
+        .single();
+
+    if (error) {
+        if (error.code === "PGRST116") {
+            return null; // Not found
+        }
+        console.error("Error fetching client by email:", error);
+        throw new Error(`Failed to fetch client: ${error.message}`);
+    }
+
+    return data ? mapClientRow(data) : null;
+}
+
+/**
  * Admin: Get client reservations
  */
 export async function getClientReservations(
@@ -1921,7 +1942,7 @@ export async function deleteVehicleImage(imageUrl: string): Promise<void> {
  */
 export async function uploadWebsiteImage(
     file: File,
-    type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials",
+    type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials" | "disneyland-promo" | "disneyland-page",
     order?: number
 ): Promise<string> {
     // Validate file type
@@ -2014,7 +2035,7 @@ export async function deleteWebsiteImage(
  * @returns Array of home page images
  */
 export async function getHomePageImages(
-    type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials"
+    type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials" | "disneyland-promo" | "disneyland-page"
 ): Promise<HomePageImage[]> {
     const { data, error } = await supabase
         .from("home_page_images")
@@ -2047,7 +2068,7 @@ export async function getHomePageImages(
  * @returns Array of all home page images
  */
 export async function getAllHomePageImages(
-    type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials"
+    type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials" | "disneyland-promo" | "disneyland-page"
 ): Promise<HomePageImage[]> {
     const { data, error } = await supabase
         .from("home_page_images")
@@ -2079,7 +2100,7 @@ export async function getAllHomePageImages(
  * @returns The created home page image
  */
 export async function createHomePageImage(imageData: {
-    type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials";
+    type: "carousel" | "hero" | "services" | "vehicles" | "features" | "testimonials" | "disneyland-promo" | "disneyland-page";
     imageUrl: string;
     displayOrder?: number;
     isActive?: boolean;

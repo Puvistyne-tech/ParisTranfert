@@ -16,6 +16,7 @@ import {
   Package,
   Search,
   Settings,
+  Sparkles,
   Star,
   Users,
   X,
@@ -55,6 +56,7 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
     const normalizedPath = pathname.split("?")[0].replace(/\/$/, "");
     const moreTabRoutes = [
       `/${locale}/admin/home-images`,
+      `/${locale}/admin/disneyland-images`,
       `/${locale}/admin/categories`,
       `/${locale}/admin/vehicles`,
       `/${locale}/admin/locations`,
@@ -80,6 +82,7 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
       [`/${locale}/admin/users`]: "Clients",
       [`/${locale}/admin/services`]: "Services",
       [`/${locale}/admin/home-images`]: "Home Images",
+      [`/${locale}/admin/disneyland-images`]: "Disneyland Images",
       [`/${locale}/admin/categories`]: "Categories",
       [`/${locale}/admin/vehicles`]: "Vehicles",
       [`/${locale}/admin/locations`]: "Locations",
@@ -116,6 +119,11 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
       name: "Home Images",
       href: `/${locale}/admin/home-images`,
       icon: ImageIcon,
+    },
+    {
+      name: "Disneyland Images",
+      href: `/${locale}/admin/disneyland-images`,
+      icon: Sparkles,
     },
     {
       name: "Categories",

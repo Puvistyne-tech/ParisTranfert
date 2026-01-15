@@ -27,7 +27,9 @@ import { AddressAutocomplete } from "@/components/ui/AddressAutocomplete";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { PhoneInput } from "@/components/ui/PhoneInput";
 import { Select } from "@/components/ui/Select";
+import { ContactInformation } from "./ContactInformation";
 import { useLocationsByService } from "@/hooks/useLocationsByService";
 import { useServiceFields } from "@/hooks/useServiceFields";
 import { cn } from "@/lib/utils";
@@ -543,8 +545,8 @@ export function Step2TripDetails({
               <div className="w-full min-w-0">
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
                   <Calendar className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-2" />
-                  <span className="hidden sm:inline">{t("pickupDate")}</span>
-                  <span className="sm:hidden">{t("date")}</span>
+                  <span className="hidden sm:inline">{t("pickupDate")} <span className="text-red-500 ml-1">*</span></span>
+                  <span className="sm:hidden">{t("date")} <span className="text-red-500 ml-1">*</span></span>
                 </label>
                 <Input
                   type="date"
@@ -557,8 +559,8 @@ export function Step2TripDetails({
               <div className="w-full min-w-0">
                 <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 sm:mb-2">
                   <Clock className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1 sm:mr-2" />
-                  <span className="hidden sm:inline">{t("pickupTime")}</span>
-                  <span className="sm:hidden">{t("time")}</span>
+                  <span className="hidden sm:inline">{t("pickupTime")} <span className="text-red-500 ml-1">*</span></span>
+                  <span className="sm:hidden">{t("time")} <span className="text-red-500 ml-1">*</span></span>
                 </label>
                 <Input
                   type="time"
@@ -571,7 +573,7 @@ export function Step2TripDetails({
               <div className="w-full md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   <Users className="w-4 h-4 inline mr-2" />
-                  {t("numberOfPassengers")}
+                  {t("numberOfPassengers")} <span className="text-red-500 ml-1">*</span>
                 </label>
                 <Select
                   value={formData.passengers?.toString() || "1"}
@@ -719,70 +721,11 @@ export function Step2TripDetails({
 
           {/* Contact Information */}
           <div className="mb-8">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-              {t("contactInformation")}
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  <User className="w-4 h-4 inline mr-2" />
-                  {t("firstNameLabel")}
-                </label>
-                <Input
-                  type="text"
-                  placeholder={t("enterFirstName")}
-                  value={formData.firstName || ""}
-                  onChange={(e) =>
-                    onFormFieldChange("firstName", e.target.value)
-                  }
-                  className={`w-full ${errorFields.has("firstName") ? "border-red-500 dark:border-red-500 border-2" : ""}`}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  <User className="w-4 h-4 inline mr-2" />
-                  {t("lastNameLabel")}
-                </label>
-                <Input
-                  type="text"
-                  placeholder={t("enterLastName")}
-                  value={formData.lastName || ""}
-                  onChange={(e) =>
-                    handleFieldChange("lastName", e.target.value)
-                  }
-                  className={`w-full ${errorFields.has("lastName") ? "border-red-500 dark:border-red-500 border-2" : ""}`}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  <Mail className="w-4 h-4 inline mr-2" />
-                  {t("emailAddressLabel")}
-                </label>
-                <Input
-                  type="email"
-                  placeholder={t("enterEmailAddress")}
-                  value={formData.email || ""}
-                  onChange={(e) => handleFieldChange("email", e.target.value)}
-                  className={`w-full ${errorFields.has("email") ? "border-red-500 dark:border-red-500 border-2" : ""}`}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  <Phone className="w-4 h-4 inline mr-2" />
-                  {t("phoneNumberLabel")}
-                </label>
-                <Input
-                  type="tel"
-                  placeholder={t("enterPhoneNumber")}
-                  value={formData.phone || ""}
-                  onChange={(e) => handleFieldChange("phone", e.target.value)}
-                  className={`w-full ${errorFields.has("phone") ? "border-red-500 dark:border-red-500 border-2" : ""}`}
-                />
-              </div>
-            </div>
+            <ContactInformation
+              formData={formData}
+              errorFields={errorFields}
+              onFormFieldChange={onFormFieldChange}
+            />
           </div>
 
           {/* Special Requests */}

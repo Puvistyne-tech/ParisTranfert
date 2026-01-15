@@ -1,23 +1,27 @@
 "use client";
 
-import { useState } from "react";
-import { BriefServices } from "@/components/home/BriefServices";
-import { DisneylandPromo } from "@/components/home/DisneylandPromo";
-import { Features } from "@/components/home/Features";
-import { Hero } from "@/components/home/Hero";
-import { ImageCarousel } from "@/components/home/ImageCarousel";
-import { Testimonials } from "@/components/home/Testimonials";
-import { VehicleClasses } from "@/components/home/VehicleClasses";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import { ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import { useLocale } from "next-intl";
+import dynamic from "next/dynamic";
+import DisneylandParisPage from "@/app/[locale]/disneyland-paris/page";
+
+// Dynamically import the Disneyland page to avoid SSR issues
+// We need to pass locale as a prop, so we'll create a wrapper
+const DisneylandParisPageContent = dynamic(
+  () => import("@/app/[locale]/disneyland-paris/page").then((mod) => ({ default: mod.default })),
+  { ssr: false }
+);
 
 const MIN_ZOOM = 0.2;
 const MAX_ZOOM = 0.6;
 const ZOOM_STEP = 0.05;
 const DEFAULT_ZOOM = 0.3;
 
-export function HomePagePreview() {
+export function DisneylandPagePreview() {
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
+  const locale = useLocale();
 
   const handleZoomIn = () => {
     setZoom((prev) => Math.min(prev + ZOOM_STEP, MAX_ZOOM));
@@ -85,17 +89,10 @@ export function HomePagePreview() {
               width: `${widthPercentage}%`,
             }}
           >
-            <Hero />
-            <ImageCarousel />
-            <DisneylandPromo />
-            <BriefServices />
-            <VehicleClasses />
-            <Features />
-            <Testimonials />
+            <DisneylandParisPage />
           </div>
         </div>
       </div>
     </div>
   );
 }
-

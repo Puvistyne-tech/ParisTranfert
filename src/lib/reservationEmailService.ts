@@ -140,6 +140,10 @@ export async function sendReservationStatusEmail(
     vehicleTypeName: vehicleType.name,
     status: reservation.status,
     serviceSubData: reservation.serviceSubData || undefined,
+    babySeats: reservation.babySeats,
+    boosterSeats: reservation.boosterSeats,
+    meetAndGreet: reservation.meetAndGreet,
+    notes: reservation.notes,
   };
 
   // Generate email template based on status
@@ -295,6 +299,10 @@ export async function sendQuoteEmail(
     vehicleTypeName: vehicleType.name,
     status: reservation.status,
     serviceSubData: reservation.serviceSubData || undefined,
+    babySeats: reservation.babySeats,
+    boosterSeats: reservation.boosterSeats,
+    meetAndGreet: reservation.meetAndGreet,
+    notes: reservation.notes,
   };
 
   const emailTemplate = generateQuoteSentEmail(reservationData, customerName, quotePrice, locale);

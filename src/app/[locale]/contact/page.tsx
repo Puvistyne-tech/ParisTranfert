@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { PhoneInput } from "@/components/ui/PhoneInput";
 import { useCreateContactMessage } from "@/hooks/useReservations";
 import type { ContactFormData } from "@/lib/validations";
 import { contactSchema } from "@/lib/validations";
@@ -24,6 +25,8 @@ export default function ContactPage() {
     handleSubmit,
     formState: { errors },
     reset,
+    watch,
+    setValue,
   } = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
   });
@@ -207,10 +210,10 @@ export default function ContactPage() {
                       error={errors.email?.message}
                       required
                     />
-                    <Input
+                    <PhoneInput
                       label={t("phoneNumber")}
-                      type="tel"
-                      {...register("phone")}
+                      value={watch("phone")}
+                      onChange={(value) => setValue("phone", value || "", { shouldValidate: true })}
                       error={errors.phone?.message}
                     />
                     <div>

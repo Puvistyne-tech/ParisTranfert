@@ -6,11 +6,13 @@ import {
   Car,
   CheckCircle,
   Clock,
+  Copy,
   Edit,
   FileText,
   Lock,
   Mail,
   MapPin,
+  Navigation,
   Phone,
   Send,
   User,
@@ -39,7 +41,9 @@ import {
 import {
   getTranslatedServiceName,
   getTranslatedVehicleDescription,
+  getTranslatedFieldLabel,
 } from "@/lib/translations";
+import { useServiceFields } from "@/hooks/useServiceFields";
 
 interface ReservationDetailContentProps {
   reservation: Reservation;
@@ -68,17 +72,63 @@ export function ReservationDetailContent({
   const tServices = useTranslations("services");
   const tFleet = useTranslations("fleet");
   const tStatus = useTranslations("reservationStatus");
+  const tStep2 = useTranslations("reservation.step2");
+  
+  // Fetch service fields to get labels for serviceSubData
+  const { data: serviceFields = [] } = useServiceFields(service?.id);
 
   const [isEditingPrice, setIsEditingPrice] = useState(false);
   const [editedPrice, setEditedPrice] = useState(reservation.totalPrice.toString());
   const [loading, setLoading] = useState(false);
   const [showSecretLogin, setShowSecretLogin] = useState(false);
   const [secretLoginClicks, setSecretLoginClicks] = useState(0);
+  const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
 
   // Initialize edited price when reservation changes
   useEffect(() => {
     setEditedPrice(reservation.totalPrice.toString());
   }, [reservation.totalPrice]);
+
+  // Copy address to clipboard
+  const handleCopyAddress = async (address: string, identifier: string) => {
+    try {
+      await navigator.clipboard.writeText(address);
+      setCopiedAddress(identifier);
+      setTimeout(() => setCopiedAddress(null), 2000);
+    } catch (err) {
+      console.error("Failed to copy address:", err);
+    }
+  };
+
+  // Open address in maps
+  const handleOpenInMaps = (address: string) => {
+    // Check if mobile device
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      // Use device-specific map apps
+      const encodedAddress = encodeURIComponent(address);
+      // Try Google Maps first (works on both iOS and Android)
+      window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, "_blank");
+    } else {
+      // Desktop: open in new tab with Google Maps
+      const encodedAddress = encodeURIComponent(address);
+      window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, "_blank");
+    }
+  };
+
+  // Check if a field is an address field
+  const isAddressField = (field: any, fieldKey: string): boolean => {
+    if (!field) {
+      // Check by field key name
+      return fieldKey.toLowerCase().includes("address") || 
+             fieldKey.toLowerCase().includes("location");
+    }
+    // Check by field type
+    return field.fieldType === "address_autocomplete" || 
+           field.fieldType === "location_select" ||
+           fieldKey.toLowerCase().includes("address");
+  };
 
   const handleSecretLoginClick = () => {
     setSecretLoginClicks((prev) => prev + 1);
@@ -674,64 +724,252 @@ export function ReservationDetailContent({
                   <Calendar className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-purple-600 dark:text-purple-400" />
                   {t("tripDetails") || "Trip Details"}
                 </h3>
-                <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
-                  <div className="flex items-center space-x-2 sm:space-x-3">
-                    <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                        {t("date")}
-                      </p>
-                      <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 truncate">
-                        {reservation.date || t("notAvailable")}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2 sm:space-x-3">
-                    <Clock className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                        {t("time")}
-                      </p>
-                      <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 truncate">
-                        {reservation.time || t("notAvailable")}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2 sm:space-x-3">
-                    <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                        {t("pickup") || "Pickup"}
-                      </p>
-                      <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 truncate">
-                        {reservation.pickupLocation || t("notAvailable")}
-                      </p>
-                    </div>
-                  </div>
-                  {reservation.destinationLocation && (
+                <div className="space-y-4">
+                  {/* Basic Trip Information */}
+                  <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                     <div className="flex items-center space-x-2 sm:space-x-3">
-                      <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                      <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
                       <div className="min-w-0">
                         <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                          {t("destination") || "Destination"}
+                          {t("date")}
                         </p>
-                        <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 truncate">
-                          {reservation.destinationLocation}
+                        <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 break-words">
+                          {reservation.date || t("notAvailable")}
                         </p>
                       </div>
                     </div>
-                  )}
-                  <div className="flex items-center space-x-2 sm:space-x-3">
-                    <Users className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                        {t("passengers")}
-                      </p>
-                      <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 truncate">
-                        {reservation.passengers || t("notAvailable")}
-                      </p>
+                    <div className="flex items-center space-x-2 sm:space-x-3">
+                      <Clock className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                          {t("time")}
+                        </p>
+                        <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 break-words">
+                          {reservation.time || t("notAvailable")}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-start space-x-2 sm:space-x-3">
+                      <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0 mt-1" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">
+                          {t("pickup") || "Pickup"}
+                        </p>
+                        <div className="flex items-start gap-2">
+                          <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 break-words flex-1">
+                            {reservation.pickupLocation || t("notAvailable")}
+                          </p>
+                          {reservation.pickupLocation && (
+                            <div className="flex gap-1 flex-shrink-0">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCopyAddress(reservation.pickupLocation, "pickup-location");
+                                }}
+                                className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                title="Copy address"
+                              >
+                                <Copy className={`w-4 h-4 ${copiedAddress === "pickup-location" ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-400"}`} />
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleOpenInMaps(reservation.pickupLocation);
+                                }}
+                                className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                title="Open in maps"
+                              >
+                                <Navigation className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    {reservation.destinationLocation && (
+                      <div className="flex items-start space-x-2 sm:space-x-3">
+                        <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0 mt-1" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">
+                            {t("destination") || "Destination"}
+                          </p>
+                          <div className="flex items-start gap-2">
+                            <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 break-words flex-1">
+                              {reservation.destinationLocation}
+                            </p>
+                            <div className="flex gap-1 flex-shrink-0">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCopyAddress(reservation.destinationLocation!, "destination-location");
+                                }}
+                                className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                title="Copy address"
+                              >
+                                <Copy className={`w-4 h-4 ${copiedAddress === "destination-location" ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-400"}`} />
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleOpenInMaps(reservation.destinationLocation!);
+                                }}
+                                className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                title="Open in maps"
+                              >
+                                <Navigation className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    <div className="flex items-center space-x-2 sm:space-x-3">
+                      <Users className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                          {t("passengers")}
+                        </p>
+                        <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 break-words">
+                          {reservation.passengers || t("notAvailable")}
+                        </p>
+                      </div>
                     </div>
                   </div>
+
+                  {/* Service-Specific Fields */}
+                  {reservation.serviceSubData && Object.keys(reservation.serviceSubData).length > 0 && (
+                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                        {tStep2("serviceDetails") || "Service Details"}
+                      </h4>
+                      <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
+                        {Object.entries(reservation.serviceSubData)
+                          .filter(([key, value]) => {
+                            // Filter out hidden fields and empty values
+                            if (!value || value === "" || value === null || value === undefined) return false;
+                            const field = serviceFields.find((f) => f.fieldKey === key);
+                            if (field && (field.isPickup || field.isDestination)) return false; // Skip pickup/destination as they're already shown
+                            return true;
+                          })
+                          .map(([key, value]) => {
+                            const field = serviceFields.find((f) => f.fieldKey === key);
+                            const label = field 
+                              ? getTranslatedFieldLabel(field.label, (k: string) => tStep2(k))
+                              : key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
+                            
+                            // Format value based on type
+                            let displayValue = String(value);
+                            if (typeof value === "boolean") {
+                              displayValue = value ? "Yes" : "No";
+                            } else if (typeof value === "object") {
+                              displayValue = JSON.stringify(value);
+                            }
+                            
+                            const isAddress = isAddressField(field, key);
+                            const fieldIdentifier = `service-field-${key}`;
+                            
+                            return (
+                              <div key={key} className="flex items-start space-x-2 sm:space-x-3">
+                                {isAddress ? (
+                                  <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0 mt-1" />
+                                ) : (
+                                  <FileText className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0 mt-1" />
+                                )}
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+                                    {label}
+                                  </p>
+                                  <div className="flex items-start gap-2">
+                                    <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 break-words flex-1">
+                                      {displayValue}
+                                    </p>
+                                    {isAddress && displayValue && displayValue !== "Yes" && displayValue !== "No" && (
+                                      <div className="flex gap-1 flex-shrink-0">
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleCopyAddress(displayValue, fieldIdentifier);
+                                          }}
+                                          className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                          title="Copy address"
+                                        >
+                                          <Copy className={`w-4 h-4 ${copiedAddress === fieldIdentifier ? "text-green-600 dark:text-green-400" : "text-gray-500 dark:text-gray-400"}`} />
+                                        </button>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleOpenInMaps(displayValue);
+                                          }}
+                                          className="p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                                          title="Open in maps"
+                                        >
+                                          <Navigation className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                                        </button>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Additional Services */}
+                  {(reservation.babySeats > 0 ||
+                    reservation.boosterSeats > 0 ||
+                    reservation.meetAndGreet) && (
+                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3">
+                        {t("additionalServices") || "Additional Services"}
+                      </h4>
+                      <div className="space-y-2">
+                        {reservation.babySeats > 0 && (
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-600 dark:text-gray-400">
+                              {t("babySeats") || "Baby Seats"}
+                            </span>
+                            <span className="font-medium text-gray-900 dark:text-gray-100">
+                              {reservation.babySeats}
+                            </span>
+                          </div>
+                        )}
+                        {reservation.boosterSeats > 0 && (
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-600 dark:text-gray-400">
+                              {t("boosterSeats") || "Booster Seats"}
+                            </span>
+                            <span className="font-medium text-gray-900 dark:text-gray-100">
+                              {reservation.boosterSeats}
+                            </span>
+                          </div>
+                        )}
+                        {reservation.meetAndGreet && (
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-600 dark:text-gray-400">
+                              {t("meetAndGreet") || "Meet & Greet"}
+                            </span>
+                            <span className="font-medium text-gray-900 dark:text-gray-100">
+                              {t("included") || "Included"}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Notes */}
+                  {reservation.notes && (
+                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                        {t("specialRequests") || "Special Requests / Notes"}
+                      </h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
+                        {reservation.notes}
+                      </p>
+                    </div>
+                  )}
                 </div>
                 </CardContent>
               </Card>
@@ -759,29 +997,29 @@ export function ReservationDetailContent({
                         <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                           {t("name")}
                         </p>
-                        <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 truncate">
+                        <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 break-words">
                           {client.firstName} {client.lastName}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2 sm:space-x-3">
                       <Mail className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                           {t("email")}
                         </p>
-                        <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 truncate">
+                        <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 break-words">
                           {client.email}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2 sm:space-x-3">
                       <Phone className="w-4 h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
                           {t("phone")}
                         </p>
-                        <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 truncate">
+                        <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-gray-100 break-words">
                           {client.phone}
                         </p>
                       </div>
@@ -792,61 +1030,10 @@ export function ReservationDetailContent({
             </AnimatedDiv>
           )}
 
-          {/* Additional Services */}
-          {(reservation.babySeats > 0 ||
-            reservation.boosterSeats > 0 ||
-            reservation.meetAndGreet) && (
-            <AnimatedDiv
-              {...(disableAnimations ? {} : { transition: { delay: 0.4 } })}
-              {...animationProps}
-            >
-              <Card>
-                <CardContent className="p-4 sm:p-6">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-                    <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-orange-600 dark:text-orange-400" />
-                    {t("additionalServices") || "Additional Services"}
-                  </h3>
-                  <div className="space-y-2">
-                    {reservation.babySeats > 0 && (
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">
-                          {t("babySeats")}
-                        </span>
-                        <span className="font-medium text-gray-900 dark:text-gray-100">
-                          {reservation.babySeats} {t("free") || "Free"}
-                        </span>
-                      </div>
-                    )}
-                    {reservation.boosterSeats > 0 && (
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">
-                          {t("boosterSeats")}
-                        </span>
-                        <span className="font-medium text-gray-900 dark:text-gray-100">
-                          {reservation.boosterSeats} {t("free") || "Free"}
-                        </span>
-                      </div>
-                    )}
-                    {reservation.meetAndGreet && (
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">
-                          {t("meetAndGreet")}
-                        </span>
-                        <span className="font-medium text-gray-900 dark:text-gray-100">
-                          {t("free") || "Free"}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </AnimatedDiv>
-          )}
-
-          {/* Price Summary - For Admin (shown later in the page) */}
+          {/* Price Summary - For Admin */}
           {isAdminUser && (
             <AnimatedDiv
-              {...(disableAnimations ? {} : { transition: { delay: 0.45 } })}
+              {...(disableAnimations ? {} : { transition: { delay: 0.4 } })}
               {...animationProps}
             >
               <Card>
@@ -863,26 +1050,6 @@ export function ReservationDetailContent({
                       €{reservation.totalPrice.toFixed(2)}
                     </span>
                   </div>
-                </CardContent>
-              </Card>
-            </AnimatedDiv>
-          )}
-
-          {/* Notes */}
-          {reservation.notes && (
-            <AnimatedDiv
-              {...(disableAnimations ? {} : { transition: { delay: 0.5 } })}
-              {...animationProps}
-            >
-              <Card>
-                <CardContent className="p-4 sm:p-6">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-                    <FileText className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-blue-600 dark:text-blue-400" />
-                    {t("specialRequests") || "Special Requests"}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-wrap">
-                    {reservation.notes}
-                  </p>
                 </CardContent>
               </Card>
             </AnimatedDiv>

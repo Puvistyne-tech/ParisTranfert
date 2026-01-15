@@ -105,6 +105,17 @@
         "Customized Experience"
       ]
     },
+    "vipLuxe": {
+      "name": "VIP Luxe Chauffeur Service",
+      "description": "Enjoy flexibility and comfort with our chauffeur-driven car at disposal. Whether for business meetings, shopping trips, or special events, our professional drivers are available by the hour.",
+      "features": [
+        "Professional Chauffeur",
+        "Premium Vehicles",
+        "Flexible Scheduling",
+        "Concierge Services",
+        "Refreshments on Board"
+      ]
+    },
     "tourGuide": {
       "name": "Tour Guide Service",
       "description": "Professional guided tours of Paris with expert local guides. Discover the city's history, culture, and hidden gems with personalized itineraries tailored to your interests.",
@@ -301,21 +312,21 @@
       "reviewConfirm": "Review & Confirm",
       "tripDetailsTitle": "Trip Details",
       "basicInformation": "Basic Information",
-      "pickupDate": "Pickup Date *",
-      "pickupTime": "Pickup Time *",
-      "numberOfPassengers": "Number of Passengers *",
+      "pickupDate": "Pickup Date",
+      "pickupTime": "Pickup Time",
+      "numberOfPassengers": "Number of Passengers",
       "passenger": "passenger",
       "passengers": "passengers",
       "serviceDetails": "Service Details",
       "pleaseProvideInfo": "Please provide the following information for your {serviceName} service:",
       "contactInformation": "Contact Information",
-      "firstNameLabel": "First Name *",
+      "firstNameLabel": "First Name",
       "enterFirstName": "Enter first name",
-      "lastNameLabel": "Last Name *",
+      "lastNameLabel": "Last Name",
       "enterLastName": "Enter last name",
-      "emailAddressLabel": "Email Address *",
+      "emailAddressLabel": "Email Address",
       "enterEmailAddress": "Enter email address",
-      "phoneNumberLabel": "Phone Number *",
+      "phoneNumberLabel": "Phone Number",
       "enterPhoneNumber": "Enter phone number",
       "specialRequestsOptional": "Special Requests (Optional)",
       "specialRequestsPlaceholderText": "Any special requests or notes...",
@@ -470,6 +481,7 @@
     "boosterSeats": "Booster Seats",
     "meetAndGreet": "Meet & Greet",
     "free": "Free",
+    "included": "Included",
     "priceSummary": "Price Summary",
     "basePrice": "Base Price",
     "total": "Total",
@@ -659,5 +671,78 @@
     "loading": "Loading reservation...",
     "viewReservation": "View Reservation Status",
     "error": "Error loading reservation"
+  },
+  "disneylandPage": {
+    "hero": {
+      "title": "Disneyland Paris",
+      "subtitle": "Experience the magic of Disneyland Paris with our premium transfer services. Your magical journey starts here!",
+      "bookDisneyTour": "Book Disney Tour",
+      "bookAirportTransfer": "Book Airport Transfer"
+    },
+    "thingsToDo": {
+      "title": "Things to Do at Disneyland Paris",
+      "subtitle": "Discover the magic, attractions, dining, and entertainment that await you at the most magical place on earth"
+    },
+    "attractions": {
+      "title": "Attractions",
+      "castle": {
+        "title": "Sleeping Beauty Castle",
+        "description": "Explore the iconic Le Château de la Belle au Bois Dormant, featuring La Galerie de la Belle au Bois Dormant and La Tanière du Dragon"
+      },
+      "alice": {
+        "title": "Alice's Curious Labyrinth",
+        "description": "Navigate through a whimsical hedge maze inspired by Alice in Wonderland"
+      },
+      "dragon": {
+        "title": "La Tanière du Dragon",
+        "description": "Discover the dragon's lair beneath the castle, home to a lifelike animatronic dragon"
+      },
+      "studios": {
+        "title": "Walt Disney Studios",
+        "description": "Experience behind-the-scenes magic with thrilling attractions and shows"
+      }
+    },
+    "dining": {
+      "title": "Dining",
+      "cinderella": {
+        "title": "L'Auberge de Cendrillon",
+        "description": "Dine in a Cinderella-themed restaurant offering French-inspired cuisine with character meet-and-greets"
+      },
+      "blueLagoon": {
+        "title": "Blue Lagoon Restaurant",
+        "description": "Enjoy Caribbean-inspired cuisine in a tropical setting with views of the Pirates of the Caribbean attraction"
+      }
+    },
+    "entertainment": {
+      "title": "Entertainment",
+      "talesOfMagic": {
+        "title": "Disney Tales of Magic",
+        "description": "Experience the spectacular nighttime show featuring drones, lasers, and projections that bring Disney stories to life"
+      },
+      "parades": {
+        "title": "Disney Parades",
+        "description": "Watch magical parades featuring your favorite Disney characters, music, and floats throughout the day"
+      }
+    },
+    "booking": {
+      "title": "Book Your Magical Journey",
+      "subtitle": "Choose the perfect transfer service for your Disneyland Paris adventure",
+      "disneyTour": {
+        "title": "Disney Tours",
+        "description": "Direct transfers to Disneyland Paris and its hotels with magical comfort for the whole family",
+        "button": "Book Disney Tour"
+      },
+      "airportTransfer": {
+        "title": "Airport Transfer",
+        "description": "Seamless transfers from Charles de Gaulle, Orly, or Beauvais airports directly to Disneyland Paris",
+        "button": "Book Airport Transfer"
+      }
+    }
+  },
+  "disneylandPromo": {
+    "title": "Discover Disneyland Paris",
+    "subtitle": "Experience the magic with our premium transfer services. Book your magical journey today!",
+    "button": "Explore Disneyland",
+    "clickHint": "Click to explore →"
   }
 }

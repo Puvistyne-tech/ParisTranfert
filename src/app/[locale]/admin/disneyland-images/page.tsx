@@ -7,12 +7,11 @@ import {
     ChevronDown,
     ChevronRight,
     Image as ImageIcon,
-    Sparkles,
 } from "lucide-react";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { DraggableImageList } from "@/components/admin/DraggableImageList";
 import { ImageGallery } from "@/components/admin/ImageGallery";
-import { HomePagePreview } from "@/components/admin/HomePagePreview";
+import { DisneylandPagePreview } from "@/components/admin/DisneylandPagePreview";
 import {
     useAllHomePageImages,
     useCreateHomePageImage,
@@ -23,14 +22,7 @@ import {
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-type ImageType =
-    | "carousel"
-    | "hero"
-    | "services"
-    | "vehicles"
-    | "features"
-    | "testimonials"
-    | "disneyland-promo";
+type ImageType = "disneyland-page";
 
 const SECTION_CONFIG: Record<
     ImageType,
@@ -42,96 +34,30 @@ const SECTION_CONFIG: Record<
         icon: React.ReactNode;
     }
 > = {
-    hero: {
-        label: "Hero Background",
-        description: "Background image for the hero section",
-        multiple: false,
-        showReorder: false,
-        icon: <ImageIcon className="w-5 h-5" />,
-    },
-    carousel: {
-        label: "Carousel Images",
-        description: "Multiple images that rotate on the home page",
+    "disneyland-page": {
+        label: "Disneyland Page",
+        description: "Images for the Disneyland page. Use display_order: 0 for hero, 1-4 for attractions, 5-6 for dining, 7-8 for entertainment, 9 for booking section background.",
         multiple: true,
         showReorder: true,
         icon: <ImageIcon className="w-5 h-5" />,
-    },
-    services: {
-        label: "Services Background",
-        description: "Background image for the services section",
-        multiple: false,
-        showReorder: false,
-        icon: <ImageIcon className="w-5 h-5" />,
-    },
-    vehicles: {
-        label: "Vehicles Background",
-        description: "Background image for the vehicles section",
-        multiple: false,
-        showReorder: false,
-        icon: <ImageIcon className="w-5 h-5" />,
-    },
-    features: {
-        label: "Features Background",
-        description: "Background image for the features section",
-        multiple: false,
-        showReorder: false,
-        icon: <ImageIcon className="w-5 h-5" />,
-    },
-    testimonials: {
-        label: "Testimonials Background",
-        description: "Background image for the testimonials section",
-        multiple: false,
-        showReorder: false,
-        icon: <ImageIcon className="w-5 h-5" />,
-    },
-    "disneyland-promo": {
-        label: "Disneyland Promo",
-        description: "Background and character images for the Disneyland promo section on home page",
-        multiple: true,
-        showReorder: true,
-        icon: <Sparkles className="w-5 h-5" />,
     },
 };
 
-export default function HomeImagesPage() {
+export default function DisneylandImagesPage() {
     const t = useTranslations("admin");
     const [expandedSections, setExpandedSections] = useState<Set<ImageType>>(
-        new Set(["carousel"])
+        new Set(["disneyland-page"])
     );
     const [uploading, setUploading] = useState<Record<ImageType, boolean>>({
-        carousel: false,
-        hero: false,
-        services: false,
-        vehicles: false,
-        features: false,
-        testimonials: false,
-        "disneyland-promo": false,
+        "disneyland-page": false,
     });
     const [uploadQueue, setUploadQueue] = useState<Record<ImageType, File[]>>({
-        carousel: [],
-        hero: [],
-        services: [],
-        vehicles: [],
-        features: [],
-        testimonials: [],
-        "disneyland-promo": [],
+        "disneyland-page": [],
     });
 
     // Fetch images for all types
-    const { data: carouselImages = [], isLoading: carouselLoading } =
-        useAllHomePageImages("carousel");
-    const { data: heroImages = [], isLoading: heroLoading } =
-        useAllHomePageImages("hero");
-    const { data: servicesImages = [], isLoading: servicesLoading } =
-        useAllHomePageImages("services");
-    const { data: vehiclesImages = [], isLoading: vehiclesLoading } =
-        useAllHomePageImages("vehicles");
-    const { data: featuresImages = [], isLoading: featuresLoading } =
-        useAllHomePageImages("features");
-    const { data: testimonialsImages = [], isLoading: testimonialsLoading } =
-        useAllHomePageImages("testimonials");
-    const { data: disneylandPromoImages = [], isLoading: disneylandPromoLoading } =
-        useAllHomePageImages("disneyland-promo");
+    const { data: pageImages = [], isLoading: pageLoading } =
+        useAllHomePageImages("disneyland-page");
 
     // Mutations
     const createImage = useCreateHomePageImage();
@@ -141,20 +67,8 @@ export default function HomeImagesPage() {
 
     const getImages = (type: ImageType) => {
         switch (type) {
-            case "carousel":
-                return carouselImages;
-            case "hero":
-                return heroImages;
-            case "services":
-                return servicesImages;
-            case "vehicles":
-                return vehiclesImages;
-            case "features":
-                return featuresImages;
-            case "testimonials":
-                return testimonialsImages;
-            case "disneyland-promo":
-                return disneylandPromoImages;
+            case "disneyland-page":
+                return pageImages;
             default:
                 return [];
         }
@@ -162,20 +76,8 @@ export default function HomeImagesPage() {
 
     const getIsLoading = (type: ImageType) => {
         switch (type) {
-            case "carousel":
-                return carouselLoading;
-            case "hero":
-                return heroLoading;
-            case "services":
-                return servicesLoading;
-            case "vehicles":
-                return vehiclesLoading;
-            case "features":
-                return featuresLoading;
-            case "testimonials":
-                return testimonialsLoading;
-            case "disneyland-promo":
-                return disneylandPromoLoading;
+            case "disneyland-page":
+                return pageLoading;
             default:
                 return false;
         }
@@ -255,10 +157,7 @@ export default function HomeImagesPage() {
         }
 
         try {
-            await deleteImage.mutateAsync({
-                id,
-                type,
-            });
+            await deleteImage.mutateAsync({ id, type });
         } catch (error) {
             console.error("Error deleting image:", error);
             alert("Failed to delete image. Please try again.");
@@ -270,10 +169,10 @@ export default function HomeImagesPage() {
             {/* Header */}
             <div>
                 <h1 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">
-                    Home Page Images
+                    Disneyland Images
                 </h1>
                 <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mt-1">
-                    Manage images for all sections of the home page
+                    Manage images for Disneyland promo section and Disneyland page
                 </p>
             </div>
 
@@ -468,11 +367,11 @@ export default function HomeImagesPage() {
                                 Live Preview
                             </h3>
                             <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                See how your images appear on the home page
+                                See how your images appear on the Disneyland page
                             </p>
                         </CardHeader>
                         <CardContent className="p-0 flex-1 min-h-0 overflow-hidden">
-                            <HomePagePreview />
+                            <DisneylandPagePreview />
                         </CardContent>
                     </Card>
                 </div>

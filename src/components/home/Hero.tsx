@@ -19,6 +19,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
+import Script from "next/script";
 import type { Location } from "@/components/models/locations";
 import type { Service } from "@/components/models/services";
 import type { VehicleType } from "@/components/models/vehicleTypes";
@@ -1016,7 +1017,7 @@ export function Hero() {
             </div>
 
             {/* Trust Indicators */}
-            <div className="flex items-center space-x-8 text-sm lg:text-base xl:text-lg text-white/90">
+            <div className="flex items-center space-x-8 text-sm lg:text-base xl:text-lg text-white/90 mb-8">
               <div className="flex items-center">
                 <Shield className="mr-2 w-4 h-4 text-yellow-300" />
                 <span>{t("trustIndicators.insured")}</span>
@@ -1030,6 +1031,7 @@ export function Hero() {
                 <span>{t("trustIndicators.rated")}</span>
               </div>
             </div>
+
           </div>
 
           {/* Right Content - Quick Booking Form */}

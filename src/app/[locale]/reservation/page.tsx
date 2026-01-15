@@ -469,16 +469,17 @@ export default function ReservationPage() {
         : formData.destination || "";
 
       // Validate base form data with Zod
+      // Ensure all required fields are strings (not undefined) before validation
       const baseData = {
-        firstName: formData.firstName || "",
-        lastName: formData.lastName || "",
-        email: formData.email || "",
-        phone: formData.phone || "",
-        pickup: pickupValue,
-        destination: destinationValue,
-        date: formData.date || "",
-        time: formData.time || "",
-        service: selectedService?.id || "",
+        firstName: typeof formData.firstName === "string" ? formData.firstName : "",
+        lastName: typeof formData.lastName === "string" ? formData.lastName : "",
+        email: typeof formData.email === "string" ? formData.email : "",
+        phone: typeof formData.phone === "string" ? formData.phone : "",
+        pickup: typeof pickupValue === "string" ? pickupValue : "",
+        destination: typeof destinationValue === "string" ? destinationValue : "",
+        date: typeof formData.date === "string" ? formData.date : "",
+        time: typeof formData.time === "string" ? formData.time : "",
+        service: typeof selectedService?.id === "string" ? selectedService.id : "",
         passengers: formData.passengers || 1,
       };
 
@@ -525,7 +526,23 @@ export default function ReservationPage() {
       // Validate service-specific fields
       if (selectedService && serviceFields.length > 0) {
         const serviceFieldSchema = createServiceFieldSchema(serviceFields);
-        const serviceFieldResult = serviceFieldSchema.safeParse(serviceSubData);
+        // Ensure all service field values are properly typed (convert undefined to empty string)
+        const sanitizedServiceSubData: Record<string, any> = {};
+        serviceFields.forEach((field) => {
+          const value = serviceSubData[field.fieldKey];
+          if (field.required) {
+            // For required fields, ensure they're the correct type
+            if (field.fieldType === "number") {
+              sanitizedServiceSubData[field.fieldKey] = value !== undefined && value !== null ? value : "";
+            } else {
+              sanitizedServiceSubData[field.fieldKey] = typeof value === "string" ? value : "";
+            }
+          } else {
+            sanitizedServiceSubData[field.fieldKey] = value;
+          }
+        });
+        
+        const serviceFieldResult = serviceFieldSchema.safeParse(sanitizedServiceSubData);
         if (!serviceFieldResult.success) {
           serviceFieldResult.error.issues.forEach((err) => {
             errors.push(err.message);

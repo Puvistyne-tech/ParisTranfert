@@ -8,6 +8,7 @@ import {
   LogOut,
   MapPin,
   MessageSquare,
+  Sparkles,
   Star,
   User,
 } from "lucide-react";
@@ -54,6 +55,11 @@ export default function AdminMorePage() {
       name: "Home Images",
       href: `/${locale}/admin/home-images`,
       icon: ImageIcon,
+    },
+    {
+      name: "Disneyland Images",
+      href: `/${locale}/admin/disneyland-images`,
+      icon: Sparkles,
     },
     {
       name: "Categories",
