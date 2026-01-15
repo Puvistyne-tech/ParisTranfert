@@ -1,5 +1,14 @@
 import { z } from "zod";
-import { isValidPhoneNumber } from "react-phone-number-input";
+
+// Server-safe phone validation function
+function isValidPhoneNumber(phone: string): boolean {
+  // Basic phone validation - accepts international format
+  // Matches: +1234567890, +33 6 12 34 56 78, etc.
+  const phoneRegex = /^\+?[1-9]\d{1,14}$/;
+  // Remove spaces, dashes, and parentheses for validation
+  const cleaned = phone.replace(/[\s\-\(\)]/g, "");
+  return phoneRegex.test(cleaned) && cleaned.length >= 10;
+}
 
 // Base reservation schema (pickup and destination are optional - validated via service fields)
 export const reservationSchema = z.object({
