@@ -15,14 +15,29 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Prestige Paris Transfers - Premium Transportation Services",
+    metadataBase: new URL("https://prestigeshuttlegroup.com"),
+    title: {
+        default: "Luxury Private Chauffeur & 24/7 Airport Transfer Service in Paris",
+        template: "%s | Prestige Shuttle Group",
+    },
     description:
-        "Premium transportation services in Paris. Reliable, comfortable, and professional. Experience luxury with our Mercedes fleet and exceptional service.",
+        "Luxury private chauffeur service in Paris offering premium CDG airport transfers, professional airport taxi service, and 24/7 private chauffeur travel across France.",
+    keywords: [
+        "luxury chauffeur Paris",
+        "airport transfer Paris",
+        "CDG airport transfer",
+        "private chauffeur service",
+        "24/7 airport taxi Paris",
+        "Prestige Shuttle Group",
+        "Mercedes chauffeur Paris",
+        "Orly airport transfer",
+        "Disneyland Paris transfer",
+    ],
     manifest: "/manifest.json",
     appleWebApp: {
         capable: true,
         statusBarStyle: "default",
-        title: "ParisTranfert",
+        title: "Prestige Shuttle Group",
     },
     icons: {
         apple: [
@@ -38,9 +53,43 @@ export const metadata: Metadata = {
             },
         ],
     },
+    openGraph: {
+        type: "website",
+        siteName: "Prestige Shuttle Group",
+        title: "Luxury Private Chauffeur & 24/7 Airport Transfer Service in Paris",
+        description:
+            "Luxury private chauffeur service in Paris offering premium CDG airport transfers, professional airport taxi service, and 24/7 private chauffeur travel across France.",
+        url: "https://prestigeshuttlegroup.com",
+        images: [
+            {
+                url: "/web-app-manifest-512x512.png",
+                width: 512,
+                height: 512,
+                alt: "Prestige Shuttle Group",
+            },
+        ],
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Luxury Private Chauffeur & 24/7 Airport Transfer Service in Paris",
+        description:
+            "Luxury private chauffeur service in Paris offering premium CDG airport transfers, professional airport taxi service, and 24/7 private chauffeur travel across France.",
+        images: ["/web-app-manifest-512x512.png"],
+    },
+    robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+            index: true,
+            follow: true,
+            "max-video-preview": -1,
+            "max-image-preview": "large",
+            "max-snippet": -1,
+        },
+    },
     other: {
         "mobile-web-app-capable": "yes",
-        "apple-mobile-web-app-title": "ParisTranfert",
+        "apple-mobile-web-app-title": "Prestige Shuttle Group",
         "apple-mobile-web-app-capable": "yes",
         "apple-mobile-web-app-status-bar-style": "default",
     },
@@ -63,7 +112,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html>
+        <html lang="en">
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >

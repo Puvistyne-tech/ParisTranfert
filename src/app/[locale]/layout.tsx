@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
@@ -6,6 +7,32 @@ import { QueryProvider } from "@/components/providers/QueryProvider";
 import { ServiceWorkerRegistration } from "@/components/pwa/ServiceWorkerRegistration";
 import { routing } from "@/i18n/routing";
 
+const baseUrl = "https://prestigeshuttlegroup.com";
+
+export function generateStaticParams() {
+    return routing.locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+    const { locale } = await params;
+
+    return {
+        alternates: {
+            canonical: `${baseUrl}/${locale}`,
+            languages: {
+                en: `${baseUrl}/en`,
+                fr: `${baseUrl}/fr`,
+                es: `${baseUrl}/es`,
+                "x-default": `${baseUrl}/en`,
+            },
+        },
+    };
+}
+
 export default async function LocaleLayout({
     children,
     params,
@@ -13,13 +40,11 @@ export default async function LocaleLayout({
     children: React.ReactNode;
     params: Promise<{ locale: string }>;
 }) {
-    // Ensure that the incoming `locale` is valid
     const { locale } = await params;
     if (!hasLocale(routing.locales, locale)) {
         notFound();
     }
 
-    // Enable static rendering
     setRequestLocale(locale);
 
     const messages = await getMessages();

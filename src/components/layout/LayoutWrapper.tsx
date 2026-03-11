@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { useLocale } from "next-intl";
 import { PublicDarkModeProvider } from "@/components/providers/DarkModeProvider";
 import { ConditionalNavbar } from "./ConditionalNavbar";
 import { Footer } from "./Footer";
@@ -8,6 +10,11 @@ import { MobileFAB } from "./MobileFAB";
 
 export function LayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const locale = useLocale();
+
+  useEffect(() => {
+    document.documentElement.lang = locale;
+  }, [locale]);
   const isAdminPage = pathname?.includes("/admin");
 
   if (isAdminPage) {

@@ -11,7 +11,7 @@
   },
   "hero": {
     "title": "Premium Paris Transfers",
-    "subtitle": "Experience luxury transportation with our professional Mercedes fleet. Airport transfers, city tours, and special occasions made effortless.",
+    "subtitle": "Experience luxury private chauffeur service in Paris with premium CDG airport transfers, 24/7 airport taxi service, and professional transport across France — effortless travel with our Mercedes fleet.",
     "quickBooking": "Quick Booking",
     "from": "From",
     "to": "To",
@@ -744,5 +744,186 @@
     "subtitle": "Experience the magic with our premium transfer services. Book your magical journey today!",
     "button": "Explore Disneyland",
     "clickHint": "Click to explore →"
+  },
+  "notFoundPage": {
+    "title": "Page Not Found",
+    "description": "The page you're looking for doesn't exist or has been moved. Let us drive you back home.",
+    "backHome": "Back to Home",
+    "browseServices": "Browse Services",
+    "brand": "Prestige Shuttle Group"
+  },
+  "cdgTransferPage": {
+    "meta": {
+      "title": "CDG Airport Transfer Paris — Luxury Private Chauffeur Service",
+      "description": "Book your CDG airport transfer with Prestige Shuttle Group. Premium private chauffeur service from Charles de Gaulle Airport. 24/7 availability, fixed prices, meet & greet included."
+    },
+    "hero": {
+      "badge": "Charles de Gaulle Airport",
+      "title": "CDG Airport Transfer",
+      "subtitle": "Luxury private chauffeur service from Charles de Gaulle Airport. Professional drivers, fixed prices and 24/7 availability — your seamless journey starts here.",
+      "cta": "Book Your Transfer",
+      "ctaSecondary": "View All Services"
+    },
+    "features": {
+      "title": "Why Choose Our CDG Airport Transfer",
+      "subtitle": "We take care of every detail so you can travel with complete peace of mind",
+      "meetGreet": {
+        "title": "Meet & Greet Service",
+        "description": "Your driver will be waiting at arrivals with a name board, ready to assist with your luggage."
+      },
+      "flightTracking": {
+        "title": "Real-Time Flight Tracking",
+        "description": "We monitor your flight in real time and adjust pickup times for delays at no extra charge."
+      },
+      "waiting": {
+        "title": "60-Min Free Waiting",
+        "description": "60 minutes of free waiting time included for all international arrivals from CDG."
+      },
+      "availability": {
+        "title": "24/7 Available",
+        "description": "Day or night, early morning or late night flights — we are always available."
+      },
+      "fixedPrice": {
+        "title": "Fixed Prices",
+        "description": "No surge pricing, no surprises. Your fare is confirmed when you book."
+      },
+      "fleet": {
+        "title": "Premium Mercedes Fleet",
+        "description": "Travel in comfort with our modern Mercedes vehicles — sedans, vans, and more."
+      }
+    },
+    "coverage": {
+      "title": "Full CDG Coverage",
+      "subtitle": "We serve all terminals at Charles de Gaulle Airport",
+      "terminals": "Terminals 1, 2A, 2B, 2C, 2D, 2E, 2F & 3",
+      "destinations": "Transfers to Paris, Disneyland, all French cities and beyond"
+    },
+    "booking": {
+      "title": "Ready to Book Your CDG Transfer?",
+      "subtitle": "Get an instant quote and secure your luxury transfer in minutes.",
+      "cta": "Book Now",
+      "ctaSecondary": "Contact Us"
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "current": "CDG Airport Transfer"
+    }
+  },
+  "orlyTransferPage": {
+    "meta": {
+      "title": "Orly Airport Transfer Paris — Premium Private Car Service",
+      "description": "Book your Orly Airport transfer with Prestige Shuttle Group. Premium private chauffeur service from Paris Orly Airport. Fixed prices, professional drivers and 24/7 service."
+    },
+    "hero": {
+      "badge": "Paris Orly Airport",
+      "title": "Orly Airport Transfer",
+      "subtitle": "Premium private car service from Paris Orly Airport. Professional licensed drivers, fixed prices and door-to-door comfort — because your journey matters.",
+      "cta": "Book Your Transfer",
+      "ctaSecondary": "View All Services"
+    },
+    "features": {
+      "title": "Why Choose Our Orly Airport Transfer",
+      "subtitle": "Every detail taken care of for a stress-free experience from Paris Orly",
+      "doorToDoor": {
+        "title": "Door-to-Door Service",
+        "description": "Direct pickup from your address and drop-off right at the terminal entrance."
+      },
+      "flightTracking": {
+        "title": "Real-Time Flight Tracking",
+        "description": "We track your flight and adapt pickup time for arrivals at no extra cost."
+      },
+      "waiting": {
+        "title": "45-Min Free Waiting",
+        "description": "45 minutes of complimentary waiting time included for all arrivals at Orly."
+      },
+      "availability": {
+        "title": "24/7 Service",
+        "description": "Our drivers are available around the clock, 365 days a year."
+      },
+      "fixedPrice": {
+        "title": "Transparent Pricing",
+        "description": "Your price is locked at booking. No hidden fees, no surprises on arrival."
+      },
+      "licensed": {
+        "title": "Licensed & Insured Drivers",
+        "description": "All our chauffeurs are professionally licensed, background-checked and insured."
+      }
+    },
+    "coverage": {
+      "title": "Full Orly Coverage",
+      "subtitle": "We serve all terminals at Paris Orly Airport",
+      "terminals": "Orly Terminal 1 (South), Terminal 2, Terminal 3 (West) & Terminal 4",
+      "destinations": "Transfers to Paris, Versailles, Disneyland and all major destinations"
+    },
+    "booking": {
+      "title": "Ready to Book Your Orly Transfer?",
+      "subtitle": "Reserve your private airport taxi from Orly in just a few clicks.",
+      "cta": "Book Now",
+      "ctaSecondary": "Contact Us"
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "current": "Orly Airport Transfer"
+    }
+  },
+  "privateChaufPage": {
+    "meta": {
+      "title": "Private Chauffeur Service Paris — Luxury Car Hire",
+      "description": "Hire a private chauffeur in Paris with Prestige Shuttle Group. Luxury Mercedes vehicles, professional licensed drivers, hourly and daily rates. Perfect for business, events and special occasions."
+    },
+    "hero": {
+      "badge": "Paris & Île-de-France",
+      "title": "Private Chauffeur Paris",
+      "subtitle": "Hire a luxury private chauffeur in Paris. Whether for business travel, special events or a day of sightseeing — our professional drivers are at your service.",
+      "cta": "Book a Chauffeur",
+      "ctaSecondary": "View All Services"
+    },
+    "features": {
+      "title": "The Prestige Shuttle Experience",
+      "subtitle": "Luxury private chauffeur service tailored to every occasion",
+      "mercedes": {
+        "title": "Mercedes Fleet",
+        "description": "Travel in the finest Mercedes sedans, vans and executive vehicles — always immaculate."
+      },
+      "professional": {
+        "title": "Professional Drivers",
+        "description": "Our chauffeurs are multilingual, discreet, punctual and exceptionally well-presented."
+      },
+      "hourly": {
+        "title": "Hourly & Daily Hire",
+        "description": "Book by the hour or for a full day. Flexible arrangements for any schedule."
+      },
+      "business": {
+        "title": "Business Travel",
+        "description": "First-class service for executives, VIPs and corporate clients across Paris and beyond."
+      },
+      "events": {
+        "title": "Special Occasions",
+        "description": "Weddings, anniversaries, galas — arrive in style with our luxury chauffeur service."
+      },
+      "tours": {
+        "title": "Guided City Tours",
+        "description": "Discover Paris at your own pace with a knowledgeable personal driver."
+      }
+    },
+    "useCases": {
+      "title": "Perfect For Every Occasion",
+      "business": "Business & Corporate",
+      "airport": "Airport Transfers",
+      "events": "Weddings & Events",
+      "tours": "City Tours",
+      "shopping": "Luxury Shopping",
+      "medical": "Medical Appointments"
+    },
+    "booking": {
+      "title": "Book Your Private Chauffeur in Paris",
+      "subtitle": "Instant quotes, flexible booking and premium service — every time.",
+      "cta": "Book Now",
+      "ctaSecondary": "Contact Us"
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "current": "Private Chauffeur Paris"
+    }
   }
 }

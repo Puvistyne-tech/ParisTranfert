@@ -4,13 +4,13 @@ import { AlertCircle, Eye, EyeOff, Info, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale } from "next-intl";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { getCurrentUser, isAdmin, signIn, signInWithGoogle } from "@/lib/auth";
 
-export default function AdminLoginPage() {
+function AdminLoginContent() {
   const router = useRouter();
   const locale = useLocale();
   const searchParams = useSearchParams();
@@ -335,5 +335,24 @@ export default function AdminLoginPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+function LoginFallback() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex items-center justify-center p-4">
+      <div className="text-center">
+        <Loader2 className="w-12 h-12 animate-spin text-primary-600 mx-auto mb-4" />
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    </div>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={<LoginFallback />}>
+      <AdminLoginContent />
+    </Suspense>
   );
 }

@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { AlertCircle, ArrowLeft, X } from "lucide-react";
+import { AlertCircle, ArrowLeft, Loader2, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { Step1Selection } from "@/components/reservation/Step1Selection";
 import { Step2TripDetails } from "@/components/reservation/Step2TripDetails";
 import { Step3BookingSummary } from "@/components/reservation/Step3BookingSummary";
@@ -41,7 +41,7 @@ interface ServiceField {
   is_destination?: boolean;
 }
 
-export default function ReservationPage() {
+function ReservationContent() {
   const t = useTranslations("reservationPage");
   const tReservation = useTranslations("reservation");
   const router = useRouter();
@@ -734,5 +734,24 @@ export default function ReservationPage() {
         )}
       </div>
     </div>
+  );
+}
+
+function ReservationFallback() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+      <div className="text-center">
+        <Loader2 className="w-12 h-12 animate-spin text-primary-600 dark:text-primary-400 mx-auto mb-4" />
+        <p className="text-gray-600 dark:text-gray-400">Loading reservation...</p>
+      </div>
+    </div>
+  );
+}
+
+export default function ReservationPage() {
+  return (
+    <Suspense fallback={<ReservationFallback />}>
+      <ReservationContent />
+    </Suspense>
   );
 }
