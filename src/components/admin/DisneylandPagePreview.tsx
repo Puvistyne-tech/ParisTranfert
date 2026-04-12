@@ -1,18 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/Button";
-import { ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
-import { useLocale } from "next-intl";
-import dynamic from "next/dynamic";
+import { RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
+import { useState } from "react";
 import DisneylandParisPage from "@/app/[locale]/disneyland-paris/page";
-
-// Dynamically import the Disneyland page to avoid SSR issues
-// We need to pass locale as a prop, so we'll create a wrapper
-const DisneylandParisPageContent = dynamic(
-  () => import("@/app/[locale]/disneyland-paris/page").then((mod) => ({ default: mod.default })),
-  { ssr: false }
-);
+import { Button } from "@/components/ui/Button";
 
 const MIN_ZOOM = 0.2;
 const MAX_ZOOM = 0.6;
@@ -21,7 +12,6 @@ const DEFAULT_ZOOM = 0.3;
 
 export function DisneylandPagePreview() {
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
-  const locale = useLocale();
 
   const handleZoomIn = () => {
     setZoom((prev) => Math.min(prev + ZOOM_STEP, MAX_ZOOM));
@@ -40,7 +30,6 @@ export function DisneylandPagePreview() {
 
   return (
     <div className="w-full h-full bg-white dark:bg-gray-900 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700 flex flex-col">
-      {/* Zoom Controls */}
       <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex-shrink-0">
         <div className="flex items-center gap-2">
           <Button
@@ -79,7 +68,6 @@ export function DisneylandPagePreview() {
         </div>
       </div>
 
-      {/* Scrollable Preview Container */}
       <div className="flex-1 overflow-auto bg-white dark:bg-gray-900 min-h-0 relative">
         <div className="p-4">
           <div

@@ -96,6 +96,60 @@ export type Database = {
         }
         Relationships: []
       }
+      disneyland_hotels: {
+        Row: {
+          address: string | null
+          created_at: string | null
+          description_i18n: Json | null
+          display_order: number
+          google_maps_url: string | null
+          hotel_website_url: string | null
+          id: string
+          image_url: string
+          is_active: boolean
+          name: string
+          price_currency: string
+          price_range: number | null
+          star_rating: number | null
+          tags: string[]
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string | null
+          description_i18n?: Json | null
+          display_order?: number
+          google_maps_url?: string | null
+          hotel_website_url?: string | null
+          id?: string
+          image_url: string
+          is_active?: boolean
+          name: string
+          price_currency?: string
+          price_range?: number | null
+          star_rating?: number | null
+          tags?: string[]
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string | null
+          description_i18n?: Json | null
+          display_order?: number
+          google_maps_url?: string | null
+          hotel_website_url?: string | null
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          name?: string
+          price_currency?: string
+          price_range?: number | null
+          star_rating?: number | null
+          tags?: string[]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       email_trigger_config: {
         Row: {
           id: number

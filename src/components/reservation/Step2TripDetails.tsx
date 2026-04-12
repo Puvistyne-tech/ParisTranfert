@@ -30,6 +30,7 @@ import { Input } from "@/components/ui/Input";
 import { PhoneInput } from "@/components/ui/PhoneInput";
 import { Select } from "@/components/ui/Select";
 import { ContactInformation } from "./ContactInformation";
+import { useDisneylandHotels } from "@/hooks/useDisneylandHotels";
 import { useLocationsByService } from "@/hooks/useLocationsByService";
 import { useServiceFields } from "@/hooks/useServiceFields";
 import { cn } from "@/lib/utils";
@@ -95,6 +96,10 @@ export function Step2TripDetails({
   // Load service locations only if needed
   const { data: serviceLocations = [] } = useLocationsByService(
     hasLocationSelect ? selectedService?.id : null,
+  );
+
+  const { data: disneylandHotelsList = [] } = useDisneylandHotels(
+    selectedService?.id === "disneyland",
   );
 
   // Initialize passengers to 1 if not set
@@ -312,6 +317,37 @@ export function Step2TripDetails({
       value === field.defaultValue &&
       field.fieldKey !== "pickup_address"
     );
+
+    if (selectedService?.id === "disneyland" && field.fieldKey === "hotel_name") {
+      const datalistId = `disneyland-hotels-${field.id}`;
+      const optionNames = disneylandHotelsList.map((h) => h.name);
+      return (
+        <div className="space-y-1.5">
+          <Input
+            type="text"
+            value={value}
+            onChange={(e) =>
+              handleServiceFieldChange(field.fieldKey, e.target.value)
+            }
+            list={datalistId}
+            className={cn(
+              "w-full",
+              hasError ? "border-red-500 dark:border-red-500 border-2" : "",
+            )}
+            placeholder={t("serviceFields.hotelNamePlaceholder")}
+            autoComplete="off"
+          />
+          <datalist id={datalistId}>
+            {optionNames.map((n, idx) => (
+              <option key={`${n}-${idx}`} value={n} />
+            ))}
+          </datalist>
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {t("disneylandHotelNameHint")}
+          </p>
+        </div>
+      );
+    }
 
     // Common props for Input and Select components
     const commonInputProps = {

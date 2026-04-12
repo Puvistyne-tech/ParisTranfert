@@ -226,7 +226,9 @@
   },
   "testimonials": {
     "title": "What Our Clients Say",
-    "subtitle": "Don't just take our word for it - hear from our satisfied customers"
+    "subtitle": "Don't just take our word for it - hear from our satisfied customers",
+    "googleAttribution": "Reviews shown are from Google.",
+    "googleMapsCta": "View on Google Maps"
   },
   "contact": {
     "title": "Get In Touch",
@@ -286,7 +288,8 @@
       "meetGreetDescription": "Personalized airport greeting service",
       "selected": "Selected",
       "addService": "Add Service",
-      "continueToTripDetails": "Continue to Trip Details"
+      "continueToTripDetails": "Continue to Trip Details",
+      "selectVehicleBeforeService": "Choose a vehicle category first. Then you can select a service — hotel details are filled in on the next step when applicable."
     },
     "step2": {
       "title": "Trip Details & Timing",
@@ -333,9 +336,11 @@
       "pleaseCompleteAllFields": "Please complete all required fields",
       "loadingServiceFields": "Loading service fields...",
       "fieldRequired": "This field is required",
+      "disneylandHotelNameHint": "Choose a hotel from the list or type your own — optional.",
       "serviceFields": {
         "pickupAddress": "Pickup Address",
         "hotelName": "Hotel Name (if applicable)",
+        "hotelNamePlaceholder": "Select or type your hotel",
         "returnTime": "Return Time",
         "returnDate": "Return Date",
         "destination": "Destination",
@@ -679,50 +684,19 @@
       "bookDisneyTour": "Book Disney Tour",
       "bookAirportTransfer": "Book Airport Transfer"
     },
-    "thingsToDo": {
-      "title": "Things to Do at Disneyland Paris",
-      "subtitle": "Discover the magic, attractions, dining, and entertainment that await you at the most magical place on earth"
-    },
-    "attractions": {
-      "title": "Attractions",
-      "castle": {
-        "title": "Sleeping Beauty Castle",
-        "description": "Explore the iconic Le Château de la Belle au Bois Dormant, featuring La Galerie de la Belle au Bois Dormant and La Tanière du Dragon"
-      },
-      "alice": {
-        "title": "Alice's Curious Labyrinth",
-        "description": "Navigate through a whimsical hedge maze inspired by Alice in Wonderland"
-      },
-      "dragon": {
-        "title": "La Tanière du Dragon",
-        "description": "Discover the dragon's lair beneath the castle, home to a lifelike animatronic dragon"
-      },
-      "studios": {
-        "title": "Walt Disney Studios",
-        "description": "Experience behind-the-scenes magic with thrilling attractions and shows"
-      }
-    },
-    "dining": {
-      "title": "Dining",
-      "cinderella": {
-        "title": "L'Auberge de Cendrillon",
-        "description": "Dine in a Cinderella-themed restaurant offering French-inspired cuisine with character meet-and-greets"
-      },
-      "blueLagoon": {
-        "title": "Blue Lagoon Restaurant",
-        "description": "Enjoy Caribbean-inspired cuisine in a tropical setting with views of the Pirates of the Caribbean attraction"
-      }
-    },
-    "entertainment": {
-      "title": "Entertainment",
-      "talesOfMagic": {
-        "title": "Disney Tales of Magic",
-        "description": "Experience the spectacular nighttime show featuring drones, lasers, and projections that bring Disney stories to life"
-      },
-      "parades": {
-        "title": "Disney Parades",
-        "description": "Watch magical parades featuring your favorite Disney characters, music, and floats throughout the day"
-      }
+    "hotels": {
+      "title": "Hotels near the parks",
+      "subtitle": "Official and partner hotels — tap the address to preview the map, or open Google Maps for full directions.",
+      "viewOnMaps": "View on Google Maps",
+      "bookTransfer": "Book transfer",
+      "mapPreviewTitle": "Map — {name}",
+      "copyAddressAria": "Copy address",
+      "copyAddress": "Copy address",
+      "starRatingAria": "{count} out of 5 stars",
+      "priceCategoryAria": "Indicative price level (not a booking quote)",
+      "visitHotelWebsite": "Hotel website",
+      "empty": "Hotel listings will appear here soon.",
+      "footerHint": "Need a door-to-door ride to your hotel? Book a premium transfer below."
     },
     "booking": {
       "title": "Book Your Magical Journey",

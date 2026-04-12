@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Building2,
   Car,
   DollarSign,
   FolderTree,
@@ -60,6 +61,11 @@ export default function AdminMorePage() {
       name: "Disneyland Images",
       href: `/${locale}/admin/disneyland-images`,
       icon: Sparkles,
+    },
+    {
+      name: "Disneyland Hotels",
+      href: `/${locale}/admin/disneyland-hotels`,
+      icon: Building2,
     },
     {
       name: "Categories",

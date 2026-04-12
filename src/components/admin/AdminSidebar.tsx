@@ -6,6 +6,7 @@ import {
   Car,
   DollarSign,
   Filter,
+  Building2,
   FolderTree,
   Image as ImageIcon,
   LayoutDashboard,
@@ -57,6 +58,7 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
     const moreTabRoutes = [
       `/${locale}/admin/home-images`,
       `/${locale}/admin/disneyland-images`,
+      `/${locale}/admin/disneyland-hotels`,
       `/${locale}/admin/categories`,
       `/${locale}/admin/vehicles`,
       `/${locale}/admin/locations`,
@@ -83,6 +85,7 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
       [`/${locale}/admin/services`]: "Services",
       [`/${locale}/admin/home-images`]: "Home Images",
       [`/${locale}/admin/disneyland-images`]: "Disneyland Images",
+      [`/${locale}/admin/disneyland-hotels`]: "Disneyland Hotels",
       [`/${locale}/admin/categories`]: "Categories",
       [`/${locale}/admin/vehicles`]: "Vehicles",
       [`/${locale}/admin/locations`]: "Locations",
@@ -124,6 +127,11 @@ export function AdminSidebar({ user }: { user: AdminUser }) {
       name: "Disneyland Images",
       href: `/${locale}/admin/disneyland-images`,
       icon: Sparkles,
+    },
+    {
+      name: "Disneyland Hotels",
+      href: `/${locale}/admin/disneyland-hotels`,
+      icon: Building2,
     },
     {
       name: "Categories",

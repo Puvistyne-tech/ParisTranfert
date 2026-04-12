@@ -4,29 +4,30 @@ import { motion } from "framer-motion";
 import {
   AlertCircle,
   Baby,
+  BookOpen,
+  Calendar,
   Car,
-  UserCheck,
-  Users,
-  Plane,
-  Heart,
   Crown,
   Globe,
-  Shield,
-  MapPin,
-  Calendar,
-  BookOpen,
-  Star,
+  Heart,
   Image as ImageIcon,
+  MapPin,
+  Plane,
+  Shield,
+  Star,
+  UserCheck,
+  Users,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from "react";
 import type { Service } from "@/components/models";
 import type { Category } from "@/components/models/categories";
-import type { VehicleType } from "@/components/models/vehicleTypes";
-import { ServiceIcon } from "@/components/models/services";
 import { CategoryId } from "@/components/models/categories";
+import { ServiceIcon } from "@/components/models/services";
+import type { VehicleType } from "@/components/models/vehicleTypes";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent } from "@/components/ui/Card";
+import { cn } from "@/lib/utils";
 import type { AdditionalServices } from "@/store/reservationStore";
 
 interface Step1SelectionProps {
@@ -318,6 +319,15 @@ export function Step1Selection({
               </p>
             </div>
 
+            {!selectedVehicleType && (
+              <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-200/90 bg-amber-50/90 px-4 py-3 dark:border-amber-800/80 dark:bg-amber-950/40">
+                <AlertCircle className="w-5 h-5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
+                <p className="text-sm text-amber-900 dark:text-amber-100/95 leading-snug">
+                  {t("selectVehicleBeforeService")}
+                </p>
+              </div>
+            )}
+
             {selectedService ? (
               <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 md:p-6">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
@@ -345,6 +355,12 @@ export function Step1Selection({
                     variant="outline"
                     size="sm"
                     onClick={onServiceModify}
+                    disabled={!selectedVehicleType}
+                    title={
+                      !selectedVehicleType
+                        ? t("selectVehicleBeforeService")
+                        : undefined
+                    }
                     className="flex items-center justify-center space-x-2 w-full sm:w-auto"
                   >
                     <span>{t("change")}</span>
@@ -359,8 +375,14 @@ export function Step1Selection({
                   return (
                     <button
                       key={service.id}
+                      type="button"
+                      disabled={!selectedVehicleType}
                       onClick={() => onServiceSelect(service)}
-                      className="group relative p-0 border-2 border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-lg transition-all duration-300 text-left bg-white dark:bg-gray-800 flex flex-col h-full"
+                      className={cn(
+                        "group relative p-0 border-2 border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-lg transition-all duration-300 text-left bg-white dark:bg-gray-800 flex flex-col h-full",
+                        !selectedVehicleType &&
+                          "opacity-50 cursor-not-allowed hover:border-gray-200 dark:hover:border-gray-700 hover:shadow-none",
+                      )}
                     >
                       {/* Service Image */}
                       <div className="relative w-full h-48 overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600">
@@ -593,7 +615,12 @@ export function Step1Selection({
         transition={{ delay: 0.2 }}
         className="text-center mb-8"
       >
-        <Button size="lg" onClick={onContinue} className="px-8 py-3">
+        <Button
+          size="lg"
+          onClick={onContinue}
+          disabled={!selectedVehicleType || !selectedService}
+          className="px-8 py-3"
+        >
           {t("continueToTripDetails")}
         </Button>
       </motion.div>

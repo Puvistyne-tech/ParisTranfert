@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { AlertCircle, ArrowLeft, Loader2, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Step1Selection } from "@/components/reservation/Step1Selection";
 import { Step2TripDetails } from "@/components/reservation/Step2TripDetails";
 import { Step3BookingSummary } from "@/components/reservation/Step3BookingSummary";
@@ -98,22 +98,54 @@ function ReservationContent() {
     vehicleTypesLoading ||
     locationsLoading;
 
-  // Handle vehicle type from query parameter (fallback if not already selected)
+  const lastAppliedQueryRef = useRef<string>("");
+
+  // Prefill vehicle, service, and Disneyland hotel name from URL (e.g. hotel card deep link)
   useEffect(() => {
+    const raw = searchParams.toString();
+    if (!raw) return;
+    if (raw === lastAppliedQueryRef.current) return;
+    if (vehicleTypes.length === 0) return;
+
+    const serviceParam = searchParams.get("service");
     const vehicleTypeParam = searchParams.get("vehicleType");
-    if (vehicleTypeParam && !selectedVehicleType && vehicleTypes.length > 0) {
+    const hotelNameParam = searchParams.get("hotelName");
+
+    const waitingForServices = Boolean(serviceParam && services.length === 0);
+
+    if (vehicleTypeParam && !selectedVehicleType) {
       const vehicleType = vehicleTypes.find((vt) => vt.id === vehicleTypeParam);
       if (vehicleType) {
         setSelectedVehicleType(vehicleType);
-        // Clean up URL by removing query parameter
-        router.replace(`/${locale}/reservation`, { scroll: false });
       }
     }
+
+    if (hotelNameParam) {
+      const decoded = decodeURIComponent(hotelNameParam.replace(/\+/g, " "));
+      updateServiceSubData({ hotel_name: decoded });
+    }
+
+    if (waitingForServices) {
+      return;
+    }
+
+    if (serviceParam && services.length > 0) {
+      const svc = services.find((s) => s.id === serviceParam);
+      if (svc) {
+        setSelectedService(svc);
+      }
+    }
+
+    lastAppliedQueryRef.current = raw;
+    router.replace(`/${locale}/reservation`, { scroll: false });
   }, [
     searchParams,
-    selectedVehicleType,
     vehicleTypes,
+    services,
+    selectedVehicleType,
     setSelectedVehicleType,
+    setSelectedService,
+    updateServiceSubData,
     locale,
     router,
   ]);

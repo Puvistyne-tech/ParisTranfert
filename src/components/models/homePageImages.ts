@@ -6,8 +6,32 @@ export enum HomePageImageType {
   FEATURES = "features",
   TESTIMONIALS = "testimonials",
   DISNEYLAND_PROMO = "disneyland-promo",
-  DISNEYLAND_PAGE = "disneyland-page",
+  DISNEYLAND_HEADER = "disneyland-header",
+  DISNEYLAND_CONTENT = "disneyland-content",
+  DISNEYLAND_BACKGROUND = "disneyland-background",
+  DISNEYLAND_FOOTER = "disneyland-footer",
+  DISNEYLAND_BOOKING = "disneyland-booking",
 }
+
+/** Types stored in `home_page_images` (and used by useHomePageImages). */
+export type HomePageImageSectionType =
+  | "carousel"
+  | "hero"
+  | "services"
+  | "vehicles"
+  | "features"
+  | "testimonials"
+  | "disneyland-promo"
+  | "disneyland-header"
+  | "disneyland-content"
+  | "disneyland-background"
+  | "disneyland-footer"
+  | "disneyland-booking";
+
+/** Storage bucket folder prefix — includes hotel card uploads. */
+export type WebsiteImageUploadType =
+  | HomePageImageSectionType
+  | "disneyland-hotel";
 
 export interface HomePageImage {
   id: string;
@@ -18,4 +42,3 @@ export interface HomePageImage {
   createdAt?: string;
   updatedAt?: string;
 }
-

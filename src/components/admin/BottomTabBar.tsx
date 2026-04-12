@@ -53,6 +53,7 @@ export function BottomTabBar() {
             (tab.name === "More" &&
               (normalizedPathname === `/${locale}/admin/home-images` ||
                 normalizedPathname === `/${locale}/admin/disneyland-images` ||
+                normalizedPathname === `/${locale}/admin/disneyland-hotels` ||
                 normalizedPathname === `/${locale}/admin/categories` ||
                 normalizedPathname === `/${locale}/admin/vehicles` ||
                 normalizedPathname === `/${locale}/admin/locations` ||
@@ -61,6 +62,7 @@ export function BottomTabBar() {
                 normalizedPathname === `/${locale}/admin/testimonials` ||
                 normalizedPathname.startsWith(`/${locale}/admin/home-images/`) ||
                 normalizedPathname.startsWith(`/${locale}/admin/disneyland-images/`) ||
+                normalizedPathname.startsWith(`/${locale}/admin/disneyland-hotels/`) ||
                 normalizedPathname.startsWith(`/${locale}/admin/categories/`) ||
                 normalizedPathname.startsWith(`/${locale}/admin/vehicles/`) ||
                 normalizedPathname.startsWith(`/${locale}/admin/locations/`) ||

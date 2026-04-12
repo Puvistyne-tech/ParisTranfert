@@ -233,7 +233,9 @@
   },
   "testimonials": {
     "title": "Ce Que Disent Nos Clients",
-    "subtitle": "Ne nous croyez pas sur parole - écoutez nos clients satisfaits"
+    "subtitle": "Ne nous croyez pas sur parole - écoutez nos clients satisfaits",
+    "googleAttribution": "Les avis affichés proviennent de Google.",
+    "googleMapsCta": "Voir sur Google Maps"
   },
   "contact": {
     "title": "Contactez-Nous",
@@ -293,7 +295,8 @@
       "meetGreetDescription": "Service d'accueil personnalisé à l'aéroport",
       "selected": "Sélectionné",
       "addService": "Ajouter le Service",
-      "continueToTripDetails": "Continuer aux Détails du Voyage"
+      "continueToTripDetails": "Continuer aux Détails du Voyage",
+      "selectVehicleBeforeService": "Choisissez d’abord une catégorie de véhicule. Vous pourrez ensuite sélectionner un service — les détails d’hôtel se remplissent à l’étape suivante le cas échéant."
     },
     "step2": {
       "title": "Détails du Voyage & Horaire",
@@ -340,9 +343,11 @@
       "pleaseCompleteAllFields": "Veuillez compléter tous les champs requis",
       "loadingServiceFields": "Chargement des champs du service...",
       "fieldRequired": "Ce champ est requis",
+      "disneylandHotelNameHint": "Choisissez un hôtel dans la liste ou saisissez le vôtre — optionnel.",
       "serviceFields": {
         "pickupAddress": "Lieu de prise en charge",
         "hotelName": "Nom de l'hôtel (si applicable)",
+        "hotelNamePlaceholder": "Choisir ou saisir votre hôtel",
         "returnTime": "Heure de retour",
         "returnDate": "Date de retour",
         "destination": "Destination",
@@ -686,50 +691,19 @@
       "bookDisneyTour": "Réserver un Tour Disney",
       "bookAirportTransfer": "Réserver un Transfert Aéroport"
     },
-    "thingsToDo": {
-      "title": "Que Faire à Disneyland Paris",
-      "subtitle": "Découvrez la magie, les attractions, la restauration et les spectacles qui vous attendent dans l'endroit le plus magique du monde"
-    },
-    "attractions": {
-      "title": "Attractions",
-      "castle": {
-        "title": "Le Château de la Belle au Bois Dormant",
-        "description": "Explorez l'emblématique château de la Belle au Bois Dormant, avec La Galerie de la Belle au Bois Dormant et La Tanière du Dragon"
-      },
-      "alice": {
-        "title": "Alice's Curious Labyrinth",
-        "description": "Naviguez dans un labyrinthe de haies fantastique inspiré d'Alice au Pays des Merveilles"
-      },
-      "dragon": {
-        "title": "La Tanière du Dragon",
-        "description": "Découvrez la tanière du dragon sous le château, abritant un dragon animatronique réaliste"
-      },
-      "studios": {
-        "title": "Walt Disney Studios",
-        "description": "Découvrez la magie des coulisses avec des attractions palpitantes et des spectacles"
-      }
-    },
-    "dining": {
-      "title": "Restauration",
-      "cinderella": {
-        "title": "L'Auberge de Cendrillon",
-        "description": "Dînez dans un restaurant sur le thème de Cendrillon offrant une cuisine d'inspiration française avec des rencontres de personnages"
-      },
-      "blueLagoon": {
-        "title": "Restaurant Blue Lagoon",
-        "description": "Savourez une cuisine d'inspiration caribéenne dans un cadre tropical avec vue sur l'attraction Pirates des Caraïbes"
-      }
-    },
-    "entertainment": {
-      "title": "Divertissement",
-      "talesOfMagic": {
-        "title": "Disney Tales of Magic",
-        "description": "Découvrez le spectacle nocturne spectaculaire avec des drones, des lasers et des projections qui donnent vie aux histoires Disney"
-      },
-      "parades": {
-        "title": "Parades Disney",
-        "description": "Regardez les parades magiques mettant en scène vos personnages Disney préférés, de la musique et des chars tout au long de la journée"
-      }
+    "hotels": {
+      "title": "Hôtels près des parcs",
+      "subtitle": "Hôtels officiels et partenaires — touchez l’adresse pour prévisualiser la carte, ou ouvrez Google Maps pour l’itinéraire complet.",
+      "viewOnMaps": "Voir sur Google Maps",
+      "bookTransfer": "Réserver un transfert",
+      "mapPreviewTitle": "Carte — {name}",
+      "copyAddressAria": "Copier l’adresse",
+      "copyAddress": "Copier l’adresse",
+      "starRatingAria": "{count} sur 5 étoiles",
+      "priceCategoryAria": "Niveau de prix indicatif (non contractuel)",
+      "visitHotelWebsite": "Site de l’hôtel",
+      "empty": "Les hôtels seront affichés ici prochainement.",
+      "footerHint": "Besoin d’un trajet porte-à-porte vers votre hôtel ? Réservez un transfert premium ci-dessous."
     },
     "booking": {
       "title": "Réservez Votre Voyage Magique",

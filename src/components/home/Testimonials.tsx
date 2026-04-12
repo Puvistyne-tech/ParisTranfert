@@ -1,35 +1,82 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Star } from "lucide-react";
+import { ExternalLink, Star } from "lucide-react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
+import type { Testimonial } from "@/components/models/testimonials";
 import { Card, CardContent } from "@/components/ui/Card";
-import { getTestimonials } from "@/lib/supabaseService";
 import { useHomePageImages } from "@/hooks/useHomePageImages";
+import { getTestimonials } from "@/lib/supabaseService";
+import type { TestimonialsPayload } from "@/lib/testimonialsPayload";
+
+const DEFAULT_GRADIENT = "from-amber-500 to-orange-600";
+
+function mapDbRowsToTestimonials(
+  rows: Awaited<ReturnType<typeof getTestimonials>>,
+): Testimonial[] {
+  return rows.map((row) => ({
+    id: row.id,
+    name: row.name,
+    initials: row.initials,
+    rating: row.rating,
+    comment: row.comment,
+    gradient: row.gradient ?? DEFAULT_GRADIENT,
+  }));
+}
 
 export function Testimonials() {
   const t = useTranslations("testimonials");
   const tCommon = useTranslations("common");
-  const [testimonials, setTestimonials] = useState<any[]>([]);
+  const locale = useLocale();
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [source, setSource] = useState<"google" | "database" | null>(null);
+  const [googleMapsUri, setGoogleMapsUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const { data: backgroundImages = [] } = useHomePageImages("testimonials");
   const backgroundImage = backgroundImages.length > 0 && backgroundImages[0]?.imageUrl ? backgroundImages[0] : null;
 
   useEffect(() => {
     async function loadTestimonials() {
+      let loaded = false;
       try {
-        const data = await getTestimonials();
-        setTestimonials(data);
+        const res = await fetch(
+          `/api/testimonials?lang=${encodeURIComponent(locale)}`,
+        );
+        if (res.ok) {
+          const data = (await res.json()) as
+            | TestimonialsPayload
+            | { error?: string };
+          if (!("error" in data) && data && "items" in data) {
+            setTestimonials(data.items);
+            setSource(data.source);
+            if (data.source === "google") {
+              setGoogleMapsUri(data.googleMapsUri);
+            } else {
+              setGoogleMapsUri(null);
+            }
+            loaded = true;
+          }
+        }
       } catch (error) {
-        console.error("Error loading testimonials:", error);
-      } finally {
-        setLoading(false);
+        console.error("Error loading testimonials (API):", error);
       }
+
+      if (!loaded) {
+        try {
+          const rows = await getTestimonials();
+          setTestimonials(mapDbRowsToTestimonials(rows));
+          setSource("database");
+          setGoogleMapsUri(null);
+        } catch (error) {
+          console.error("Error loading testimonials (fallback):", error);
+        }
+      }
+      setLoading(false);
     }
     loadTestimonials();
-  }, []);
+  }, [locale]);
 
   if (loading) {
     return (
@@ -105,13 +152,33 @@ export function Testimonials() {
           <p className="text-xl lg:text-2xl xl:text-3xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
             {t("subtitle")}
           </p>
+          {source === "google" && (
+            <p className="mt-4 text-sm text-gray-500 dark:text-gray-500 max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3">
+              <span>{t("googleAttribution")}</span>
+              {googleMapsUri ? (
+                <a
+                  href={googleMapsUri}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-primary-600 dark:text-primary-400 hover:underline font-medium"
+                >
+                  {t("googleMapsCta")}
+                  <ExternalLink className="w-3.5 h-3.5" aria-hidden />
+                </a>
+              ) : null}
+            </p>
+          )}
         </motion.div>
 
         {/* Testimonials Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {testimonials.map((testimonial, index) => (
             <motion.div
-              key={testimonial.name}
+              key={
+                testimonial.id ??
+                testimonial.reviewName ??
+                `${testimonial.name}-${index}`
+              }
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
